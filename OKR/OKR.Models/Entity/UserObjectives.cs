@@ -17,7 +17,7 @@ namespace OKR.Models.Entity
 
 
         [ForeignKey("ApplicationUser")]
-        public Guid ApplicationUserId { get; set; }
+        public string ApplicationUserId { get; set; }
         [ForeignKey("ApplicationUserId")]
         public ApplicationUser? ApplicationUser { get; set; }
     }
