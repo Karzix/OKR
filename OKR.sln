@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OKR.Service", "OKR.API\OKR.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maynghien.Infrastructure", "Maynghien.Infrastructure\Maynghien.Infrastructure.csproj", "{2F990305-45A9-41AD-9B5B-D870CA82FDAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKR.Infrastructure", "OKR.Infrastructure\OKR.Infrastructure.csproj", "{4699337F-90C8-4C46-9272-26063CB48ED3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{2F990305-45A9-41AD-9B5B-D870CA82FDAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F990305-45A9-41AD-9B5B-D870CA82FDAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F990305-45A9-41AD-9B5B-D870CA82FDAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4699337F-90C8-4C46-9272-26063CB48ED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4699337F-90C8-4C46-9272-26063CB48ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4699337F-90C8-4C46-9272-26063CB48ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4699337F-90C8-4C46-9272-26063CB48ED3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
