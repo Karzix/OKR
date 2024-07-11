@@ -1,4 +1,3 @@
-
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using OKR.Gateway;
@@ -10,7 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddJsonFile("ocelot.json")
+    .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .Build(); ;
+
 //if (environment == "Development")
 //{
 //    configuration = new ConfigurationBuilder()
