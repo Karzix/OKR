@@ -1,9 +1,9 @@
 import axios from "axios";
-const baseAPIUrl = "localhost:7268/";
+const baseAPIUrl = "https://localhost:7231/";
 export const axiosInstance = axios.create({
     baseURL: baseAPIUrl,
    // timeout: 10000,
-    headers: {'X-Custom-Header': 'foobar'}
+    headers: {'Access-Control-Allow-Origin': 'http://localhost:5173/'} 
   });
 
   

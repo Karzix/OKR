@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using OKR.Gateway;
@@ -12,18 +13,6 @@ IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .Build(); ;
 
-//if (environment == "Development")
-//{
-//    configuration = new ConfigurationBuilder()
-//    .AddJsonFile("ocelotDev.json")
-//    .Build();
-//}
-//else
-//{
-//configuration = new ConfigurationBuilder()
-//.AddJsonFile("ocelot.json")
-//.Build();
-//}
 var configurationAppSetting = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .Build();
@@ -34,7 +23,6 @@ Log.Logger = new LoggerConfiguration()
 
 //builder.Host.UseSerilog();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
@@ -48,10 +36,13 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerForOcelotUI();
 //}
+//app.UseCors(builder => builder.WithOrigins("https://localhost:7231/").AllowAnyHeader().AllowAnyMethod());
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseOcelot().Wait();
 
+//app.UseCors("AllowSpecificOrigin");
 app.UseAuthorization();
 
 app.MapControllers();
