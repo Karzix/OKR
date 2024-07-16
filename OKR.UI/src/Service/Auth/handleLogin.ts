@@ -24,6 +24,7 @@ export const handleLogin = async (model: UserModel): Promise<AppResponse<LoginRe
             if(resust.data!=undefined){
                 Cookies.set('accessToken', resust.data.token ?? "", { expires: undefined });
                 Cookies.set('Roles', JSON.stringify(resust.data.roles) ?? "", { expires: undefined });
+                Cookies.set('refreshToken', resust.data.refreshToken ?? "", { expires: undefined });
             }
             
         }

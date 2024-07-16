@@ -7,6 +7,7 @@ using MayNghien.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using OKR.Models;
 using OKR.Models.Entity;
 
 namespace OKR.Models.Context
@@ -31,6 +32,7 @@ namespace OKR.Models.Context
         public DbSet<Sidequests> Sidequests { get; set; }
         public DbSet<TargetType> TargetType { get; set; }
         public DbSet<UserObjectives> UserObjectives { get; set; }
+        public DbSet<RefreshTokenModel> RefreshTokenModel { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

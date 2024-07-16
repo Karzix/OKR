@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OKR.Models\OKR.Models.csproj" />
+    <ProjectReference Include="..\OKR.Repository\OKR.Repository.csproj" />
     <ProjectReference Include="..\OKR.Service\OKR.Service.csproj" />
   </ItemGroup>
 

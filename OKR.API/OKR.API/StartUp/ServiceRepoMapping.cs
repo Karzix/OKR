@@ -1,4 +1,6 @@
-﻿using OKR.Service.Contract;
+﻿using OKR.Repository.Contract;
+using OKR.Repository.Implementation;
+using OKR.Service.Contract;
 using OKR.Service.Implementation;
 
 namespace OKR.API.StartUp
@@ -8,6 +10,9 @@ namespace OKR.API.StartUp
         public ServiceRepoMapping() { }
         public void Mapping(WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<IRefreshTokenModelRepository, RefreshTokenModelRepository>();
+
+
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();   
         }
     }

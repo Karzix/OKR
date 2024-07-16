@@ -34,7 +34,9 @@
     userName: '',
     password: '',
     email: '',
-    role:''
+    role:'',
+    token: '',
+    refreshToken: '',
   });
   import { ElMessageBox } from 'element-plus'
   import router from '@/router';

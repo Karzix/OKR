@@ -15,5 +15,7 @@ namespace OKR.DTO
         public string? Role { get; set; }
         public Guid? DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
+        public string? RefreshToken { get; set; }
+        public string? Token { get; set; }
     }
 }

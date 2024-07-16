@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Contract\" />
-    <Folder Include="Implementation\" />
+    <ProjectReference Include="..\..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+    <ProjectReference Include="..\OKR.Models\OKR.Models.csproj" />
   </ItemGroup>
 
 </Project>

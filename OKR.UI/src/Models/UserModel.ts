@@ -4,4 +4,6 @@ export class UserModel {
     password: string| undefined;
     email: string|undefined;
     role: string|unknown;
+    token: string | undefined;
+    refreshToken: string | undefined;
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
 using OKR.Service.Contract;
@@ -21,6 +22,20 @@ namespace OKR.API.Controllers
         {
             var result = await _authencationService.AuthencationUser(login);
             return Ok(result);
+        }
+        [HttpPost]
+        [Route("Refresh")]
+        public IActionResult Refresh(UserDto request)
+        {
+            var result =  _authencationService.Refresh(request);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("test")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public IActionResult test()
+        {
+            return Ok("OK");
         }
     }
 }
