@@ -1,7 +1,7 @@
 ﻿{
     "Routes": [
         {
-            "DownstreamPathTemplate": "/OKR-api/{everything}",
+            "DownstreamPathTemplate": "/{everything}",
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                 {
@@ -9,7 +9,7 @@
                     "Port": 7223
                 }
             ],
-            "UpstreamHttpMethod": [ "Get", "Post" ],
+            "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
             "UpstreamPathTemplate": "/OKR-gateway/{everything}",
             //"RateLimitOptions": {
             //    "ClientWhitelist": [],

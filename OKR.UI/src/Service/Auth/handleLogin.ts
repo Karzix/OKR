@@ -5,7 +5,7 @@ import { reactive } from 'vue';
 import type { LoginResult } from '@/Models/LoginResult';
 import type { UserModel } from "@/Models/UserModel";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
-const loginUrl = "OKR-gateway/Account";
+const loginUrl = "OKR-gateway/account/login";
 
 export const handleLogin = async (model: UserModel): Promise<AppResponse<LoginResult>> => {
 
@@ -25,6 +25,7 @@ export const handleLogin = async (model: UserModel): Promise<AppResponse<LoginRe
                 Cookies.set('accessToken', resust.data.token ?? "", { expires: undefined });
                 Cookies.set('Roles', JSON.stringify(resust.data.roles) ?? "", { expires: undefined });
                 Cookies.set('refreshToken', resust.data.refreshToken ?? "", { expires: undefined });
+                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${resust.data.token}`;
             }
             
         }
