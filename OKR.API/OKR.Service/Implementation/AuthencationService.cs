@@ -9,6 +9,7 @@ using OKR.Models;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
+using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -230,6 +231,7 @@ namespace OKR.Service.Implementation
                     Roles = roles.ToArray(),
                     Email = user.Email
                 };
+                Log.Information(user.UserName + " login");
                 result.BuildResult(userDto);
             }
             catch (Exception ex)
