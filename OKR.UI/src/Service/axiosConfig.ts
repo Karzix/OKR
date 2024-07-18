@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(response => response, async error => {
       var user = new UserModel();
       user.token = Cookies.get('accessToken')?.toString();
       user.refreshToken = Cookies.get('refreshToken')?.toString();
-      const response = await axios.post("https://localhost:7231/OKR-gateway/refresh",user.refreshToken);
+      const response = await axios.post(baseAPIUrl + "OKR-gateway/refresh",user.refreshToken);
 
       if (response.status === 200) {
           Cookies.set('accessToken',  response.data.data.token ?? "", { expires: undefined });

@@ -217,6 +217,26 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-
+        public async Task<AppResponse<UserDto>> GetInforAccount()
+        {
+            var result = new AppResponse<UserDto>();
+            try
+            {
+                var user = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
+                var roles = await _userManager.GetRolesAsync(user);
+                var userDto = new UserDto
+                {
+                    UserName = user.UserName,
+                    Roles = roles.ToArray(),
+                    Email = user.Email
+                };
+                result.BuildResult(userDto);
+            }
+            catch (Exception ex)
+            {
+                return result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
+        }
     }
 }

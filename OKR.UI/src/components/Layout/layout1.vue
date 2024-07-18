@@ -1,7 +1,7 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-aside width="200px">
+      <el-aside >
         <el-row class="tac">
           <el-col :span="30">
             <el-menu default-active="1" class="el-menu-vertical-demo">
@@ -9,7 +9,7 @@
                 <el-icon>
                   <Close />
                 </el-icon>
-                <span>Logout</span>
+                <span>{{ Cookies.get('userName')?.toString() }}</span>
               </el-menu-item>
             </el-menu>
           </el-col>
@@ -25,7 +25,8 @@
 
 <script setup lang="ts">
 import router from "@/router";
-
+import Cookies from 'js-cookie';
+import {Close} from '@element-plus/icons-vue'
 const handleAsideClick = (action: string) => {
   switch (action) {
     case "logout":

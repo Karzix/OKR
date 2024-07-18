@@ -4,6 +4,7 @@ using OKR.API.StartUp;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Service.Mapper;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 app.MapIdentityApi<ApplicationUser>();
 
 app.Run();

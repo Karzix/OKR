@@ -13,12 +13,10 @@ namespace OKR.API.Controllers
     public class AccountController : ControllerBase
     {
         private IAuthencationService _authencationService;
-        private IHttpContextAccessor _contextAccessor;
 
-        public AccountController(IAuthencationService authencationService, IHttpContextAccessor contextAccessor)
+        public AccountController(IAuthencationService authencationService)
         {
             _authencationService = authencationService;
-            _contextAccessor = contextAccessor;
         }
 
         [HttpPost]
@@ -41,8 +39,15 @@ namespace OKR.API.Controllers
         [Route("test")]
         public IActionResult test()
         {
-            var UserName = ClaimHelper.GetClainByName(_contextAccessor, "UserName");
             return Ok("OK");
+        }
+
+        [HttpGet]
+        [Route("get-infor-account")]
+        public async Task<IActionResult> GetInforAccount()
+        {
+            var result =await _authencationService.GetInforAccount();
+            return Ok(result);
         }
     }
 }

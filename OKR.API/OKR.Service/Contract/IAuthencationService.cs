@@ -13,6 +13,7 @@ namespace OKR.Service.Contract
     {
         public Task<AppResponse<LoginResult>> AuthencationUser(UserDto user);
         public AppResponse<LoginResult> Refresh(UserDto request);
+        public Task<AppResponse<UserDto>> GetInforAccount();
 
     }
 }
