@@ -41,7 +41,7 @@ namespace OKR.API.Controllers
         [Route("test")]
         public IActionResult test()
         {
-            //var UserName = ClaimHelper.GetClainByName(_contextAccessor, "UserName");
+            var UserName = ClaimHelper.GetClainByName(_contextAccessor, "UserName");
             return Ok("OK");
         }
     }
