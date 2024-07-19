@@ -50,7 +50,7 @@ namespace OKR.Service.Implementation
                 };
                 await _userManager.CreateAsync(newUser);
                 await _userManager.AddPasswordAsync(newUser, request.Password ?? "Abc@123");
-                if (!(await _roleManager.RoleExistsAsync(request.Role)))
+                if (!(await _roleManager.RoleExistsAsync(request.Role )))
                 {
                     IdentityRole role = new IdentityRole { Name = request.Role };
                     await _roleManager.CreateAsync(role);
