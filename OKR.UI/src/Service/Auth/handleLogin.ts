@@ -7,7 +7,7 @@ import type { UserModel } from "@/Models/UserModel";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
 import { LoginModel } from "@/Models/LoginModel";
 
-const loginUrl = "OKR-gateway/login?useCookies=false&useSessionCookies=false";
+const loginUrl = "login";
 
 export const handleLogin = async (model: LoginModel): Promise<boolean> => {
   try{
@@ -20,7 +20,7 @@ export const handleLogin = async (model: LoginModel): Promise<boolean> => {
         "Authorization"
       ] = `Bearer ${responseObject.accessToken}`;
   
-      var infor = await axiosInstance.get("OKR-gateway/account/get-infor-account");
+      var infor = await axiosInstance.get("account/account-infor");
       var inforData = infor.data;
       if (inforData.isSuccess) {
         Cookies.set("userName", inforData.data.userName ?? "", { expires: undefined });

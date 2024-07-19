@@ -43,7 +43,7 @@ namespace OKR.API.Controllers
         }
 
         [HttpGet]
-        [Route("get-infor-account")]
+        [Route("account-infor")]
         public async Task<IActionResult> GetInforAccount()
         {
             var result =await _authencationService.GetInforAccount();
