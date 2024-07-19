@@ -1,5 +1,6 @@
 ﻿using MayNghien.Infrastructure.Models;
 using MayNghien.Infrastructure.Models.Entity;
+using MayNghien.Infrastructure.Request.Base;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -31,5 +32,6 @@ namespace Maynghien.Infrastructure.Repository
         IQueryable<T> GetAll();
         IQueryable<T> FindByPredicate(Expression<Func<T, bool>> predicate);
         int CountRecordsByPredicate(Expression<Func<T, bool>> predicate);
+        IQueryable<T> addSort(IQueryable<T> input, SortByInfo sortByInfo);
     }
 }

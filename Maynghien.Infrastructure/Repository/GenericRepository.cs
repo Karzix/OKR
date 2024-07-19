@@ -2,6 +2,7 @@
 using EFCore.BulkExtensions;
 using MayNghien.Infrastructure.Models;
 using MayNghien.Infrastructure.Models.Entity;
+using MayNghien.Infrastructure.Request.Base;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -193,5 +194,27 @@ namespace Maynghien.Infrastructure.Repository
 		{
 			return GetSet().Where(predicate).Count();
 		}
-	}
+        public IQueryable<TEntity> addSort(IQueryable<TEntity> input, SortByInfo sortByInfo)
+        {
+            var result = input.AsQueryable();
+            var type = sortByInfo.FieldName;
+            type = char.ToUpper(type[0]) + type.Substring(1);
+
+            var param = Expression.Parameter(typeof(TEntity), "m");
+            var property = Expression.Property(param, type);
+            var lambda = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(property, typeof(object)), param);
+
+
+            if (sortByInfo.Ascending != null && sortByInfo.Ascending.Value)
+            {
+                result = result.OrderBy(lambda);
+            }
+            else
+            {
+                result = result.OrderByDescending(lambda);
+            }
+
+            return (IQueryable<TEntity>)result;
+        }
+    }
 }
