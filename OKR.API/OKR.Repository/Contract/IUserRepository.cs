@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Contract
 {
-    public interface IUseRepository 
+    public interface IUserRepository 
     {
         public IQueryable FindBy(Expression<Func<ApplicationUser, bool>> predicate);
+        int CountRecordsByPredicate(Expression<Func<ApplicationUser, bool>> predicate);
+        public IQueryable<ApplicationUser> FindByPredicate(Expression<Func<ApplicationUser, bool>> predicate);
     }
 }

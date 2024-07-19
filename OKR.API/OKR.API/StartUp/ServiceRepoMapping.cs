@@ -11,9 +11,12 @@ namespace OKR.API.StartUp
         public void Mapping(WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IRefreshTokenModelRepository, RefreshTokenModelRepository>();
+            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
-            builder.Services.AddScoped<IAuthencationService, AuthencationService>();   
+            builder.Services.AddScoped<IAuthencationService, AuthencationService>();
+            builder.Services.AddScoped<IUserService, UserService>();
         }
     }
 }
