@@ -3,9 +3,11 @@ using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using OKR.Gateway;
 using Serilog;
+using SharedSettings;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var sharedConfig = SharedConfig.LoadSharedConfiguration();
+builder.Configuration.AddConfiguration(sharedConfig);
 // Add services to the container.
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -13,11 +15,9 @@ IConfigurationRoot configuration = new ConfigurationBuilder()
     .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .Build(); ;
 
-var configurationAppSetting = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
+
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(configurationAppSetting)
+    .ReadFrom.Configuration(builder.Configuration)
     //.Enrich.FromLogContext()
     .CreateLogger();
 

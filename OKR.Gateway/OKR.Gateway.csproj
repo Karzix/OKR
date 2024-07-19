@@ -20,4 +20,6 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <Import Project="..\SharedSettings\SharedSettings.projitems" Label="Shared" />
+
 </Project>

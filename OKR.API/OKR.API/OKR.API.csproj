@@ -17,4 +17,6 @@
     <ProjectReference Include="..\OKR.Service\OKR.Service.csproj" />
   </ItemGroup>
 
+  <Import Project="..\..\SharedSettings\SharedSettings.projitems" Label="Shared" />
+
 </Project>

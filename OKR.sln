@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OKR.Service", "OKR.API\OKR.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Maynghien.Infrastructure", "Maynghien.Infrastructure\Maynghien.Infrastructure.csproj", "{2F990305-45A9-41AD-9B5B-D870CA82FDAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKR.Infrastructure", "OKR.Infrastructure\OKR.Infrastructure.csproj", "{4699337F-90C8-4C46-9272-26063CB48ED3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OKR.Infrastructure", "OKR.Infrastructure\OKR.Infrastructure.csproj", "{4699337F-90C8-4C46-9272-26063CB48ED3}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedSettings", "SharedSettings\SharedSettings.shproj", "{40B8015F-B20E-4ED7-98F2-18F34FB973C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,5 +74,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB6BBDB9-5DA2-4061-9C9F-0B75AD0B726C}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SharedSettings\SharedSettings.projitems*{3fe61be1-8c5e-471c-9ef8-e927f68ec572}*SharedItemsImports = 5
+		SharedSettings\SharedSettings.projitems*{40b8015f-b20e-4ed7-98f2-18f34fb973c9}*SharedItemsImports = 13
+		SharedSettings\SharedSettings.projitems*{a13f23db-3a1a-4e77-927a-0aa9d4a01a74}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

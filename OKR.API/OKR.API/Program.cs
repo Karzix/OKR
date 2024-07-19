@@ -5,10 +5,12 @@ using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Service.Mapper;
 using Serilog;
+using SharedSettings;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var sharedConfig = SharedConfig.LoadSharedConfiguration();
+builder.Configuration.AddConfiguration(sharedConfig);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<OKRDBContext>(options =>
