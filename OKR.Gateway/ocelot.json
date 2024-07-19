@@ -10,7 +10,7 @@
                 }
             ],
             "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
-            "UpstreamPathTemplate": "/OKR-gateway/{everything}",
+            "UpstreamPathTemplate": "/{everything}",
             //"RateLimitOptions": {
             //    "ClientWhitelist": [],
             //    "EnableRateLimiting": true,
