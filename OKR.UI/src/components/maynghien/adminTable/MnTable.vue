@@ -1,6 +1,3 @@
-
-
-
 <template>
     <div  >
         <el-table :class="scroll == false ? 'admin-table' :'scroll'" :data="datas" @sort-change="handleSortChange" border row-key="id" table-layout="auto" 

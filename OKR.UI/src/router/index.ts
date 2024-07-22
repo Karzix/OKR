@@ -6,6 +6,7 @@ import LayoutBlank from '@/components/Layout/LayoutBlank.vue';
 
 import HomePageView from '@/views/HomeView.vue'
 import LoginVue from '@/views/Auth/Login.vue';
+import UserVue from '@/views/User/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
 
 const router = createRouter({
@@ -19,6 +20,10 @@ const router = createRouter({
         {
           path: "",
           component: HomePageView,
+        },
+        {
+          path: "User",
+          component: UserVue,
         },
       ],
     },
@@ -41,12 +46,11 @@ router.beforeEach((to, from, next) => {
   const userRoles: string[] = getRolesFromToken() ??[];
 
   if (to.meta.requiresAuth && isAuthenticated == false) {
-    next('/login'); // Chuyển hướng đến trang đăng nhập
+    next('/login'); 
   } else if (to.meta.roles && !hasPermission(userRoles, to.meta.roles as string[])) {
-    // Xử lý truy cập không được phép
-    next('/CustomerLink2'); // Chuyển hướng đến trang 403 hoặc xử lý khác
+    next('/'); 
   } else {
-    next(); // Tiếp tục đến trang yêu cầu
+    next();
   }
 });
 
