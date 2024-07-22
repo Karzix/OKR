@@ -7,6 +7,8 @@ import LayoutBlank from '@/components/Layout/LayoutBlank.vue';
 import HomePageView from '@/views/HomeView.vue'
 import LoginVue from '@/views/Auth/Login.vue';
 import UserVue from '@/views/User/Index.vue'
+import BranchVue from '@/views/Department/Branch.vue'
+import TeamVue from '@/views/Department/Team.vue'
 import { LoginResult } from '@/Models/LoginResult';
 
 const router = createRouter({
@@ -24,6 +26,14 @@ const router = createRouter({
         {
           path: "User",
           component: UserVue,
+        },
+        {
+          path: "Branch",
+          component: BranchVue,
+        },
+        {
+          path: "Team",
+          component: TeamVue,
         },
       ],
     },
