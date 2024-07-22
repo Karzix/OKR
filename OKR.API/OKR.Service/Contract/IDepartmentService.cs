@@ -18,6 +18,6 @@ namespace OKR.Service.Contract
         AppResponse<DepartmentDto> Create(DepartmentDto request);
         AppResponse<string> Delete(Guid id);
         AppResponse<SearchResponse<DepartmentDto>> Search(SearchRequest request);
-
+        AppResponse<List<DepartmentDto>> GetParentDepartmentByLevel(int level);
     }
 }

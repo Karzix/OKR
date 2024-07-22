@@ -170,13 +170,13 @@ namespace OKR.Service.Implementation
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = users.Skip(startIndex).Take(pageSize).ToList();
+                var UserList = users.Skip(startIndex).Take(pageSize);
                 var dtoList = UserList.Select(x => new DepartmentDto
                 {
                     Id = x.Id,
                     Name = x.Name,
                     ParentDepartmentId = x.ParentDepartmentId,
-                    ParentDepartmentName = x.ParentDepartment.Name
+                    ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : ""
                 }).ToList();
                 var searchResult = new SearchResponse<DepartmentDto>
                 {
@@ -211,11 +211,17 @@ namespace OKR.Service.Implementation
                             case "name":
                                 predicate = predicate.And(m => m.Name.Contains(filter.Value));
                                 break;
+                            case "level":
+                                predicate = predicate.And(m=>m.Level == int.Parse(filter.Value)); 
+                                break;
+                            case "parentDepartmentId":
+                                predicate = predicate.And(m => m.ParentDepartmentId == Guid.Parse(filter.Value));
+                                break;
                             default:
                                 break;
                         }
                     }
-
+                predicate = predicate.And(x => x.IsDeleted == false);
                 return predicate;
             }
             catch (Exception)
@@ -223,6 +229,28 @@ namespace OKR.Service.Implementation
 
                 throw;
             }
+        }
+
+        public AppResponse<List<DepartmentDto>> GetParentDepartmentByLevel(int level)
+        {
+            var result = new AppResponse<List<DepartmentDto>>();
+            try
+            {
+                var data = _departmentRepository.GetAll().Where(x=>x.Level == (level - 1))
+                    .Select(x=> new DepartmentDto
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        ParentDepartmentId = x.ParentDepartmentId,
+                        ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : ""
+                    }).ToList();
+                result.BuildResult(data);
+            }
+            catch (Exception ex) 
+            { 
+                result.BuildError(ex.Message + " " + ex.StackTrace);    
+            }
+            return result;
         }
     }
 }
