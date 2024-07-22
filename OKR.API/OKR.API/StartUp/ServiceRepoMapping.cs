@@ -17,6 +17,8 @@ namespace OKR.API.StartUp
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using OKR.DTO;
+using OKR.Models.Entity;
 
 
 namespace OKR.Service.Mapper
@@ -12,7 +14,7 @@ namespace OKR.Service.Mapper
 
 		public void CreateMap()
 		{
-			
+			CreateMap<DepartmentDto, Department>().ReverseMap();
 		}
 	}
 }
