@@ -11,5 +11,6 @@ namespace OKR.Repository.Contract
 {
     public interface IDepartmentRepository : IGenericRepository<Department, OKRDBContext, ApplicationUser>
     {
+        Department GetParentOfChildDepartment(int levelParent, int levelChild, Guid idChild);
     }
 }

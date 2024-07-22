@@ -11,6 +11,7 @@ namespace OKR.Models.Entity
     public class Department : BaseEntity
     {
         public string Name { get; set; }
+        public int Level { get; set; }
 
         [ForeignKey("Department")]
         public Guid? ParentDepartmentId { get; set; }
