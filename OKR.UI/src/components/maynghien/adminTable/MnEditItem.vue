@@ -18,6 +18,18 @@
                         <el-option v-for="item in column.dropdownData.data" :key="item[column.dropdownData.keyMember]"
                             :label="item[column.dropdownData.displayMember]" :value="item[column.dropdownData.keyMember]" />
                     </el-select>
+
+                    <div v-if="column.key != undefined && (column.inputType == 'tree')" class="tree-view">
+                        <el-tree 
+                            style="max-width: 600px"
+                            :props="treeProps"
+                            :data="column.dropdownData.data"
+                            @node-click="(data:any)=>{ if(column.key) model[column.key] = data.id; console.log(data.id) }"
+                            :highlight-current="true"
+                        />
+                        <!-- {{ model[column.key] }} -->
+                    </div>
+
                 </div>
 
             </div>
@@ -59,7 +71,16 @@ const props = defineProps<{
     openDialog: boolean;
     title: string;
 }>();
-
+interface Tree {
+  id: number
+  name: string
+  leaf?: boolean
+  zones?: Tree[]
+}
+const treeProps = {
+    label: 'name',
+    children: 'zones'
+};
 const dialogWidth = ref('35%');
 if (window.innerWidth < 600) {
     dialogWidth.value = '100%';
@@ -143,5 +164,14 @@ watch(() => props.editItem, () => {
 
 .editform .el-select {
     width: 100%;
+}
+.tree-view{
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+@media screen and (max-width: 650px) {
+    .form-dialog{
+        width: 100% !important;
+    }
 }
 </style>

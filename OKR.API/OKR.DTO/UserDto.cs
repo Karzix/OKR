@@ -13,7 +13,7 @@ namespace OKR.DTO
         public string? Password { get; set; }
         public string? Email { get; set; }
         public string? Role { get; set; }
-        public string[] Roles {  get; set; }
+        public string[]? Roles {  get; set; }
         public Guid? DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
         public string? RefreshToken { get; set; }

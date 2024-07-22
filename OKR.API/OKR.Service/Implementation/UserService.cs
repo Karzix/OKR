@@ -7,6 +7,7 @@ using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
+using System.Data.Entity;
 using System.Linq.Expressions;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
@@ -116,13 +117,15 @@ namespace OKR.Service.Implementation
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = users.Skip(startIndex).Take(pageSize).ToList();
-                var dtoList = UserList.Select(x => new UserDto
+                var UserQueryable = users.Skip(startIndex).Take(pageSize).Include(x=>x.Department);
+                var UserList = UserQueryable.ToList();
+                var dtoList = UserQueryable.Select(x => new UserDto
                     {
                         Email = x.Email,
                         UserName = x.UserName,
                         Id = Guid.Parse(x.Id),
                         DepartmentName = x.DepartmentId != null ? x.Department.Name : "",
+                        DepartmentId = x.DepartmentId
                     }).ToList();
                 if (dtoList != null && dtoList.Count > 0)
                 {

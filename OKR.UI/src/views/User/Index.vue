@@ -5,7 +5,7 @@
       :apiName="'User'"
       :allowAdd="true"
       :allowEdit="true"
-      :allowDelete="true"
+      :allowDelete="false"
       title="User"
       :CustomActions="CustomActions"
       :changePageSize="false"
@@ -120,6 +120,38 @@ const tableColumns: TableColumn[] = [
         },
       ],
     },
+  },
+  {
+    key: "departmentId",
+    label: "Department",
+    width: 1000,
+    sortable: true,
+    enableEdit: true,
+
+    enableCreate: true,
+    required: true,
+    hidden: true,
+    showSearch: true,
+    inputType: "tree",
+    dropdownData: {
+      displayMember: "name",
+      keyMember: "id",
+      apiUrl: "Department",
+    },
+  },
+  {
+    key: "departmentName",
+    label: "depaetment",
+    width: 1000,
+    sortable: false,
+    enableEdit: false,
+
+    enableCreate: false,
+    required: false,
+    hidden: false,
+    showSearch: false,
+    inputType: "text",
+    dropdownData: null,
   },
 ];
 const CustomActions: CustomAction[] = [

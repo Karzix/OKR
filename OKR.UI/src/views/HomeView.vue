@@ -1,55 +1,64 @@
 <template>
-  <el-tree-select
-    v-model="value"
-    lazy
-    :load="load"
+  <el-tree
+    style="max-width: 600px"
     :props="props"
-    style="width: 240px"
+    :data="treeData"
+    @node-click="handleNodeClick"
+    :highlight-current="true"
   />
-  <el-divider />
-  <VersionTag version="2.2.26" /> show lazy load label:
-  <el-tree-select
-    v-model="value2"
-    lazy
-    :load="load"
-    :props="props"
-    :cache-data="cacheData"
-    style="width: 240px"
-  />
-  {{ value }}
+  <p>Selected Node Id: {{ value }}</p>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
-const value = ref();
-const value2 = ref(5);
-
-const cacheData = [{ value: 5, label: "lazy load node5" }];
+interface Tree {
+  id: number
+  name: string
+  leaf?: boolean
+  zones?: Tree[]
+}
 
 const props = {
-  label: "label",
-  children: "children",
-  isLeaf: "isLeaf",
-};
+  label: 'name',
+  children: 'zones',
+  isLeaf: 'leaf',
+}
 
-let id = 0;
-
-const load = (node : any, resolve : any) => {
-  if (node.isLeaf) return resolve([]);
-
-  setTimeout(() => {
-    resolve([
+const treeData: Tree[] = [
+  {
+    id: 1,
+    name: 'Zone 1',
+    zones: [
       {
-        value: ++id,
-        label: `lazy load node${id}`,
+        id: 11,
+        name: 'Sub Zone 1-1',
       },
       {
-        value: ++id,
-        label: `lazy load node${id}`,
-        isLeaf: true,
+        id: 12,
+        name: 'Sub Zone 1-2',
       },
-    ]);
-  }, 400);
-};
+    ],
+  },
+  {
+    id: 2,
+    name: 'Zone 2',
+    zones: [
+      {
+        id: 21,
+        name: 'Sub Zone 2-1',
+      },
+      {
+        id: 22,
+        name: 'Sub Zone 2-2',
+      },
+    ],
+  },
+]
+
+const value = ref<number | null>(null)
+
+const handleNodeClick = (data: Tree) => {
+  value.value = data.id
+}
 </script>

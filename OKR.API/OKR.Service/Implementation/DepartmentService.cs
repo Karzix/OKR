@@ -7,6 +7,7 @@ using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
+using System.Linq;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
 namespace OKR.Service.Implementation
@@ -94,8 +95,9 @@ namespace OKR.Service.Implementation
                     Id = x.Id,
                     Name = x.Name,
                     ParentDepartmentId = x.ParentDepartmentId,
-                    ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : ""
+                    ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : "",
                 }).ToList();
+                data = BuildTree(data);
                 result.BuildResult(data);
             }
             catch (Exception ex)
@@ -251,6 +253,30 @@ namespace OKR.Service.Implementation
                 result.BuildError(ex.Message + " " + ex.StackTrace);    
             }
             return result;
+        }
+
+        private List<DepartmentDto> BuildTree(List<DepartmentDto> departments)
+        {
+            var departmentDict = departments.ToDictionary(d => d.Id);
+            var rootDepartments = new List<DepartmentDto>();
+
+            foreach (var department in departments)
+            {
+                if (department.ParentDepartmentId == null)
+                {
+                    rootDepartments.Add(department);
+                }
+                else if (departmentDict.TryGetValue(department.ParentDepartmentId, out var parentDepartment))
+                {
+                    if (parentDepartment.Zones == null)
+                    {
+                        parentDepartment.Zones = new List<DepartmentDto>();
+                    }
+                    parentDepartment.Zones.Add(department);
+                }
+            }
+
+            return rootDepartments;
         }
     }
 }

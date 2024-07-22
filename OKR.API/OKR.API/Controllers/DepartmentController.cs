@@ -60,7 +60,6 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("parent-department-by-level/{level}")]
-        [AllowAnonymous]
         public IActionResult ParentDepartmentByLevel(int level)
         {
             var result = _departmentService.GetParentDepartmentByLevel(level);
