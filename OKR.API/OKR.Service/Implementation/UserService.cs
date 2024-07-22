@@ -65,12 +65,12 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<string>> LockAsync(string Id, int day = 30)
+        public async Task<AppResponse<string>> LockAsync(UserDto request, int day = 30)
         {
             var result = new AppResponse<string>();
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(Id);
+                ApplicationUser user = await _userManager.FindByIdAsync(request.Id.ToString());
                 if (user == null)
                 {
                     return result.BuildError("can't find user");

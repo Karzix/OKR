@@ -25,6 +25,20 @@ import Cookies from "js-cookie";
 import { ref } from "vue";
 
 const tableColumns: TableColumn[] = [
+{
+    key: "id",
+    label: "id",
+    width: 1000,
+    sortable: false,
+    enableEdit: false,
+
+    enableCreate: false,
+    required: false,
+    hidden: true,
+    showSearch: false,
+    inputType: "text",
+    dropdownData: null,
+  },
   {
     key: "userName",
     label: "Tên Người dùng",

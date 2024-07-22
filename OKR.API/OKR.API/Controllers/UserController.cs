@@ -1,4 +1,5 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
@@ -8,6 +9,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize(Roles ="superadmin")]
     public class UserController : Controller
     {
         private IUserService _userService;
@@ -31,9 +33,9 @@ namespace OKR.API.Controllers
         }
         [HttpPut]
         [Route("lock")]
-        public async Task<IActionResult> Lock(string Id)
+        public async Task<IActionResult> Lock(UserDto request)
         {
-            var result = await _userService.LockAsync(Id);
+            var result = await _userService.LockAsync(request);
             return Ok(result);
         }
         [HttpPost]
