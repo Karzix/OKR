@@ -14,13 +14,15 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ITargetTypeRepository, TargetTypeRepository>();
+            builder.Services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
+            builder.Services.AddScoped<IKeyResultRepository, KeyResultRepository>();
 
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
             builder.Services.AddScoped<ITargetTypeService, TargetTypeService>();
-
+            builder.Services.AddScoped<IObjectiveService, ObjectiveService>();
         }
     }
 }
