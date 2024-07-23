@@ -15,6 +15,7 @@ namespace OKR.Service.Mapper
 		public void CreateMap()
 		{
 			CreateMap<DepartmentDto, Department>().ReverseMap();
+			CreateMap<TargetTypeDto, TargetType>().ReverseMap();
 		}
 	}
 }

@@ -13,11 +13,13 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IRefreshTokenModelRepository, RefreshTokenModelRepository>();
             builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ITargetTypeRepository, TargetTypeRepository>();
 
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+            builder.Services.AddScoped<ITargetTypeService, TargetTypeService>();
 
         }
     }
