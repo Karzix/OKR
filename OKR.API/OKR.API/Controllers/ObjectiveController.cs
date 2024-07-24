@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MayNghien.Infrastructure.Request.Base;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
 using OKR.Service.Contract;
+using OKR.Service.Implementation;
 
 namespace OKR.API.Controllers
 {
@@ -31,5 +33,12 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("search")]
+        public IActionResult Search(SearchRequest request)
+        {
+            var result = _objectiveService.Search(request);
+            return Ok(result);
+        }
     }
 }

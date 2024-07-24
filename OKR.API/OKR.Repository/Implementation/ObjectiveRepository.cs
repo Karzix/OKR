@@ -16,7 +16,7 @@ namespace OKR.Repository.Implementation
         {
         }
 
-        public void Add(Objective obj, List<KeyResults> keyResults)
+        public void Add(Objective obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -32,6 +32,12 @@ namespace OKR.Repository.Implementation
                         item.Active = true;
                     }
                     _context.AddRange(keyResults);
+
+                    foreach (var item in sidequests)
+                    {
+                        item.CreatedOn = DateTime.UtcNow;
+                    }
+                    _context.AddRange(sidequests);
                     _context.SaveChanges();
                     transaction.Commit();
                 }

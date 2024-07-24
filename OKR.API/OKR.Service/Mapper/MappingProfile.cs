@@ -18,6 +18,7 @@ namespace OKR.Service.Mapper
 			CreateMap<TargetTypeDto, TargetType>().ReverseMap();
 			CreateMap<KeyResultDto, KeyResults>().ReverseMap();
 			CreateMap<ObjectiveDto, Objective>().ReverseMap();
+			CreateMap<SidequestsDto, Sidequests>().ReverseMap();
 
 		}
 	}

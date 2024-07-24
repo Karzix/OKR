@@ -1,16 +1,15 @@
 ﻿using AutoMapper;
+using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using NetTopologySuite.Index.HPRtree;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Data.Entity;
+using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
 namespace OKR.Service.Implementation
 {
@@ -21,15 +20,17 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private ITargetTypeRepository _targetTypeRepository;
         private IKeyResultRepository _keyResultRepository;
+        private ISidequestsRepository _questsRepository;
 
         public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectiveRepository objectiveRepository, IMapper mapper,
-            ITargetTypeRepository targetTypeRepository, IKeyResultRepository keyResultRepository)
+            ITargetTypeRepository targetTypeRepository, IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
             _mapper = mapper;
             _targetTypeRepository = targetTypeRepository;
             _keyResultRepository = keyResultRepository;
+            _questsRepository = sidequestsRepository;
         }
 
         public AppResponse<ObjectiveDto> Create(ObjectiveDto request)
@@ -45,18 +46,49 @@ namespace OKR.Service.Implementation
                 }
                 var objective =_mapper.Map<Objective>(request);
                 objective.Id = Guid.NewGuid();
-                objective.CreatedBy = userName; 
-                var keyResults = _mapper.Map<List<KeyResults>>(request.ListKeyResults);
-                foreach (var item in keyResults)
+                objective.CreatedBy = userName;
+                var keyResults = new List<KeyResults>();
+                var ListKeyResultsDtoTemp = new List<KeyResultDto>();
+                foreach(var k in request.ListKeyResults)
                 {
-                    item.Id = Guid.NewGuid();
-                    item.CreatedBy = userName;
-                }
-                _objectiveRepository.Add(objective,keyResults);
+                    var newKeyResult = _mapper.Map<KeyResults>(k);
+                    newKeyResult.Id = Guid.NewGuid();
+                    newKeyResult.CreatedBy = userName;
+                    keyResults.Add(newKeyResult);
 
+                    var newKeyResultDto =_mapper.Map<KeyResultDto>(newKeyResult);
+                    newKeyResultDto.Sidequests = k.Sidequests;
+                    ListKeyResultsDtoTemp.Add(newKeyResultDto);
+                }
+
+                //foreach (var item in keyResults)
+                //{
+                //    item.Id = Guid.NewGuid();
+                //    item.CreatedBy = userName;
+                //}
+
+                //var ListKeyResultsTemp = request.ListKeyResults;
+
+                var ListSidequests = new List<Sidequests>();
+                foreach (var k in ListKeyResultsDtoTemp)
+                {
+                    foreach (var s in k.Sidequests != null ? k.Sidequests : [])
+                    {
+                        ListSidequests.Add(new Sidequests()
+                        {
+                            CreatedBy = userName,
+                            CreatedOn = DateTime.Now,
+                            Id = Guid.NewGuid(),
+                            KeyResultsId = k.Id.Value,
+                            Name = s.Name,
+                        });
+                    }
+                }
+                _objectiveRepository.Add(objective,keyResults, ListSidequests);
 
                 request.Id = objective.Id;
                 request.ListKeyResults = _mapper.Map<List<KeyResultDto>>(keyResults);
+
 
                 result.BuildResult(request);
             }
@@ -105,13 +137,88 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<SearchResponse<ObjectiveDto>>();
             try
             {
+                var query = BuildFilterExpression(request.Filters);
+                var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
+                var model = _objectiveRepository.FindByPredicate(query);
+                if (request.SortBy != null)
+                {
+                    model = _objectiveRepository.addSort(model, request.SortBy);
+                }
+                int pageIndex = request.PageIndex ?? 1;
+                int pageSize = request.PageSize ?? 10;
+                int startIndex = (pageIndex - 1) * (int)pageSize;
+                var List = model.Skip(startIndex).Take(pageSize).Include(x=>x.TargetType)
+                    .Select(x => new ObjectiveDto
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Deadline = x.Deadline,
+                        StartDay = x.StartDay,
+                        TargetTypeId = x.TargetTypeId,
+                        TargetTypeName = x.TargetType.Name,
+                        ListKeyResults = _keyResultRepository.GetAll().Where(k=>k.ObjectiveId == x.Id)
+                        .Select(k=> new KeyResultDto
+                        {
+                            Active = k.Active,
+                            CurrentPoint = k.CurrentPoint,
+                            Deadline = k.Deadline,
+                            Description = k.Description,
+                            Id = k.Id,
+                            MaximunPoint = k.MaximunPoint,
+                            Unit = k.Unit,
+                            Sidequests = _questsRepository.GetAll().Where(s => s.KeyResultsId == k.Id).
+                            Select(s=> new SidequestsDto
+                            {
+                                Id=s.Id,
+                                Name=s.Name,
+                                Status = s.Status,
+                                KeyResultsId = s.KeyResultsId,
+                            }).ToList(),
+                        }).ToList(),
+                    })
+                    .ToList();
 
+
+                var searchUserResult = new SearchResponse<ObjectiveDto>
+                {
+                    TotalRows = numOfRecords,
+                    TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
+                    CurrentPage = pageIndex,
+                    Data = List,
+                };
+                result.BuildResult(searchUserResult);
             }
             catch (Exception ex)
             {
                 result.BuildError(ex.Message + " " + ex.StackTrace);
             }
             return result;
+        }
+        private ExpressionStarter<Objective> BuildFilterExpression(List<Filter> Filters)
+        {
+            try
+            {
+                var predicate = PredicateBuilder.New<Objective>(true);
+
+
+                if (Filters != null)
+                    foreach (var filter in Filters)
+                    {
+                        switch (filter.FieldName)
+                        {
+                            
+                            default:
+                                break;
+                        }
+                    }
+                predicate = predicate.And(x => x.IsDeleted != true);
+                return predicate;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

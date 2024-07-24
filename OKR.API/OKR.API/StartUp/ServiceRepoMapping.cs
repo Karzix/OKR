@@ -16,6 +16,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<ITargetTypeRepository, TargetTypeRepository>();
             builder.Services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
             builder.Services.AddScoped<IKeyResultRepository, KeyResultRepository>();
+            builder.Services.AddScoped<ISidequestsRepository, SidequestsRepository>();
 
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();

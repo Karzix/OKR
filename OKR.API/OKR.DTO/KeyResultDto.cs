@@ -15,5 +15,7 @@ namespace OKR.DTO
         public string? Unit { get; set; } // % Percent, # value, 01 bool
         public int? CurrentPoint { get; set; }
         public int? MaximunPoint { get; set; }
+
+        public List<SidequestsDto>? Sidequests { get; set; }
     }
 }

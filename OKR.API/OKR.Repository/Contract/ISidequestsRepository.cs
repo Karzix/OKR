@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Contract
 {
-    public interface IObjectiveRepository : IGenericRepository<Objective,OKRDBContext, ApplicationUser>
+    public interface ISidequestsRepository : IGenericRepository<Sidequests,OKRDBContext,ApplicationUser>
     {
-        void Add(Objective obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
     }
 }

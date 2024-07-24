@@ -12,9 +12,9 @@ namespace OKR.Models.Entity
     {
         public string Name { get; set; }
         public bool Status { get; set; } = false;
-        [ForeignKey("Objective")]
-        public Guid ObjectiveId { get; set; }
-        [ForeignKey("ObjectiveId")]
-        public Objective? Objective { get; set; }
+        [ForeignKey("KeyResults")]
+        public Guid KeyResultsId { get; set; }
+        [ForeignKey("KeyResultsId")]
+        public KeyResults? KeyResults { get; set; }
     }
 }
