@@ -11,7 +11,7 @@ namespace OKR.DTO
     public class SidequestsDto : BaseDto
     {
         public string Name { get; set; }
-        public bool Status { get; set; } = false;
+        public bool? Status { get; set; } = false;
         public Guid? KeyResultsId { get; set; }
 
 

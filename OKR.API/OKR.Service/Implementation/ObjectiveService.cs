@@ -104,7 +104,10 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<string>();
             try
             {
-
+                var objective = _objectiveRepository.Get(Id);
+                objective.IsDeleted = true;
+                _objectiveRepository.Edit(objective);
+                result.BuildResult("OK");
             }
             catch (Exception ex)
             {
@@ -147,7 +150,10 @@ namespace OKR.Service.Implementation
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var List = model.Skip(startIndex).Take(pageSize).Include(x=>x.TargetType)
+
+                model = model.Skip(startIndex).Take(pageSize);
+                var objectId_point = _objectiveRepository.caculatePercentObjective(model);
+                var List = model.Include(x=>x.TargetType)
                     .Select(x => new ObjectiveDto
                     {
                         Id = x.Id,
@@ -175,6 +181,7 @@ namespace OKR.Service.Implementation
                                 KeyResultsId = s.KeyResultsId,
                             }).ToList(),
                         }).ToList(),
+                        Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
                     })
                     .ToList();
 

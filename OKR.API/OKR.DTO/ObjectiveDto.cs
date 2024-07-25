@@ -17,5 +17,6 @@ namespace OKR.DTO
         public Guid? TargetTypeId { get; set; }
         public string? TargetTypeName { get; set; }
         public List<KeyResultDto>? ListKeyResults { get; set; }
+        public double? Point {  get; set; }
     }
 }
