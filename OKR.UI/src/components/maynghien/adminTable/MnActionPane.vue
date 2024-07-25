@@ -160,7 +160,7 @@ watch(() => props.tableColumns, async () => {
 }, { immediate: true })
 
 </script>
-<style >
+<style scoped>
 .action-pane {
     width: "100%";
     padding: 10px;

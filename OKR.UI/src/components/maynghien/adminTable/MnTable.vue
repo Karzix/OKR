@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { TableColumn } from './Models/TableColumn'
 import { SearchDTOItem } from './Models/SearchDTOItem'
-import { ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 import {
     Check,
     Delete,
@@ -169,13 +169,18 @@ function formatHTML(htmlContent : string) {
         return `<div v-pre style="white-space: normal;">${htmlContent}</div>`;
     }
 
-const checkMobile = () => {
-  var chieuRongManHinh = window.innerWidth;
-  if(chieuRongManHinh <= 600){
-    isMobile.value = true;
-  }
-}
-checkMobile();
+const handleResize = () => {
+  isMobile.value = window.innerWidth < 600;
+
+};
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  handleResize(); // Gọi hàm này để kiểm tra kích thước ban đầu
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
   
 <style>
@@ -189,7 +194,7 @@ checkMobile();
     height: 80vh !important;
 }
 .row-not-watched {
-  background-color: blue !important; /* Chọn màu xanh tùy ý */
+    background-color: blue !important; /* Chọn màu xanh tùy ý */
 }
 .Pending{
     background-color: #e2e73f !important;
@@ -207,11 +212,18 @@ checkMobile();
     background-color: orange !important;
 }
 .element-lv2 {
-    padding-left: 15px;
-    background-color: #f1f0f785;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
 }
 .element-lv2 > div {
-    border-bottom: 1px solid rgb(183, 179, 179);
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+.element-lv2 > div:last-child {
+    border-bottom: none;
 }
 .el-scrollbar__bar.is-horizontal {
     height: 8px !important;
@@ -219,5 +231,15 @@ checkMobile();
 .el-scrollbar__thumb {
     background-color: blue !important;
 }
+
+.expand-transition {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+.expand-transition-enter-active, .expand-transition-leave-active {
+    max-height: 500px;
+}
+.expand-transition-enter, .expand-transition-leave-to /* .expand-transition-leave-active in <2.1.8 */ {
+    max-height: 0;
+}
 </style>
-  

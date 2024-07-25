@@ -38,6 +38,7 @@ const tableColumns: TableColumn[] = [
     showSearch: false,
     inputType: "text",
     dropdownData: null,
+    hiddenElement: true
   },
   {
     key: "userName",
@@ -80,6 +81,7 @@ const tableColumns: TableColumn[] = [
     showSearch: false,
     inputType: "text",
     dropdownData: null,
+    hiddenElement: true
   },
   {
     key: "lockoutEnabled",
@@ -94,6 +96,7 @@ const tableColumns: TableColumn[] = [
     showSearch: false,
     inputType: "text",
     dropdownData: null,
+    hiddenElement: true
   },
   {
     key: "role",
@@ -152,6 +155,7 @@ const tableColumns: TableColumn[] = [
     showSearch: false,
     inputType: "text",
     dropdownData: null,
+    hiddenElement: true
   },
 ];
 const CustomActions: CustomAction[] = [
