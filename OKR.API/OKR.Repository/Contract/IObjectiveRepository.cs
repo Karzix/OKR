@@ -13,5 +13,6 @@ namespace OKR.Repository.Contract
     {
         void Add(Objective obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
         Dictionary<Guid, int> caculatePercentObjective(IQueryable<Objective> input);
+        int caculateOveralProgress(IQueryable<Objective> input);
     }
 }

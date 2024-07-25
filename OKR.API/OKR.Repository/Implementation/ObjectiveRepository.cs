@@ -78,6 +78,32 @@ namespace OKR.Repository.Implementation
 
             return resultDictionary;
         }
+        public int caculateOveralProgress(IQueryable<Objective> input)
+        {
+            var result = input.Select(obj => new
+            {
+                pointObj = _context.KeyResults.Where(kr => kr.ObjectiveId == obj.Id)
+                .Select(kr => new
+                {
+                    krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
+                                                    ? (kr.CurrentPoint / (double)kr.MaximunPoint)
+                    : (kr.CurrentPoint / kr.MaximunPoint) / 2
+                    + (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
+                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()) / 2
+                    : (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
+                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()),
+                    krId = kr.Id,
+                }).ToList(),
+                Id = obj.Id
+            }).ToList();
 
+            // Convert the result to a dictionary with the correct calculations
+            var point = result.ToDictionary(
+                x => x.Id,
+                x => (int)x.pointObj.Average(po => po.krPoint * 100)
+            ).Average(x=>x.Value);
+
+            return (int)point;
+        }
     }
 }

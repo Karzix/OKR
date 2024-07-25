@@ -169,7 +169,7 @@ namespace OKR.Service.Implementation
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-
+                
                 model = model.Skip(startIndex).Take(pageSize);
                 var objectId_point = _objectiveRepository.caculatePercentObjective(model);
                 var List = model.Include(x=>x.TargetType)

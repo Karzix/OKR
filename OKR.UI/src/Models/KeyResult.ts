@@ -9,5 +9,5 @@ export class KeyResult {
   currentPoint: number | undefined;
   maximumPoint: number | undefined;
   objectId: string | undefined;
-  sidequests: Sidequest[] | undefined;
+  sidequests!: Sidequest[];
 }
