@@ -20,5 +20,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+	  <ProjectReference Include="..\..\OKR.Infrastructure\OKR.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

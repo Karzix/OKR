@@ -14,6 +14,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+	  <ProjectReference Include="..\..\OKR.Infrastructure\OKR.Infrastructure.csproj" />
 	  <ProjectReference Include="..\OKR.DTO\OKR.DTO.csproj" />
 	  <ProjectReference Include="..\OKR.Models\OKR.Models.csproj" />
 	  <ProjectReference Include="..\OKR.Repository\OKR.Repository.csproj" />

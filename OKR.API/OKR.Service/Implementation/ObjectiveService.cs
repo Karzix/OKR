@@ -5,6 +5,7 @@ using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using NetTopologySuite.Index.HPRtree;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
@@ -44,6 +45,32 @@ namespace OKR.Service.Implementation
                 {
                     return result.BuildError("Need to select target type");
                 }
+                if(request.ListKeyResults == null || request.ListKeyResults.Count == 0)
+                {
+                    return result.BuildError("requires at least one keyResult");
+                }
+                foreach(var item in request.ListKeyResults)
+                {
+                    if(item.Unit == TypeUnitKeyResult.Checked)
+                    {
+                        if(item.Sidequests.Count() == 0)
+                        {
+                            result.BuildError(item.Description + " requires at least one Sidequests");
+                        }
+                    }
+                    else
+                    {
+                        if(item.MaximunPoint == 0)
+                        {
+                            return result.BuildError("MaximunPoint need to be greater than 0");
+                        }
+                        if(item.CurrentPoint < 0)
+                        {
+                            return result.BuildError("CurrentPoint cannot be negative");
+                        }
+                    }
+                }
+
                 var objective =_mapper.Map<Objective>(request);
                 objective.Id = Guid.NewGuid();
                 objective.CreatedBy = userName;
@@ -60,14 +87,6 @@ namespace OKR.Service.Implementation
                     newKeyResultDto.Sidequests = k.Sidequests;
                     ListKeyResultsDtoTemp.Add(newKeyResultDto);
                 }
-
-                //foreach (var item in keyResults)
-                //{
-                //    item.Id = Guid.NewGuid();
-                //    item.CreatedBy = userName;
-                //}
-
-                //var ListKeyResultsTemp = request.ListKeyResults;
 
                 var ListSidequests = new List<Sidequests>();
                 foreach (var k in ListKeyResultsDtoTemp)

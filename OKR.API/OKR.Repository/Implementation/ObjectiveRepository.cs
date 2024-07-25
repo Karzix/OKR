@@ -1,5 +1,6 @@
 ﻿using Maynghien.Infrastructure.Repository;
 using NetTopologySuite.IO;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
@@ -57,7 +58,7 @@ namespace OKR.Repository.Implementation
                 pointObj = _context.KeyResults.Where(kr => kr.ObjectiveId == obj.Id)
                 .Select(kr => new
                 {
-                    krPoint = kr.Unit != "01" ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
+                    krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
                                                     ? (kr.CurrentPoint/ (double)kr.MaximunPoint)
                     :(kr.CurrentPoint / kr.MaximunPoint) / 2
                     + (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /

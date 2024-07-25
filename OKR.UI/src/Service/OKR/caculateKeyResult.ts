@@ -11,7 +11,7 @@ export const caculateKeyResult = (keyResult: KeyResult) => {
         })
         point = countSidequestDone / keyResult.sidequests.length;
     }
-    if(keyResult.unit != "01" && keyResult.currentPoint != undefined && keyResult.maximumPoint != undefined){
+    if(keyResult.unit != 2 && keyResult.currentPoint != undefined && keyResult.maximumPoint != undefined){
         var pointKeyResult = keyResult.currentPoint / keyResult.maximumPoint;
         point = point/2 + pointKeyResult/2;
     }

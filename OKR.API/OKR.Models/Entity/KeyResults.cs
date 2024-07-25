@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using MayNghien.Infrastructure.Models.Entity;
+using OKR.Infrastructure.Enum;
 
 namespace OKR.Models.Entity
 {
@@ -14,7 +15,7 @@ namespace OKR.Models.Entity
         public string Description { get; set; }
         public bool Active { get; set; } = true;
         public DateTime Deadline { get; set; }
-        public string? Unit {  get; set; } // % Percent, # value
+        public TypeUnitKeyResult? Unit {  get; set; } // % Percent, # value
         public int CurrentPoint { get; set; }
         public int MaximunPoint { get; set; }
 
@@ -25,9 +26,9 @@ namespace OKR.Models.Entity
         public Objective? Objective { get; set; }
         public KeyResults()
         {
-            if(this.Unit.IsNullOrEmpty())
+            if(this.Unit == null)
             {
-                this.Unit = "%";
+                this.Unit = TypeUnitKeyResult.Percent;
             }
 
         }

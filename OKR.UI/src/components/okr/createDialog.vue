@@ -25,9 +25,9 @@
           >
             <el-option
               v-for="item in [
-                { key: '#', name: 'Value' },
-                { key: '%', name: 'Percent' },
-                { key: '01', name: 'Checked' },
+                { key: 1, name: 'Value' },
+                { key: 0, name: 'Percent' },
+                { key: 2, name: 'Checked' },
               ]"
               :key="item.key"
               :label="item.name"
@@ -100,7 +100,7 @@ const keyResult = ref<KeyResult>({
   description: "",
   active: true,
   deadline: undefined,
-  unit: "",
+  unit: 0,
   currentPoint: 0,
   maximumPoint: 0,
   objectId: "",
