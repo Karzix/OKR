@@ -232,11 +232,21 @@ namespace OKR.Service.Implementation
                     {
                         switch (filter.FieldName)
                         {
-                            
+                            case "createBy":
+                                {
+                                    predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
+                                    break;
+                                }
+
                             default:
                                 break;
                         }
                     }
+
+                if(Filters.Where(x=>x.FieldName == "createBy").Count() == 0)
+                {
+                    predicate = predicate.And(x => x.CreatedBy.Equals(_contextAccessor.HttpContext.User.Identity.Name));
+                }
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
             }
@@ -245,6 +255,24 @@ namespace OKR.Service.Implementation
 
                 throw;
             }
+        }
+
+        public AppResponse<int> CaculateOveralProgress(SearchRequest request)
+        {
+            var result = new AppResponse<int>();
+            try
+            {
+                var query = BuildFilterExpression(request.Filters);
+                var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
+                var model = _objectiveRepository.FindByPredicate(query);
+                var point = _objectiveRepository.caculateOveralProgress(model);
+                result.BuildResult(point);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
         }
     }
 }

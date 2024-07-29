@@ -40,5 +40,12 @@ namespace OKR.API.Controllers
             var result = _objectiveService.Search(request);
             return Ok(result);
         }
+        [HttpPost]
+        [Route("overal-progress")]
+        public IActionResult OverallProgress(SearchRequest request)
+        {
+            var result = _objectiveService.CaculateOveralProgress(request);
+            return Ok(result);
+        }
     }
 }
