@@ -2,8 +2,8 @@
   <el-card style="">
     <template #header>
       <div class="card-header">
-        <el-progress type="circle" :percentage="25" />
-        <el-button type="primary">new objective</el-button>
+        <el-progress type="circle" :percentage="overalProgress" />
+        <el-button type="primary" @click="Create = true">new objective</el-button>
       </div>
     </template>
     <el-card style="" v-for="item in data.data">
@@ -14,6 +14,9 @@
       <el-tree :data="buildTree(item)" :props="defaultProps" />
     </el-card>
   </el-card>
+  <el-dialog v-model="Create" class="createDialog">
+    <CreateObjective></CreateObjective>
+  </el-dialog>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
@@ -22,6 +25,7 @@ import { SearchResponse } from '../../components/maynghien/BaseModels/SearchResp
 import { Objective } from '../../Models/Objective';
 import { axiosInstance } from '../../Service/axiosConfig'
 import { SearchRequest } from '../../components/maynghien/BaseModels/SearchRequest';
+import CreateObjective from './CreateOKR.vue';
 interface Tree {
   label: string;
   children?: Tree[];
@@ -32,20 +36,6 @@ const searchRequest = ref<SearchRequest>({
   filters: [],
   SortBy: undefined
 })
-const datatree: Tree[] = [
-  {
-    label: "Level one 1",
-    children: [
-      {
-        label: "Level two 1-1",
-      },
-      {
-        label: "Level two 1-2",
-      },
-    ],
-  },
-];
-
 const defaultProps = {
   children: "children",
   label: "label",
@@ -66,6 +56,8 @@ const data = ref<SearchResponse<Objective[]>>({
   currentPage: 1,
   rowsPerPage: 0,
 })
+const overalProgress = ref(0);
+const Create = ref(false);
 const buildTree = (objective: Objective) : Tree[] => {
   var dataTreeTemp = [] as Tree[] 
   for(let i  = 0; i < objective.listKeyResults?.length; i++) {
@@ -85,8 +77,10 @@ const buildTree = (objective: Objective) : Tree[] => {
   return dataTreeTemp
 }
 const Search = async () => {
-  var respone = await axiosInstance.post("Objective/search", searchRequest.value)
-  data.value = respone.data.data
+  var responeSeach = await axiosInstance.post("Objective/search", searchRequest.value)
+  data.value = responeSeach.data.data
+  var responeOverallProgress = await axiosInstance.post("Objective/overal-progress",searchRequest.value)
+  overalProgress.value = responeOverallProgress.data.data
 }
 Search()
 </script>

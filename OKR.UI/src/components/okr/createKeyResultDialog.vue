@@ -39,21 +39,20 @@
       <div class="dl-flex">
         <div class="form-item">
           <p class="form-label">Current Point</p>
-          <el-input-number
+          <el-input-number :disabled="keyResult.unit === 2"
             v-model="keyResult.currentPoint"
             class="mx-4"
-            :min="1"
-            :max="10"
+            :min="0"
+            :max="keyResult.maximumPoint"
             controls-position="right"
           />
         </div>
         <div class="form-item">
           <p class="form-label">Maximum Point</p>
-          <el-input-number
+          <el-input-number :disabled="keyResult.unit === 2"
             v-model="keyResult.maximumPoint"
             class="mx-4"
             :min="1"
-            :max="10"
             controls-position="right"
           />
         </div>
@@ -102,7 +101,7 @@ const keyResult = ref<KeyResult>({
   deadline: undefined,
   unit: 0,
   currentPoint: 0,
-  maximumPoint: 0,
+  maximumPoint: 100,
   objectId: "",
   sidequests: [],
 });

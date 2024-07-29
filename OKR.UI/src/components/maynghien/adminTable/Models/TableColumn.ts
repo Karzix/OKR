@@ -1,6 +1,6 @@
 
 export class TableColumn {
-    key?: string = "";
+    key: string = "";
     label?: string = "";
     width?: number = 0;
     sortable?: boolean = false;

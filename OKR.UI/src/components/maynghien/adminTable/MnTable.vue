@@ -30,7 +30,9 @@
                     <el-link v-if="column.inputType == 'link' && column.key && scope.row[column.key]"  :href="scope.row[column.key]" target="_blank" type="primary">Xem</el-link>
                     <el-link v-else-if="column.inputType == 'phoneNumber' && column.key && scope.row[column.key]" :href="'tel:' + scope.row[column.key]" target="_blank" type="primary">{{hideMiddleNumbers(scope.row[column.key]) }}</el-link>
                     <!-- <span v-else-if="column.key">{{ scope.row[column.key] }}</span> -->
-                    
+                    <div v-else-if="column.inputType == 'dropdown' && column.key && scope.row[column.key]" style="white-space: normal;">
+                        {{ getDropdownDisplayValue(column.dropdownData, scope.row[column.key])  }}
+                    </div>
                     <div v-else-if="column.key" v-html="formatHTML(scope.row[column.key])"></div>
                 </template>
             </el-table-column>
@@ -181,6 +183,12 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
+
+function getDropdownDisplayValue(dropdownData: { data: any[], keyMember: string, displayMember: string }, key: any): string {
+    const item = dropdownData.data.find(x => x[dropdownData.keyMember] === key);
+    return item ? item[dropdownData.displayMember] : '';
+}
+
 </script>
   
 <style>
@@ -228,9 +236,7 @@ onUnmounted(() => {
 .el-scrollbar__bar.is-horizontal {
     height: 8px !important;
 }
-.el-scrollbar__thumb {
-    background-color: blue !important;
-}
+
 
 .expand-transition {
     transition: all 0.3s ease;

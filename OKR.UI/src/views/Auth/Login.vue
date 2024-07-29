@@ -96,7 +96,4 @@ main.el-main {
 body {
   margin: 0px;
 }
-.el-dialog__header {
-  background-color: #f89898;
-}
 </style>

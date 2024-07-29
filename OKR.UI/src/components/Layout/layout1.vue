@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <div id="aside">
-        <el-aside v-if="!isMobile" v-show="isAsideVisible">
+        <el-aside v-if="!isMobile" v-show="isAsideVisible" class="aside-fixed">
           <el-row class="tac">
             <el-col>
               <el-menu default-active="1" class="el-menu-vertical-demo">
@@ -23,11 +23,7 @@
           </el-row>
         </el-aside>
 
-        <el-drawer
-          v-model="drawerMenuMobile"
-          width="100%"
-          direction="ltr"
-        >
+        <el-drawer v-model="drawerMenuMobile" width="100%" direction="ltr">
           <el-row class="tac">
             <el-col>
               <el-menu default-active="1" class="el-menu-vertical-demo">
@@ -51,12 +47,20 @@
 
       <el-container>
         <el-header>
-          <!-- <button class="toggle-button" >☰</button> -->
           Header
-          <el-button v-if="isMobile" class="toggle-button" type="primary" :icon="Expand" circle @click="toggleAside"/>
+          <el-button
+            v-if="isMobile"
+            class="toggle-button"
+            type="primary"
+            :icon="Expand"
+            circle
+            @click="toggleAside"
+          />
         </el-header>
-        <el-main>
-          <router-view />
+        <el-main class="scrollable-main">
+          <el-scrollbar>
+            <router-view />
+          </el-scrollbar>
         </el-main>
       </el-container>
     </el-container>
@@ -67,7 +71,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import router from "@/router";
 import Cookies from "js-cookie";
-import { Close,Expand } from "@element-plus/icons-vue";
+import { Close, Expand } from "@element-plus/icons-vue";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
@@ -135,8 +139,8 @@ function logout() {
 }
 @media (min-width: 600px) {
   .toggle-button {
-  display: none;
-}
+    display: none;
+  }
 }
 @media (max-width: 600px) {
   .toggle-button {
@@ -145,11 +149,40 @@ function logout() {
   .el-drawer.ltr {
     width: 80% !important;
   }
-  .el-aside{
+  .el-aside {
     width: 100%;
   }
   .el-drawer__body {
     padding: 0 !important;
   }
+}
+
+</style>
+<style scoped>
+.common-layout {
+  height: 100vh;
+}
+
+.el-container {
+  height: 100%;
+}
+
+#aside {
+  height: 100%;
+}
+
+.el-aside {
+  height: 100%;
+}
+
+
+
+.el-main {
+  height: 100%;
+  overflow: hidden;
+}
+
+.scrollable-main {
+  overflow-y: auto;
 }
 </style>
