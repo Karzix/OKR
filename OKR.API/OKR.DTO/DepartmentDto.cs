@@ -13,6 +13,7 @@ namespace OKR.DTO
         public string Name { get; set; }
         public Guid? ParentDepartmentId { get; set; }
         public string? ParentDepartmentName { get; set; }
+        public int? level {  get; set; }
 
         public List<DepartmentDto>? Zones { get; set; }
     }

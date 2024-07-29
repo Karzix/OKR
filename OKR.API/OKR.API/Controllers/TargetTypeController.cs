@@ -19,7 +19,7 @@ namespace OKR.API.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         public IActionResult GetAll()
         {
             var result = _targetTypeService.GetAll();

@@ -216,5 +216,10 @@ namespace Maynghien.Infrastructure.Repository
 
             return (IQueryable<TEntity>)result;
         }
+
+        public void EditRange(List<TEntity> entities)
+        {
+            _context.UpdateRange(entities);
+        }
     }
 }

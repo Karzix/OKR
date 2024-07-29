@@ -243,7 +243,7 @@ namespace OKR.Service.Implementation
                         }
                     }
 
-                if(Filters.Where(x=>x.FieldName == "createBy").Count() == 0)
+                if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
                 {
                     predicate = predicate.And(x => x.CreatedBy.Equals(_contextAccessor.HttpContext.User.Identity.Name));
                 }

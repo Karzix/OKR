@@ -19,6 +19,7 @@ namespace Maynghien.Infrastructure.Repository
         void Delete(T entity);
 
         void Edit(T entity);
+        void EditRange(List<T> entities);
 
         void AddRange(List<T> entities, bool isCommit = true);
 

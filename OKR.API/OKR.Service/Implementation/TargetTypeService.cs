@@ -74,6 +74,7 @@ namespace OKR.Service.Implementation
                
                 var targetType = _targetTypeRepository.Get(request.Id.Value);
                 targetType.Name = request.Name;
+                targetType.LevelApply = request.LevelApply;
                 _targetTypeRepository.Edit(targetType);
                 result.BuildResult(request);
             }
@@ -138,7 +139,9 @@ namespace OKR.Service.Implementation
                     .Select(x => new TargetTypeDto
                     {
                         Id = x.Id,
-                        Name = x.Name
+                        Name = x.Name,
+                        LevelApply = x.LevelApply,
+
                     })
                     .ToList();
 

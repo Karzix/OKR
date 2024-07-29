@@ -65,5 +65,12 @@ namespace OKR.API.Controllers
             var result = _departmentService.GetParentDepartmentByLevel(level);
             return Ok(result);
         }
+        [HttpGet]
+        [Route("department-level")]
+        public IActionResult DepartmentLevelNumber()
+        {
+            var result = _departmentService.DepartmentLevelNumber();
+            return Ok(result);
+        }
     }
 }

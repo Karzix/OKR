@@ -10,6 +10,7 @@ namespace OKR.DTO
     public class TargetTypeDto : BaseDto
     {
         public string Name { get; set; }
-
+        public int LevelApply { get; set; }
+        public string? LevelApplyText { get; set; }
     }
 }

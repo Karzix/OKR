@@ -10,5 +10,6 @@ namespace OKR.Models.Entity
     public class TargetType : BaseEntity
     {
         public string Name { get; set; }
+        public int LevelApply { get; set; } = 1;
     }
 }

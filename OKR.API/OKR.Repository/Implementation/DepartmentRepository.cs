@@ -41,6 +41,30 @@ namespace OKR.Repository.Implementation
 
             return null;
         }
+        public List<Department> GetAllChildDepartments(Guid parentId)
+        {
+            var departments = new List<Department>();
+            var pendingParents = new List<Guid> { parentId };
 
+            while (pendingParents.Any())
+            {
+                // Tìm tất cả các department có ParentDepartmentId trong danh sách pendingParents
+                var childDepartments = _context.Department
+                    .Where(d => pendingParents.Contains(d.ParentDepartmentId.Value))
+                    .ToList();
+
+                if (childDepartments.Any())
+                {
+                    departments.AddRange(childDepartments);
+                    pendingParents = childDepartments.Select(d => d.Id).ToList();
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return departments;
+        }
     }
 }

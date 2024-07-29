@@ -139,11 +139,22 @@ namespace OKR.Service.Implementation
                     return result.BuildError("can't find Paren epartment");
                 }
                 var department = _departmentRepository.Get(request.Id.Value);
+                var currentParentDepaetment = department.ParentDepartmentId;
                 department.Name = request.Name;
                 department.ParentDepartmentId = request.ParentDepartmentId;
                 department.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
                 department.ModifiedOn = DateTime.UtcNow;
+                if(currentParentDepaetment != request.ParentDepartmentId && currentParentDepaetment != null)
+                {
+                    department.Level = _departmentRepository.Get(currentParentDepaetment.Value).Level + 1;
+                }
                 _departmentRepository.Edit(department);
+
+                var allChild = _departmentRepository.GetAllChildDepartments(department.Id);
+                allChild.ForEach(x => x.Level = x.Level + 1);
+
+                _departmentRepository.EditRange(allChild);
+
                 result.BuildResult(request);
             }
             catch (Exception ex)
@@ -178,7 +189,8 @@ namespace OKR.Service.Implementation
                     Id = x.Id,
                     Name = x.Name,
                     ParentDepartmentId = x.ParentDepartmentId,
-                    ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : ""
+                    ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : "",
+                    level = x.Level,
                 }).ToList();
                 var searchResult = new SearchResponse<DepartmentDto>
                 {
@@ -278,5 +290,26 @@ namespace OKR.Service.Implementation
 
             return rootDepartments;
         }
+
+        public AppResponse<List<int>> DepartmentLevelNumber()
+        {
+            var result = new AppResponse<List<int>>();
+            try
+            {
+                var max = _departmentRepository.GetAll().Max(x=>x.Level);
+                var listINT = new List<int>();
+                for (int i = 1; i <= max; i++)
+                {
+                    listINT.Add(i);
+                }
+                result.BuildResult(listINT);
+            }
+            catch(Exception ex)
+            {
+                result.BuildError(ex.Message + ex.StackTrace);
+            }
+            return result;
+        }
+
     }
 }
