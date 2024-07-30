@@ -7,7 +7,7 @@ export class KeyResult {
   deadline: Date | undefined;
   unit: number | undefined;
   currentPoint: number | undefined;
-  maximumPoint: number | undefined;
-  objectId: string | undefined;
-  sidequests!: Sidequest[];
+  maximunPoint: number | undefined;
+  // objectId: string | undefined;
+  sidequests: Sidequest[] = [];
 }

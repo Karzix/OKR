@@ -77,9 +77,9 @@ const buildTree = (objective: Objective) : Tree[] => {
   return dataTreeTemp
 }
 const Search = async () => {
-  var responeSeach = await axiosInstance.post("Objective/search", searchRequest.value)
+  var responeSeach = await axiosInstance.post("Objectives/search", searchRequest.value)
   data.value = responeSeach.data.data
-  var responeOverallProgress = await axiosInstance.post("Objective/overal-progress",searchRequest.value)
+  var responeOverallProgress = await axiosInstance.post("Objectives/overal-progress",searchRequest.value)
   overalProgress.value = responeOverallProgress.data.data
 }
 Search()

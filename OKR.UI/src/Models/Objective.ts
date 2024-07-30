@@ -7,6 +7,6 @@ export class Objective {
     deadline: Date | undefined;
     targetTypeId: string | undefined;
     targetTypeName: string | undefined;
-    listKeyResults!: KeyResult[] ;
+    listKeyResults: KeyResult[]  = []; 
     point: number | undefined;   
 }

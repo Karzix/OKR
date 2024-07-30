@@ -11,8 +11,7 @@
           <p class="form-label">Deadline</p>
           <el-date-picker
             v-model="keyResult.deadline"
-            type="datetime"
-            placeholder="Select date and time"
+            type="date"
             class="form-input"
           />
         </div>
@@ -43,14 +42,14 @@
             v-model="keyResult.currentPoint"
             class="mx-4"
             :min="0"
-            :max="keyResult.maximumPoint"
+            :max="keyResult.maximunPoint"
             controls-position="right"
           />
         </div>
         <div class="form-item">
           <p class="form-label">Maximum Point</p>
           <el-input-number :disabled="keyResult.unit === 2"
-            v-model="keyResult.maximumPoint"
+            v-model="keyResult.maximunPoint"
             class="mx-4"
             :min="1"
             controls-position="right"
@@ -95,14 +94,14 @@ import { Sidequest } from "@/Models/Sidequests";
 const dialogVisible = ref(false);
 const sidequestsName = ref("");
 const keyResult = ref<KeyResult>({
-  id: "",
+  id: undefined,
   description: "",
   active: true,
   deadline: undefined,
   unit: 0,
   currentPoint: 0,
-  maximumPoint: 100,
-  objectId: "",
+  maximunPoint: 100,
+  // objectId: "",
   sidequests: [],
 });
 const emit = defineEmits<{
@@ -111,6 +110,17 @@ const emit = defineEmits<{
 
 const handleAddItem = (item: KeyResult) => {
   emit("onAddItem", item);
+  item = {
+    id: undefined,
+    description: "",
+    active: true,
+    deadline: undefined,
+    unit: 0,
+    currentPoint: 0,
+    maximunPoint: 100,
+    // objectId: "",
+    sidequests: [],
+  };
 };
 
 const handleAddSideQuest = () => {
@@ -123,6 +133,7 @@ const handleAddSideQuest = () => {
         name: sidequestsName.value,
         id: undefined,
         status: false,
+        keyResultsId: undefined,
       }
       keyResult.value.sidequests.push(newSideQuest);
       sidequestsName.value = "";
