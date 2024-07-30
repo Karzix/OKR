@@ -11,8 +11,8 @@ namespace OKR.DTO
     public class ObjectiveDto : BaseDto
     {
         public string Name { get; set; }
-        public DateTime StartDay { get; set; }
-        public DateTime Deadline { get; set; }
+        public DateTime? StartDay { get; set; }
+        public DateTime? Deadline { get; set; }
         //public int MaximunPoint { get; set; }
         public Guid? TargetTypeId { get; set; }
         public string? TargetTypeName { get; set; }

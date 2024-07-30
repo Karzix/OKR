@@ -14,16 +14,16 @@ using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
 namespace OKR.Service.Implementation
 {
-    public class ObjectiveService : IObjectiveService
+    public class ObjectiveService : IObjectivesService
     {
         private IHttpContextAccessor _contextAccessor;
-        private IObjectiveRepository _objectiveRepository;
+        private IObjectivesRepository _objectiveRepository;
         private IMapper _mapper;
         private ITargetTypeRepository _targetTypeRepository;
         private IKeyResultRepository _keyResultRepository;
         private ISidequestsRepository _questsRepository;
 
-        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectiveRepository objectiveRepository, IMapper mapper,
+        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
             ITargetTypeRepository targetTypeRepository, IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository)
         {
             _contextAccessor = contextAccessor;

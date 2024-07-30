@@ -9,11 +9,11 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ObjectiveController : Controller
+    public class ObjectivesController : Controller
     {
-        private IObjectiveService _objectiveService;
+        private IObjectivesService _objectiveService;
 
-        public ObjectiveController(IObjectiveService objectiveService)
+        public ObjectivesController(IObjectivesService objectiveService)
         {
             _objectiveService = objectiveService;
         }

@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Implementation
 {
-    public class ObjectiveRepository : GenericRepository<Objectives, OKRDBContext, ApplicationUser>, IObjectiveRepository
+    public class ObjectivesRepository : GenericRepository<Objectives, OKRDBContext, ApplicationUser>, IObjectivesRepository
     {
-        public ObjectiveRepository(OKRDBContext unitOfWork) : base(unitOfWork)
+        public ObjectivesRepository(OKRDBContext unitOfWork) : base(unitOfWork)
         {
         }
 

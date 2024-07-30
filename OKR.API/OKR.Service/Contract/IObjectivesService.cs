@@ -4,7 +4,7 @@ using OKR.DTO;
 
 namespace OKR.Service.Contract
 {
-    public interface IObjectiveService
+    public interface IObjectivesService
     {
         public AppResponse<ObjectiveDto> Create(ObjectiveDto request);
         public AppResponse<SearchResponse<ObjectiveDto>> Search(SearchRequest request);

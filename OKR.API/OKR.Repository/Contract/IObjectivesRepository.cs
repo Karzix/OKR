@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Contract
 {
-    public interface IObjectiveRepository : IGenericRepository<Objectives,OKRDBContext, ApplicationUser>
+    public interface IObjectivesRepository : IGenericRepository<Objectives,OKRDBContext, ApplicationUser>
     {
         void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
         Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input);
