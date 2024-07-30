@@ -71,7 +71,7 @@ namespace OKR.Service.Implementation
                     }
                 }
 
-                var objective =_mapper.Map<Objective>(request);
+                var objective =_mapper.Map<Objectives>(request);
                 objective.Id = Guid.NewGuid();
                 objective.CreatedBy = userName;
                 var keyResults = new List<KeyResults>();
@@ -141,7 +141,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var ojective = _objectiveRepository.Get(Id);
-                var listKeyResult = _keyResultRepository.FindBy(x=>x.ObjectiveId == Id).ToList();
+                var listKeyResult = _keyResultRepository.FindBy(x=>x.ObjectivesId == Id).ToList();
                 var data = _mapper.Map<ObjectiveDto>(ojective);
                 data.ListKeyResults = _mapper.Map<List<KeyResultDto>>(listKeyResult);
 
@@ -171,7 +171,7 @@ namespace OKR.Service.Implementation
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 
                 model = model.Skip(startIndex).Take(pageSize);
-                var objectId_point = _objectiveRepository.caculatePercentObjective(model);
+                var objectId_point = _objectiveRepository.caculatePercentObjectives(model);
                 var List = model.Include(x=>x.TargetType)
                     .Select(x => new ObjectiveDto
                     {
@@ -181,7 +181,7 @@ namespace OKR.Service.Implementation
                         StartDay = x.StartDay,
                         TargetTypeId = x.TargetTypeId,
                         TargetTypeName = x.TargetType.Name,
-                        ListKeyResults = _keyResultRepository.GetAll().Where(k=>k.ObjectiveId == x.Id)
+                        ListKeyResults = _keyResultRepository.GetAll().Where(k=>k.ObjectivesId == x.Id)
                         .Select(k=> new KeyResultDto
                         {
                             Active = k.Active,
@@ -220,11 +220,11 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
-        private ExpressionStarter<Objective> BuildFilterExpression(List<Filter> Filters)
+        private ExpressionStarter<Objectives> BuildFilterExpression(List<Filter> Filters)
         {
             try
             {
-                var predicate = PredicateBuilder.New<Objective>(true);
+                var predicate = PredicateBuilder.New<Objectives>(true);
 
 
                 if (Filters != null)

@@ -10,10 +10,10 @@ namespace OKR.Models.Entity
 {
     public class UserObjectives : BaseEntity
     {
-        [ForeignKey("Objective")]
-        public Guid ObjectiveId { get; set; }
-        [ForeignKey("ObjectiveId")]
-        public Objective? Objective { get; set; }
+        [ForeignKey("Objectives")]
+        public Guid ObjectivesId { get; set; }
+        [ForeignKey("ObjectivesId")]
+        public Objectives? Objectives { get; set; }
 
 
         [ForeignKey("ApplicationUser")]

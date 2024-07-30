@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Implementation
 {
-    public class ObjectiveRepository : GenericRepository<Objective, OKRDBContext, ApplicationUser>, IObjectiveRepository
+    public class ObjectiveRepository : GenericRepository<Objectives, OKRDBContext, ApplicationUser>, IObjectiveRepository
     {
         public ObjectiveRepository(OKRDBContext unitOfWork) : base(unitOfWork)
         {
         }
 
-        public void Add(Objective obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
+        public void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -31,7 +31,7 @@ namespace OKR.Repository.Implementation
                     foreach (var item in keyResults)
                     {
                         item.CreatedOn = DateTime.UtcNow;
-                        item.ObjectiveId = obj.Id;
+                        item.ObjectivesId = obj.Id;
                         item.Active = true;
                     }
                     _context.AddRange(keyResults);
@@ -51,11 +51,11 @@ namespace OKR.Repository.Implementation
             }
         } 
 
-        public Dictionary<Guid,int> caculatePercentObjective(IQueryable<Objective> input)
+        public Dictionary<Guid,int> caculatePercentObjectives(IQueryable<Objectives> input)
         {
             var result = input.Select(obj => new
             {
-                pointObj = _context.KeyResults.Where(kr => kr.ObjectiveId == obj.Id)
+                pointObj = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
                 .Select(kr => new
                 {
                     krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
@@ -78,11 +78,11 @@ namespace OKR.Repository.Implementation
 
             return resultDictionary;
         }
-        public int caculateOveralProgress(IQueryable<Objective> input)
+        public int caculateOveralProgress(IQueryable<Objectives> input)
         {
             var result = input.Select(obj => new
             {
-                pointObj = _context.KeyResults.Where(kr => kr.ObjectiveId == obj.Id)
+                pointObj = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
                 .Select(kr => new
                 {
                     krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0

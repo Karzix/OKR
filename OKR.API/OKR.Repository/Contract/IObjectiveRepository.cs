@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace OKR.Repository.Contract
 {
-    public interface IObjectiveRepository : IGenericRepository<Objective,OKRDBContext, ApplicationUser>
+    public interface IObjectiveRepository : IGenericRepository<Objectives,OKRDBContext, ApplicationUser>
     {
-        void Add(Objective obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
-        Dictionary<Guid, int> caculatePercentObjective(IQueryable<Objective> input);
-        int caculateOveralProgress(IQueryable<Objective> input);
+        void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
+        Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input);
+        int caculateOveralProgress(IQueryable<Objectives> input);
     }
 }

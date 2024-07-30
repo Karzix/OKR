@@ -8,7 +8,7 @@ using MayNghien.Infrastructure.Models.Entity;
 
 namespace OKR.Models.Entity
 {
-    public class Objective : BaseEntity
+    public class Objectives : BaseEntity
     {
         public string Name { get; set; }
         public DateTime StartDay { get; set; }

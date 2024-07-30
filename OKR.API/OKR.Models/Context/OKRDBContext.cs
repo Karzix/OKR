@@ -26,7 +26,7 @@ namespace OKR.Models.Context
         public DbSet<Department> Department { get; set; }
         public DbSet<DepartmentObjectives> DepartmentObjectives { get; set; }
         public DbSet<EvaluateTarget> EvaluateTarget { get; set; }
-        public DbSet<Objective> Objective { get; set; }
+        public DbSet<Objectives> Objectives { get; set; }
         public DbSet<KeyResults> KeyResults { get; set; }
         public DbSet<ProgressUpdates> ProgressUpdates { get; set; }
         public DbSet<Sidequests> Sidequests { get; set; }
