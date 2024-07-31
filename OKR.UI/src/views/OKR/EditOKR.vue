@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-radio-group v-model="objective.targetTypeId" size="large">
+      <el-radio-group v-model="props.objective.targetTypeId" size="large">
         <el-radio-button
           v-for="item in TargetTypes"
           :label="item.name"
@@ -11,20 +11,20 @@
     </div>
     <div class="form-item">
       <p class="form-label">Objective name</p>
-      <el-input v-model="objective.name" />
+      <el-input v-model="props.objective.name" />
     </div>
     <div class="form-item">
       <p class="form-label">start Day</p>
-      <el-date-picker format="DD/MM/YYYY" v-model="objective.startDay" type="date" />
+      <el-date-picker v-model="props.objective.startDay" type="date" />
     </div>
     <div class="form-item">
       <p class="form-label">start Day</p>
-      <el-date-picker format="DD/MM/YYYY" v-model="objective.deadline" type="date" />
+      <el-date-picker v-model="props.objective.deadline" type="date" />
     </div>
   </div>
   <div id="add-keyResult">
     <div
-      v-for="(o, index) in objective.listKeyResults"
+      v-for="(o, index) in props.objective.listKeyResults "
       :key="o.id"
       class="key-result-item"
     >
@@ -38,7 +38,9 @@
       </div>
       <p class="key-result-info">
         <strong>Deadline:</strong>
-        {{ o.deadline ? formatDate(o.deadline) : "No deadline" }}
+        {{
+          o.deadline ? formatDate(o.deadline) : "No deadline"
+        }}
       </p>
       <p class="key-result-info">
         <strong>Current Point:</strong> {{ o.currentPoint }}
@@ -58,35 +60,25 @@
     </div>
     <createKeyResultDialog @on-add-item="handleAddKeyResult" />
   </div>
-  <el-button type="primary" @click="Save()">Confirm</el-button>
+  <el-button type="primary" @click="Edit()">Confirm</el-button>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import createKeyResultDialog from "@/components/okr/createKeyResultDialog.vue";
 import { KeyResult } from "@/Models/KeyResult";
 import { Objective } from "@/Models/Objective";
 import { axiosInstance } from "../../Service/axiosConfig";
 import { TargetType } from "@/Models/TargetType";
 import { CloseBold } from "@element-plus/icons-vue";
-import { formatDate } from "../../Service/formatDate";
+import { formatDate } from '../../Service/formatDate'
 
-const objective = ref<Objective>({
-  id: undefined,
-  name: "",
-  startDay: undefined,
-  deadline: undefined,
-  listKeyResults: [],
-  targetTypeId: undefined,
-  targetTypeName: "",
-  point: 0,
-});
 const props = defineProps<{
-  objective: Objective;
-  isEdit: boolean;
+    objective: Objective;
 }>();
+
 const TargetTypes = ref<TargetType[]>([]);
 const handleAddKeyResult = (item: KeyResult) => {
-  objective.value.listKeyResults.push(item);
+  props.objective.listKeyResults.push(item);
 };
 const GetGeneralData = () => {
   axiosInstance.get("TargetType").then((res) => {
@@ -95,53 +87,19 @@ const GetGeneralData = () => {
 };
 onMounted(() => {
   GetGeneralData();
-  if (props.isEdit) {
-    objective.value = props.objective;
-  }
 });
-watch(
-  () => props.isEdit,
-  () => {
-    if (props.isEdit) {
-      objective.value = props.objective;
-    }
-    else{
-      objective.value = {
-        id: undefined,
-        name: "",
-        startDay: undefined,
-        deadline: undefined,
-        listKeyResults: [],
-        targetTypeId: undefined,
-        targetTypeName: "",
-        point: 0,
-      }
-    }
-  }
-);
-const Save = () => {
-  if (props.isEdit) {
-    axiosInstance
-      .put("Objectives", objective.value)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  } else {
-    axiosInstance
-      .post("Objectives", objective.value)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+const Edit = () => {
+  axiosInstance
+    .put("Objectives", props.objective)
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };
 function deleteKeyResult(index: number) {
-  objective.value.listKeyResults.splice(index, 1);
+  props.objective.listKeyResults.splice(index, 1);
 }
 </script>
 <style scoped>

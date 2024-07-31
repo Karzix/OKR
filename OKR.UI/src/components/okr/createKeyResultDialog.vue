@@ -13,6 +13,7 @@
             v-model="keyResult.deadline"
             type="date"
             class="form-input"
+            format="DD/MM/YYYY" 
           />
         </div>
         <div class="form-item">
@@ -57,7 +58,11 @@
         </div>
         <div class="form-item">
           <p class="form-label">Sidequest</p>
-          <el-checkbox v-for="item in keyResult.sidequests" :label="item.name" v-model="item.status" size="large" />
+          <div v-for="(item,index) in keyResult.sidequests">
+            <el-checkbox  :label="item.name" v-model="item.status" size="large" />
+            <el-icon @click="handleDeleteSideQuest(index)"><Close /></el-icon>
+          </div>
+          
           <el-input
             v-model="sidequestsName"
             style="width: 240px"
@@ -91,6 +96,8 @@
 import { ref } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
 import { Sidequest } from "@/Models/Sidequests";
+import { Close } from "@element-plus/icons-vue";
+import {getUtcOffsetInHours} from '@/Service/formatDate'
 const dialogVisible = ref(false);
 const sidequestsName = ref("");
 const keyResult = ref<KeyResult>({
@@ -141,7 +148,9 @@ const handleAddSideQuest = () => {
 
   }
 };
-
+const handleDeleteSideQuest  = (index : number) =>{
+  keyResult.value.sidequests?.splice(index,1)
+}
 
 
 </script>
