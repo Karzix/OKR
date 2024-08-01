@@ -11,5 +11,6 @@ namespace OKR.Service.Contract
         public AppResponse<ObjectiveDto> Get(Guid Id);
         public AppResponse<string> Delete(Guid Id);
         public AppResponse<int> CaculateOveralProgress(SearchRequest request);
+        public AppResponse<ObjectiveDto> Edit(ObjectiveDto request);
     }
 }

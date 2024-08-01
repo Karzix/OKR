@@ -274,5 +274,58 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
+
+
+        public AppResponse<ObjectiveDto> Edit(ObjectiveDto request)
+        {
+            var result = new AppResponse<ObjectiveDto>();
+            try
+            {
+                var objectives = _objectiveRepository.Get(request.Id.Value);
+                var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
+                var listSidequests = _questsRepository.GetAll().Where(x=> listKeyResults.Any(kr => kr.Id == x.KeyResultsId)).ToList();
+
+                objectives.StartDay = request.StartDay.Value;
+                objectives.Deadline = request.Deadline.Value;
+                objectives.Name = request.Name;
+                objectives.TargetTypeId = request.TargetTypeId.Value;
+
+                foreach (var item in listKeyResults)
+                {
+                    item.IsDeleted = true;
+                }
+                foreach (var item in request.ListKeyResults)
+                {
+                    var kr = listKeyResults.Where(x => x.Id == item.Id).First();
+                    kr.IsDeleted = false;
+                    kr.ModifiedOn = DateTime.Now;
+                    kr.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
+                    kr.MaximunPoint = item.MaximunPoint.Value;
+                    kr.Deadline = item.Deadline.Value;
+                    kr.Active = item.Active.Value;
+                    kr.CurrentPoint = item.CurrentPoint.Value;
+                    kr.Description = item.Description;
+                    kr.Unit = item.Unit.Value;
+                    foreach (var sqdto in item.Sidequests)
+                    {
+                        var sq = listSidequests.Where(x=>x.Id == sqdto.Id).First();
+                        sq.IsDeleted = false;
+                        sq.ModifiedOn = DateTime.Now;
+                        sq.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
+                        sq.Name = sqdto.Name;
+                        sq.Status = (bool)sqdto.Status;
+                    }
+                }
+                _objectiveRepository.Edit(objectives);
+                _keyResultRepository.EditRange(listKeyResults);
+                _questsRepository.EditRange(listSidequests);
+                result.BuildResult(request);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
+        }
     }
 }

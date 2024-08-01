@@ -47,5 +47,12 @@ namespace OKR.API.Controllers
             var result = _objectiveService.CaculateOveralProgress(request);
             return Ok(result);
         }
+        [HttpPut]
+        public IActionResult Edit(ObjectiveDto request)
+        {
+            var result = _objectiveService.Edit(request);
+            return Ok(result);
+        }
+
     }
 }
