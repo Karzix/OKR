@@ -15,7 +15,7 @@
     </el-card>
   </el-card>
   <el-dialog v-model="createDialog" class="createDialog">
-    <CreateObjective :objective="editItem" :is-edit="EditDialog"></CreateObjective>
+    <CreateObjective :objective="editItem" :is-edit="EditDialog" @on-save-success="createDialog = false"></CreateObjective>
   </el-dialog>
   <!-- <el-dialog v-model="EditDialog" class="createDialog">
     <EditORK :objective="editItem"></EditORK>

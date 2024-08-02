@@ -285,7 +285,8 @@ namespace OKR.Service.Implementation
                 //edit
                 var objectives = _objectiveRepository.Get(request.Id.Value);
                 var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
-                var listSidequests = _questsRepository.GetAll().Where(x=> listKeyResults.Any(kr => kr.Id == x.KeyResultsId)).ToList();
+                var listkrID = listKeyResults.Select(x=>x.Id).ToList();
+                var listSidequests = _questsRepository.GetAll().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
 
                 objectives.StartDay = request.StartDay.Value;
                 objectives.Deadline = request.Deadline.Value;
@@ -298,7 +299,11 @@ namespace OKR.Service.Implementation
                 }
                 foreach (var item in request.ListKeyResults)
                 {
-                    var kr = listKeyResults.Where(x => x.Id == item.Id).First();
+                    var kr = listKeyResults.Where(x => x.Id == item.Id).FirstOrDefault();
+                    if (kr == null)
+                    {
+                        continue;
+                    }
                     kr.IsDeleted = false;
                     kr.ModifiedOn = DateTime.Now;
                     kr.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;

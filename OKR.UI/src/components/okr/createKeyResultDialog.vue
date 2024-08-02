@@ -1,6 +1,10 @@
 <template>
-  <el-button plain @click="dialogVisible = true"> Add </el-button>
-  <el-dialog v-model="dialogVisible" title="Add" class="createDialog">
+  <el-dialog
+    v-model="props.dialogVisible"
+    @close="handleClose"
+    :title="props.isEdit ? 'Edit key result' : 'Create key result'"
+    class="createDialog"
+  >
     <div class="body">
       <div class="form-item">
         <p class="form-label">Description</p>
@@ -13,7 +17,7 @@
             v-model="keyResult.deadline"
             type="date"
             class="form-input"
-            format="DD/MM/YYYY" 
+            format="DD/MM/YYYY"
           />
         </div>
         <div class="form-item">
@@ -39,7 +43,8 @@
       <div class="dl-flex">
         <div class="form-item">
           <p class="form-label">Current Point</p>
-          <el-input-number :disabled="keyResult.unit === 2"
+          <el-input-number
+            :disabled="keyResult.unit === 2"
             v-model="keyResult.currentPoint"
             class="mx-4"
             :min="0"
@@ -49,7 +54,8 @@
         </div>
         <div class="form-item">
           <p class="form-label">Maximum Point</p>
-          <el-input-number :disabled="keyResult.unit === 2"
+          <el-input-number
+            :disabled="keyResult.unit === 2"
             v-model="keyResult.maximunPoint"
             class="mx-4"
             :min="1"
@@ -58,11 +64,15 @@
         </div>
         <div class="form-item">
           <p class="form-label">Sidequest</p>
-          <div v-for="(item,index) in keyResult.sidequests">
-            <el-checkbox  :label="item.name" v-model="item.status" size="large" />
+          <div v-for="(item, index) in keyResult.sidequests">
+            <el-checkbox
+              :label="item.name"
+              v-model="item.status"
+              size="large"
+            />
             <el-icon @click="handleDeleteSideQuest(index)"><Close /></el-icon>
           </div>
-          
+
           <el-input
             v-model="sidequestsName"
             style="width: 240px"
@@ -75,13 +85,12 @@
     </div>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
         <el-button
           type="primary"
           @click="
             () => {
               handleAddItem(keyResult);
-              dialogVisible = false;
+              handleClose();
             }
           "
         >
@@ -93,12 +102,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
 import { Sidequest } from "@/Models/Sidequests";
 import { Close } from "@element-plus/icons-vue";
-import {getUtcOffsetInHours} from '@/Service/formatDate'
-const dialogVisible = ref(false);
+import { getUtcOffsetInHours } from "@/Service/formatDate";
 const sidequestsName = ref("");
 const keyResult = ref<KeyResult>({
   id: undefined,
@@ -113,27 +121,38 @@ const keyResult = ref<KeyResult>({
 });
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
+  (e: "onTurnOffDialog"): void;
+  (e: "onEditItem", item: KeyResult): void;
 }>();
-
+const props = defineProps<{
+  keyresults: KeyResult;
+  isEdit: boolean;
+  dialogVisible: boolean;
+}>();
 const handleAddItem = (item: KeyResult) => {
-  emit("onAddItem", item);
+  if (!props.isEdit) {
+    emit("onAddItem", item);
+  }
+  else{
+    emit("onEditItem", item);
+  }
   item = {
-    id: undefined,
-    description: "",
-    active: true,
-    deadline: undefined,
-    unit: 0,
-    currentPoint: 0,
-    maximunPoint: 100,
-    // objectId: "",
-    sidequests: [],
-  };
+      id: undefined,
+      description: "",
+      active: true,
+      deadline: undefined,
+      unit: 0,
+      currentPoint: 0,
+      maximunPoint: 100,
+      // objectId: "",
+      sidequests: [],
+    };
 };
 
 const handleAddSideQuest = () => {
   if (sidequestsName.value) {
-    if(!keyResult.value.sidequests) {
-      keyResult.value.sidequests = [] as Sidequest[]
+    if (!keyResult.value.sidequests) {
+      keyResult.value.sidequests = [] as Sidequest[];
     }
     if (keyResult.value.sidequests) {
       var newSideQuest: Sidequest = {
@@ -141,18 +160,56 @@ const handleAddSideQuest = () => {
         id: undefined,
         status: false,
         keyResultsId: undefined,
-      }
+      };
       keyResult.value.sidequests.push(newSideQuest);
       sidequestsName.value = "";
     }
-
   }
 };
-const handleDeleteSideQuest  = (index : number) =>{
-  keyResult.value.sidequests?.splice(index,1)
-}
+const handleDeleteSideQuest = (index: number) => {
+  keyResult.value.sidequests?.splice(index, 1);
+};
+onMounted(() => {
+  if (props.isEdit) {
+    keyResult.value = props.keyresults;
+  } else {
+    keyResult.value = {
+      id: undefined,
+      description: "",
+      active: true,
+      deadline: undefined,
+      unit: 0,
+      currentPoint: 0,
+      maximunPoint: 100,
+      // objectId: "",
+      sidequests: [],
+    };
+  }
+});
+watch(
+  () => props.isEdit,
+  () => {
+    if (props.isEdit) {
+      keyResult.value = props.keyresults;
+    } else {
+      keyResult.value = {
+        id: undefined,
+        description: "",
+        active: true,
+        deadline: undefined,
+        unit: 0,
+        currentPoint: 0,
+        maximunPoint: 100,
+        // objectId: "",
+        sidequests: [],
+      };
+    }
+  }
+);
 
-
+const handleClose = () => {
+  emit("onTurnOffDialog");
+};
 </script>
 
 <style scoped>

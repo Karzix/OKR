@@ -15,11 +15,19 @@
     </div>
     <div class="form-item">
       <p class="form-label">start Day</p>
-      <el-date-picker format="DD/MM/YYYY" v-model="objective.startDay" type="date" />
+      <el-date-picker
+        format="DD/MM/YYYY"
+        v-model="objective.startDay"
+        type="date"
+      />
     </div>
     <div class="form-item">
       <p class="form-label">start Day</p>
-      <el-date-picker format="DD/MM/YYYY" v-model="objective.deadline" type="date" />
+      <el-date-picker
+        format="DD/MM/YYYY"
+        v-model="objective.deadline"
+        type="date"
+      />
     </div>
   </div>
   <div id="add-keyResult">
@@ -35,6 +43,9 @@
         <el-button @click="deleteKeyResult(index)"
           ><el-icon><CloseBold /></el-icon
         ></el-button>
+        <el-button @click="editKeyresult(index)"
+          ><el-icon>Edit</el-icon></el-button
+        >
       </div>
       <p class="key-result-info">
         <strong>Deadline:</strong>
@@ -56,7 +67,17 @@
         </ul>
       </div>
     </div>
-    <createKeyResultDialog @on-add-item="handleAddKeyResult" />
+    <createKeyResultDialog
+      @on-add-item="handleAddKeyResult"
+      :is-edit="isEditKeyresults"
+      :keyresults="editKeyresultItme"
+      :dialog-visible="createKeyResultDialogVisible"
+      @on-turn-off-dialog="handleClose"
+      @on-edit-item="handleEditKeyResult"
+    />
+    <el-button plain @click="createKeyResultDialogVisible = true">
+      Add
+    </el-button>
   </div>
   <el-button type="primary" @click="Save()">Confirm</el-button>
 </template>
@@ -69,6 +90,7 @@ import { axiosInstance } from "../../Service/axiosConfig";
 import { TargetType } from "@/Models/TargetType";
 import { CloseBold } from "@element-plus/icons-vue";
 import { formatDate } from "../../Service/formatDate";
+import { deepCopy } from "../../Service/deepCopy";
 
 const objective = ref<Objective>({
   id: undefined,
@@ -84,9 +106,31 @@ const props = defineProps<{
   objective: Objective;
   isEdit: boolean;
 }>();
+const emit = defineEmits<{
+  (e: "onSaveSuccess"): void;
+}>();
 const TargetTypes = ref<TargetType[]>([]);
+const editKeyresultItme = ref<KeyResult>({
+  id: undefined,
+  description: "",
+  active: true,
+  deadline: undefined,
+  unit: 0,
+  currentPoint: 0,
+  maximunPoint: 100,
+  // objectId: "",
+  sidequests: [],
+});
+const isEditKeyresults = ref<boolean>(false);
+const createKeyResultDialogVisible = ref<boolean>(false);
 const handleAddKeyResult = (item: KeyResult) => {
   objective.value.listKeyResults.push(item);
+};
+const handleEditKeyResult = (item: KeyResult) => {
+  const index = objective.value.listKeyResults.findIndex(x => x.id === item.id);
+  if (index !== -1) {
+    objective.value.listKeyResults.splice(index, 1, item);
+  }
 };
 const GetGeneralData = () => {
   axiosInstance.get("TargetType").then((res) => {
@@ -104,8 +148,7 @@ watch(
   () => {
     if (props.isEdit) {
       objective.value = props.objective;
-    }
-    else{
+    } else {
       objective.value = {
         id: undefined,
         name: "",
@@ -115,7 +158,7 @@ watch(
         targetTypeId: undefined,
         targetTypeName: "",
         point: 0,
-      }
+      };
     }
   }
 );
@@ -125,6 +168,9 @@ const Save = () => {
       .put("Objectives", objective.value)
       .then((res) => {
         console.log(res);
+        if (res.data.data.isSuccess) {
+          emit("onSaveSuccess");
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -142,6 +188,14 @@ const Save = () => {
 };
 function deleteKeyResult(index: number) {
   objective.value.listKeyResults.splice(index, 1);
+}
+function editKeyresult(index: number) {
+  editKeyresultItme.value = deepCopy(objective.value.listKeyResults[index]);
+  isEditKeyresults.value = true;
+  createKeyResultDialogVisible.value = true;
+}
+function handleClose() {
+  createKeyResultDialogVisible.value = false;
 }
 </script>
 <style scoped>
