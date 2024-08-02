@@ -281,6 +281,8 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<ObjectiveDto>();
             try
             {
+                var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                //edit
                 var objectives = _objectiveRepository.Get(request.Id.Value);
                 var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
                 var listSidequests = _questsRepository.GetAll().Where(x=> listKeyResults.Any(kr => kr.Id == x.KeyResultsId)).ToList();
@@ -319,6 +321,31 @@ namespace OKR.Service.Implementation
                 _objectiveRepository.Edit(objectives);
                 _keyResultRepository.EditRange(listKeyResults);
                 _questsRepository.EditRange(listSidequests);
+
+                //create new
+                var ListNewKeyresultsDto = request.ListKeyResults.Where(x => listKeyResults.Any(kr => kr.Id != x.Id)).ToList();
+                var ListNewKeyresults = new List<KeyResults>();
+                var ListNewSidequests = new List<Sidequests>();
+                ListNewKeyresultsDto.ForEach(X =>
+                {
+                    var newKR = _mapper.Map<KeyResults>(X);
+                    newKR.Id = Guid.NewGuid();
+                    newKR.CreatedBy = userName;
+                    newKR.CreatedOn = DateTime.Now;
+                    newKR.ObjectivesId = objectives.Id;
+                    ListNewKeyresults.Add(newKR);
+                    X.Sidequests.ForEach(sq =>
+                    {
+                        var newSQ = _mapper.Map<Sidequests>(sq);
+                        newSQ.Id = Guid.NewGuid();
+                        newSQ.CreatedBy = userName;
+                        newSQ.KeyResultsId = newKR.Id;
+                        newSQ.CreatedOn = DateTime.Now;
+                        ListNewSidequests.Add(newSQ);
+                    });
+                });
+                _keyResultRepository.AddRange(ListNewKeyresults);
+                _questsRepository.AddRange(ListNewSidequests);
                 result.BuildResult(request);
             }
             catch (Exception ex)
