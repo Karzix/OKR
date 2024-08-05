@@ -24,6 +24,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
             builder.Services.AddScoped<ITargetTypeService, TargetTypeService>();
             builder.Services.AddScoped<IObjectivesService, ObjectiveService>();
+            builder.Services.AddScoped<IKeyResultsService, KeyResultsService>();
         }
     }
 }
