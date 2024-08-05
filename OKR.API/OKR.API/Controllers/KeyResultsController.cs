@@ -5,7 +5,7 @@ using OKR.Service.Contract;
 
 namespace OKR.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class KeyResultsController : Controller
     {
