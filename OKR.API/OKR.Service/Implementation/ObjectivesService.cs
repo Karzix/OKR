@@ -297,6 +297,10 @@ namespace OKR.Service.Implementation
                 {
                     item.IsDeleted = true;
                 }
+                foreach(var item in listSidequests)
+                {
+                    item.IsDeleted = true;
+                }
                 foreach (var item in request.ListKeyResults)
                 {
                     var kr = listKeyResults.Where(x => x.Id == item.Id).FirstOrDefault();
@@ -321,11 +325,9 @@ namespace OKR.Service.Implementation
                         sq.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
                         sq.Name = sqdto.Name;
                         sq.Status = (bool)sqdto.Status;
+                        sq.KeyResultsId = kr.Id;
                     }
                 }
-                _objectiveRepository.Edit(objectives);
-                _keyResultRepository.EditRange(listKeyResults);
-                _questsRepository.EditRange(listSidequests);
 
                 //create new
                 var ListNewKeyresultsDto = request.ListKeyResults.Where(x => listKeyResults.Any(kr => kr.Id != x.Id)).ToList();
@@ -349,9 +351,12 @@ namespace OKR.Service.Implementation
                         ListNewSidequests.Add(newSQ);
                     });
                 });
-                _keyResultRepository.AddRange(ListNewKeyresults);
-                _questsRepository.AddRange(ListNewSidequests);
-                result.BuildResult(request);
+
+                listKeyResults.AddRange(ListNewKeyresults);
+                listSidequests.AddRange(ListNewSidequests);
+
+                _objectiveRepository.Edit(objectives, listKeyResults, listSidequests);
+
             }
             catch (Exception ex)
             {

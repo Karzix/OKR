@@ -47,6 +47,7 @@ namespace OKR.Repository.Implementation
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    throw;
                 }
             }
         } 
@@ -104,6 +105,34 @@ namespace OKR.Repository.Implementation
             ).Average(x=>x.Value);
 
             return (int)point;
+        }
+
+        public void Edit(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    _context.Objectives.Update(obj);
+
+                    var listKeyResultsEdit = keyResults.Where(x => _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).Any(kr => kr.Id == x.Id)).ToList();
+                    _context.KeyResults.UpdateRange(listKeyResultsEdit);
+                    var listNewKeyResultsEdit = keyResults.Where(x => _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).Any(kr => kr.Id != x.Id)).ToList();
+                    _context.KeyResults.AddRange(listKeyResultsEdit);
+
+                    var ListIdKeyresults = listKeyResultsEdit.Select(x => x.Id).ToList();
+                    var listSidequestsEdit = sidequests.Where(x => ListIdKeyresults.Contains(x.Id)).ToList();
+                    _context.Sidequests.UpdateRange(listSidequestsEdit);
+                    var listNewSidequests = sidequests.Where(x => !ListIdKeyresults.Contains(x.Id)).ToList();
+                    _context.Sidequests.AddRange(listNewSidequests);
+                    _context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                }
+            }
         }
     }
 }
