@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
@@ -37,7 +38,7 @@ namespace OKR.Service.Implementation
                     return result.BuildError("current point is invalid");
                 }
                 var progressUpdates = new ProgressUpdates();
-                var updateString = GetUpdateString(request, keyresult);
+                var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
                 progressUpdates.CreatedBy = userName;
                 progressUpdates.CreatedOn = DateTime.UtcNow;
                 progressUpdates.Note = updateString;
@@ -78,8 +79,6 @@ namespace OKR.Service.Implementation
             {
                 content += "update deadline from " + CurKeyResults.Deadline.ToString("dd/MM/yyyy") + " to " + NewKeyResult.Deadline.Value.ToString("dd/MM/yyyy") + "; ";
             }
-
-
             return content;
         }
     }

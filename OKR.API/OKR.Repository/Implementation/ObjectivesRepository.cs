@@ -131,6 +131,7 @@ namespace OKR.Repository.Implementation
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    throw;
                 }
             }
         }
