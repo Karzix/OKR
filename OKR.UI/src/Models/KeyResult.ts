@@ -10,4 +10,5 @@ export class KeyResult {
   maximunPoint: number | undefined;
   // objectId: string | undefined;
   sidequests: Sidequest[] = [];
+  note: string = "";
 }

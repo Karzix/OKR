@@ -118,6 +118,7 @@ const keyResult = ref<KeyResult>({
   maximunPoint: 100,
   // objectId: "",
   sidequests: [],
+  note: "",
 });
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
@@ -146,6 +147,7 @@ const handleAddItem = (item: KeyResult) => {
       maximunPoint: 100,
       // objectId: "",
       sidequests: [],
+      note: ""
     };
 };
 
@@ -183,6 +185,7 @@ onMounted(() => {
       maximunPoint: 100,
       // objectId: "",
       sidequests: [],
+      note:""
     };
   }
 });
@@ -202,6 +205,7 @@ watch(
         maximunPoint: 100,
         // objectId: "",
         sidequests: [],
+        note: ""
       };
     }
   }

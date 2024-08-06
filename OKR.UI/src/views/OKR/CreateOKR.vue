@@ -107,7 +107,7 @@ const props = defineProps<{
   isEdit: boolean;
 }>();
 const emit = defineEmits<{
-  (e: "onSaveSuccess"): void;
+  (e: "onSearchObjective"): void;
 }>();
 const TargetTypes = ref<TargetType[]>([]);
 const editKeyresultItme = ref<KeyResult>({
@@ -120,6 +120,7 @@ const editKeyresultItme = ref<KeyResult>({
   maximunPoint: 100,
   // objectId: "",
   sidequests: [],
+  note: "",
 });
 const isEditKeyresults = ref<boolean>(false);
 const createKeyResultDialogVisible = ref<boolean>(false);
@@ -168,8 +169,8 @@ const Save = () => {
       .put("Objectives", objective.value)
       .then((res) => {
         console.log(res);
-        if (res.data.data.isSuccess) {
-          emit("onSaveSuccess");
+        if (res.data.isSuccess) {
+          emit("onSearchObjective");
         }
       })
       .catch((error) => {
@@ -179,7 +180,9 @@ const Save = () => {
     axiosInstance
       .post("Objectives", objective.value)
       .then((res) => {
-        console.log(res);
+        if (res.data.isSuccess) {
+          emit("onSearchObjective");
+        }
       })
       .catch((error) => {
         console.log(error);

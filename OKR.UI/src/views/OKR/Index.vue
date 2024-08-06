@@ -6,7 +6,7 @@
         <el-button type="primary" @click="CreateObjectives">new objective</el-button>
       </div>
     </template>
-    <el-card style="" v-for="item in data.data">
+    <el-card style="" v-for="item in data.data" @click="handleDeatail(item)">
       <div style="">
         <h3>{{ item.name }} <el-icon @click="editObjective(item)"><Edit /></el-icon></h3>
         <el-progress :percentage="item.point" :color="customColorMethod" />
@@ -14,12 +14,12 @@
       <el-tree :data="buildTree(item)" :props="defaultProps" />
     </el-card>
   </el-card>
-  <el-dialog v-model="createDialog" class="createDialog">
-    <CreateObjective :objective="editItem" :is-edit="EditDialog" @on-save-success="createDialog = false"></CreateObjective>
+  <el-dialog v-model="createDialog" class="">
+    <CreateObjective :objective="editItem" :is-edit="EditDialog" @onSearchObjective="Search()"></CreateObjective>
   </el-dialog>
-  <!-- <el-dialog v-model="EditDialog" class="createDialog">
-    <EditORK :objective="editItem"></EditORK>
-  </el-dialog> -->
+  <el-dialog v-model="DeatailDialog" class="">
+    <Deatail :objective="editItem" @onSearchObjective="Search()" ></Deatail>
+  </el-dialog>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
@@ -32,7 +32,7 @@ import CreateObjective from './CreateOKR.vue';
 import { Edit } from '@element-plus/icons-vue'
 import {deepCopy} from '../../Service/deepCopy'
 import { RecalculateTheDate } from '../../Service/formatDate';
-
+import Deatail from '@/views/OKR/Deatail.vue'
 
 interface Tree {
   label: string;
@@ -77,6 +77,7 @@ const data = ref<SearchResponse<Objective[]>>({
 const overalProgress = ref(0);
 const createDialog = ref(false);
 const EditDialog = ref(false);
+const DeatailDialog = ref(false);
 const buildTree = (objective: Objective) : Tree[] => {
   var dataTreeTemp = [] as Tree[] 
   for(let i  = 0; i < objective.listKeyResults?.length; i++) {
@@ -118,5 +119,10 @@ const editObjective = (objective: Objective) => {
 const CreateObjectives = () => {
   EditDialog.value = false
   createDialog.value = true
+}
+const handleDeatail = (objective: Objective) => {
+  console.log(objective);
+  editItem.value = deepCopy(objective);
+  DeatailDialog.value = true
 }
 </script>
