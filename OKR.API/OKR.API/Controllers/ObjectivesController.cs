@@ -1,4 +1,5 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
@@ -9,6 +10,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class ObjectivesController : Controller
     {
         private IObjectivesService _objectiveService;

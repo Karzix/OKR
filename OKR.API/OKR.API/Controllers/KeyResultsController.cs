@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
 using OKR.Service.Contract;
@@ -7,6 +8,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class KeyResultsController : Controller
     {
         private IKeyResultsService _keyResultsService;

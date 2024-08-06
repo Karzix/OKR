@@ -73,7 +73,7 @@ namespace OKR.Service.Implementation
             }
             if (NewKeyResult.CurrentPoint != CurKeyResults.CurrentPoint)
             {
-                content += "update weights from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
+                content += "update weights from " + CurKeyResults.CurrentPoint + " to " + NewKeyResult.CurrentPoint + "; ";
             }
             if(NewKeyResult.Deadline != CurKeyResults.Deadline)
             {

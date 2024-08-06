@@ -1,4 +1,5 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.Service.Contract;
@@ -7,6 +8,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
+    [Authorize]
     public class ProgressUpdatesController : Controller
     {
         private IProgressUpdatesService _progressUpdatesService;
