@@ -1,4 +1,5 @@
 ﻿using Maynghien.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.IO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Context;
@@ -68,13 +69,13 @@ namespace OKR.Repository.Implementation
                         (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()) ,
                     krId = kr.Id,
                 }).ToList(),
-                    Id = obj.Id
-                }).ToList();
+                Id = obj.Id
+            }).ToList();
 
             // Convert the result to a dictionary with the correct calculations
             var resultDictionary = result.ToDictionary(
                 x => x.Id,
-                x => (int)x.pointObj.Average(po => po.krPoint *100)
+                x => (int)x.pointObj.Average(po => po.krPoint * 100)
             );
 
             return resultDictionary;
@@ -113,24 +114,45 @@ namespace OKR.Repository.Implementation
             {
                 try
                 {
+                    // Kiểm tra sự tồn tại của đối tượng
+                    if (_context.Objectives.Any(o => o.Id == obj.Id) == false)
+                    {
+                        throw new Exception("Objective does not exist.");
+                    }
+
                     _context.Objectives.Update(obj);
 
-                    var listKeyResultsEdit = keyResults.Where(x => _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).Any(kr => kr.Id == x.Id)).ToList();
+                    var existingKeyResults = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).ToList();
+
+                    var listKeyResultsEdit = keyResults.Where(x => existingKeyResults.Any(kr => kr.Id == x.Id)).ToList();
                     _context.KeyResults.UpdateRange(listKeyResultsEdit);
-                    var listNewKeyResultsEdit = keyResults.Where(x => _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).Any(kr => kr.Id != x.Id)).ToList();
-                    _context.KeyResults.AddRange(listKeyResultsEdit);
+
+                    var listNewKeyResults = keyResults.Where(x => existingKeyResults.All(kr => kr.Id != x.Id)).ToList();
+                    _context.KeyResults.AddRange(listNewKeyResults);
 
                     var ListIdKeyresults = listKeyResultsEdit.Select(x => x.Id).ToList();
+
                     var listSidequestsEdit = sidequests.Where(x => ListIdKeyresults.Contains(x.Id)).ToList();
                     _context.Sidequests.UpdateRange(listSidequestsEdit);
+
                     var listNewSidequests = sidequests.Where(x => !ListIdKeyresults.Contains(x.Id)).ToList();
                     _context.Sidequests.AddRange(listNewSidequests);
+
                     _context.SaveChanges();
                     transaction.Commit();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    transaction.Rollback();
+                    // Log inner exception details for further investigation
+                    Console.WriteLine(dbEx.InnerException?.Message);
+                    throw;
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
+                    // Log general exception details
+                    Console.WriteLine(ex.Message);
                     throw;
                 }
             }

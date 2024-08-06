@@ -11,7 +11,7 @@ namespace OKR.DTO
 {
     public class KeyResultDto : BaseDto
     {
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public bool? Active { get; set; } = true;
         public DateTime? Deadline { get; set; }
         public TypeUnitKeyResult? Unit { get; set; } // % Percent, # value, 01 bool

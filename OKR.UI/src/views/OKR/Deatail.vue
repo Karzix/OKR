@@ -12,8 +12,8 @@
     </div>
   </div>
   <div>
-    <div v-for="item in props.objective.listKeyResults">
-      <el-progress :percentage="item.currentPoint" />
+    <div v-for="item in props.objective.listKeyResults" class="key-result">
+      <el-progress :percentage="caculateKeyResult(item)" />
       <div class="custom-header">
         <div class="header-content flex items-center">
           <span class="text-large font-600 mr-3">{{ item.description }}</span>
@@ -55,6 +55,7 @@ import { KeyResult } from "@/Models/KeyResult";
 import { ref } from "vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 import { deepCopy } from "../../Service/deepCopy";
+import {caculateKeyResult} from '../../Service/OKR/caculateKeyResult'
 
 const props = defineProps<{
   objective: Objective;
@@ -99,5 +100,8 @@ const handleProgressUpdate = (keyresults: KeyResult) => {
 .header-extra {
   display: flex;
   align-items: center;
+}
+.key-result{
+  border: 1px solid black;
 }
 </style>

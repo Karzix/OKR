@@ -330,7 +330,7 @@ namespace OKR.Service.Implementation
                 }
 
                 //create new
-                var ListNewKeyresultsDto = request.ListKeyResults.Where(x => listKeyResults.Any(kr => kr.Id != x.Id)).ToList();
+                var ListNewKeyresultsDto = request.ListKeyResults.Where(x => listKeyResults.All(kr => kr.Id != x.Id)).ToList();
                 var ListNewKeyresults = new List<KeyResults>();
                 var ListNewSidequests = new List<Sidequests>();
                 ListNewKeyresultsDto.ForEach(X =>
