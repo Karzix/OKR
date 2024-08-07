@@ -242,10 +242,10 @@ namespace OKR.Service.Implementation
                                 break;
                         }
                     }
-
+                var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
                 {
-                    predicate = predicate.And(x => x.CreatedBy.Equals(_contextAccessor.HttpContext.User.Identity.Name));
+                    predicate = predicate.And(x => x.CreatedBy.Equals(userName));
                 }
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;

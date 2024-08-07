@@ -14,10 +14,10 @@
       <el-tree :data="buildTree(item)" :props="defaultProps" />
     </el-card>
   </el-card>
-  <el-dialog v-model="createDialog" class="">
+  <el-dialog v-model="createDialog" class="dialogOKR">
     <CreateObjective :objective="editItem" :is-edit="EditDialog" @onSearchObjective="Search()"></CreateObjective>
   </el-dialog>
-  <el-dialog v-model="DeatailDialog" class="">
+  <el-dialog v-model="DeatailDialog" class="dialogOKR">
     <Deatail :objective="editItem" @onSearchObjective="Search()" ></Deatail>
   </el-dialog>
 </template>
@@ -126,3 +126,16 @@ const handleDeatail = (objective: Objective) => {
   DeatailDialog.value = true
 }
 </script>
+<style >
+@media screen and (max-width: 600px) {
+  .dialogOKR{
+    width: 100% !important;
+  }
+}
+</style>
+<style scoped>
+.sidequests {
+    display: flex;
+    flex-direction: column;
+}
+</style>

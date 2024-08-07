@@ -38,12 +38,26 @@
           {{ item.currentPoint }}/{{ item.maximunPoint }}
         </el-descriptions-item>
       </el-descriptions>
+      <div class="sidequests">
+        <el-checkbox
+          size="large"
+          v-for="sidequest in item.sidequests"
+          :label="sidequest.name"
+          v-model="sidequest.status"
+          @change="handleChangeSidequest(sidequest)"
+        />
+      </div>
     </div>
   </div>
   <el-dialog v-model="visibleDialogProgressUpdate" class="">
     <UpdateProgress
       :keyresults="tempKeyResults"
-      @onSaveUpdateProgress=" () => {emit('onSearchObjective');visibleDialogProgressUpdate = false}"
+      @onSaveUpdateProgress="
+        () => {
+          emit('onSearchObjective');
+          visibleDialogProgressUpdate = false;
+        }
+      "
     ></UpdateProgress>
   </el-dialog>
 </template>
@@ -55,7 +69,10 @@ import { KeyResult } from "@/Models/KeyResult";
 import { ref } from "vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 import { deepCopy } from "../../Service/deepCopy";
-import {caculateKeyResult} from '../../Service/OKR/caculateKeyResult'
+import { caculateKeyResult } from "../../Service/OKR/caculateKeyResult";
+import { Sidequest } from "@/Models/Sidequests";
+import { axiosInstance } from "../../Service/axiosConfig";
+import { ElMessage } from "element-plus";
 
 const props = defineProps<{
   objective: Objective;
@@ -82,6 +99,15 @@ const handleProgressUpdate = (keyresults: KeyResult) => {
   console.log(tempKeyResults.value);
   visibleDialogProgressUpdate.value = true;
 };
+const handleChangeSidequest = (item: Sidequest) => {
+  axiosInstance.put("Sidequests", item).then((res) => {
+    if (res.data.isSuccess) {
+      emit("onSearchObjective");
+    } else {
+      ElMessage.error(res.data.message);
+    }
+  });
+};
 </script>
 <style scoped>
 .custom-header {
@@ -101,7 +127,7 @@ const handleProgressUpdate = (keyresults: KeyResult) => {
   display: flex;
   align-items: center;
 }
-.key-result{
+.key-result {
   border: 1px solid black;
 }
 </style>
