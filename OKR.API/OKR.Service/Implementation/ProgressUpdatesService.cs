@@ -2,6 +2,7 @@
 using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
+using Microsoft.AspNetCore.Http;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
@@ -15,11 +16,13 @@ namespace OKR.Service.Implementation
     {
         private IMapper _mapper;
         private IProgressUpdatesRepository _progressUpdatesRepository;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public ProgressUpdatesService(IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository)
+        public ProgressUpdatesService(IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -82,7 +85,12 @@ namespace OKR.Service.Implementation
                                 break;
                         }
                     }
-                predicate = predicate.And(x => x.IsDeleted == false);
+                var userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+                if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                {
+                    predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                }
+                predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
             }
             catch (Exception)
