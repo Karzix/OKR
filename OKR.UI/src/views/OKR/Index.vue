@@ -1,5 +1,5 @@
 <template>
-  <el-card style="height: 93vh; overflow-y: auto">
+  <el-card style="">
     <template #header>
       <div class="card-header">
         <el-progress type="circle" :percentage="overalProgress" />

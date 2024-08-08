@@ -1,5 +1,5 @@
 <template>
-  <div class="infinite-list-wrapper">
+  <div class="infinite-list-wrapper"  style="overflow: auto">
     <ul
       v-infinite-scroll="searchProgressUpdate"
       class="list"
@@ -20,8 +20,6 @@
         </el-card>
       </li>
     </ul>
-    <p v-if="loading" class="loading-text">Loading...</p>
-    <p v-if="noMore" class="no-more-text">No more</p>
   </div>
 </template>
 
@@ -60,7 +58,6 @@ const searchResponse = ref<SearchResponse<ProgressUpdates[]>>({
 });
 const listProgressUpdate = ref<ProgressUpdates[]>([]);
 const searchProgressUpdate = () => {
-  loading.value = true;
   try{
     axiosInstance
     .post("ProgressUpdates/search", searchRequest.value)
@@ -76,10 +73,6 @@ const searchProgressUpdate = () => {
         if(searchResponse.value.data && searchResponse.value.data != null){
           searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
           listProgressUpdate.value.push(...searchResponse.value.data!);
-          noMore.value = false;
-        }
-        else{
-          noMore.value = true
         }
       }
     });
@@ -87,7 +80,6 @@ const searchProgressUpdate = () => {
   catch(e){
     console.error(e);
   }
-  loading.value = false;
 };
 onMounted(() => {
   var userName = route.params.userName;
@@ -129,17 +121,6 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.loading-text, .no-more-text {
-  text-align: center;
-  color: #888;
-  margin-top: 20px;
-}
 
-.el-card {
-  padding: 10px;
-}
 
-.el-icon {
-  margin: 0 5px;
-}
 </style>
