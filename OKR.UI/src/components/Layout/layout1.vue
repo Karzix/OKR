@@ -14,7 +14,7 @@
                 </el-menu-item>
                 <el-menu-item index="2" @click="handleAsideClick('User')">
                   <el-icon>
-                    <Close />
+                    <User />
                   </el-icon>
                   <span>User</span>
                 </el-menu-item>
@@ -35,7 +35,7 @@
                 </el-menu-item>
                 <el-menu-item index="2" @click="handleAsideClick('User')">
                   <el-icon>
-                    <Close />
+                    <User />
                   </el-icon>
                   <span>User</span>
                 </el-menu-item>
@@ -71,7 +71,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import router from "@/router";
 import Cookies from "js-cookie";
-import { Close, Expand } from "@element-plus/icons-vue";
+import { Close, Expand, User } from "@element-plus/icons-vue";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
@@ -108,7 +108,7 @@ const handleResize = () => {
 
 onMounted(() => {
   window.addEventListener("resize", handleResize);
-  handleResize(); // Gọi hàm này để kiểm tra kích thước ban đầu
+  handleResize();
 });
 
 onUnmounted(() => {

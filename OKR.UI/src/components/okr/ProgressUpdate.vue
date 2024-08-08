@@ -42,7 +42,7 @@ import { isNumberOrNumericString} from '@/Service/Number'
 const route = useRoute();
 const count = ref(10);
 const loading = ref(false);
-const noMore = computed(() => count.value >= 20);
+const noMore = ref(false);
 const disabled = computed(() => loading.value || noMore.value);
 
 const searchRequest = ref<SearchRequest>({
@@ -60,7 +60,9 @@ const searchResponse = ref<SearchResponse<ProgressUpdates[]>>({
 });
 const listProgressUpdate = ref<ProgressUpdates[]>([]);
 const searchProgressUpdate = () => {
-  axiosInstance
+  loading.value = true;
+  try{
+    axiosInstance
     .post("ProgressUpdates/search", searchRequest.value)
     .then((response) => {
       if (!response.data.isSuccess) {
@@ -71,13 +73,21 @@ const searchProgressUpdate = () => {
         searchResponse.value.data?.forEach((item) => {
           item.createOn = RecalculateTheDate(item.createOn);
         })
-        if(searchResponse.value.data != null){
+        if(searchResponse.value.data && searchResponse.value.data != null){
           searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
           listProgressUpdate.value.push(...searchResponse.value.data!);
+          noMore.value = false;
         }
-        
+        else{
+          noMore.value = true
+        }
       }
     });
+  }
+  catch(e){
+    console.error(e);
+  }
+  loading.value = false;
 };
 onMounted(() => {
   var userName = route.params.userName;
