@@ -1,4 +1,5 @@
 ﻿using MayNghien.Infrastructure.Models;
+using OKR.Infrastructure.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,5 +17,6 @@ namespace OKR.DTO
         public int OldPoint { get; set; }
         public DateTime? CreateOn { get; set; }
         public string? CreateBy { get; set; }
+        public TypeUnitKeyResult? Unit { get; set; }
     }
 }

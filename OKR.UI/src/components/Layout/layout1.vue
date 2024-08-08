@@ -46,7 +46,7 @@
       </div>
 
       <el-container>
-        <el-header>
+        <el-header v-if="isMobile">
           Header
           <el-button
             v-if="isMobile"

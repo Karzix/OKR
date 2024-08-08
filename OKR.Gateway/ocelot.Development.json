@@ -11,13 +11,13 @@
             ],
             "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
             "UpstreamPathTemplate": "/{everything}",
-            "RateLimitOptions": {
-                "ClientWhitelist": [],
-                "EnableRateLimiting": true,
-                "Period": "1m",
-                "PeriodTimespan": 60,
-                "Limit": 10
-            },
+            //"RateLimitOptions": {
+            //    "ClientWhitelist": [],
+            //    "EnableRateLimiting": true,
+            //    "Period": "1m",
+            //    "PeriodTimespan": 60,
+            //    "Limit": 10
+            //},
             "SwaggerKey": "api1"
         }
     ],

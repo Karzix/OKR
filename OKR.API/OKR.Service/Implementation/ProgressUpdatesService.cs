@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Http;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
-using OKR.Repository.Implementation;
 using OKR.Service.Contract;
+using System;
+using System.Data.Entity;
+using System.Diagnostics;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
 namespace OKR.Service.Implementation
@@ -33,22 +35,29 @@ namespace OKR.Service.Implementation
             {
                 var query = BuildFilterExpression(request.Filters);
                 var numOfRecords = _progressUpdatesRepository.CountRecordsByPredicate(query);
-                var users = _progressUpdatesRepository.FindByPredicate(query);
+                var progress = _progressUpdatesRepository.FindByPredicate(query);
                 if (request.SortBy != null)
                 {
-                    users = _progressUpdatesRepository.addSort(users, request.SortBy);
+                    progress = _progressUpdatesRepository.addSort(progress, request.SortBy);
                 }
                 else
                 {
-                    users = users.OrderByDescending(x => x.CreatedOn);
+                    progress = progress.OrderByDescending(x => x.CreatedOn);
                 }
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = users.Skip(startIndex).Take(pageSize);
-                var dtoList = UserList.Select(x => new ProgressUpdatesDto
+                var progressList = progress.Skip(startIndex).Take(pageSize).Include(x=>x.KeyResults);
+                var dtoList = progressList.Select(x => new ProgressUpdatesDto
                 {
                     Id = x.Id,
+                    CreateBy = x.CreatedBy,
+                    CreateOn = x.CreatedOn,
+                    KeyResultId = x.KeyResultId,
+                    NewPoint = x.NewPoint,
+                    Note = x.Note,
+                    OldPoint = x.OldPoint,
+                    Unit = x.KeyResults.Unit,
                 }).ToList();
                 var searchResult = new SearchResponse<ProgressUpdatesDto>
                 {

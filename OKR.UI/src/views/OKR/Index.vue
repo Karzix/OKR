@@ -1,13 +1,15 @@
 <template>
-  <el-card style="">
+  <el-card style="height: 93vh; overflow-y: auto;" >
     <template #header>
       <div class="card-header">
         <el-progress type="circle" :percentage="overalProgress" />
         <el-button type="primary" @click="CreateObjectives">new objective</el-button>
+        <el-button type="primary" @click="page = 0">Home</el-button>
+        <el-button type="primary" @click="page = 1">progress</el-button>
       </div>
-      <BodyIndex :data="data" @onEditObjective="editObjective" @onDeatail="handleDeatail"></BodyIndex>
     </template>
- 
+    <BodyIndex :data="data" @onEditObjective="editObjective" @onDeatail="handleDeatail" v-if="page == 0"></BodyIndex>
+    <ProgressUpdates v-if="page == 1"></ProgressUpdates>
   </el-card>
   <el-dialog v-model="createDialog" class="dialogOKR">
     <CreateObjective :objective="editItem" :is-edit="EditDialog" @onSearchObjective="Search()"></CreateObjective>
@@ -29,6 +31,7 @@ import {deepCopy} from '../../Service/deepCopy'
 import { RecalculateTheDate } from '../../Service/formatDate';
 import Deatail from '@/views/OKR/Deatail.vue'
 import BodyIndex from '@/components/okr/BodyIndex.vue'
+import ProgressUpdates from '@/components/okr/ProgressUpdate.vue';
 
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -53,6 +56,7 @@ const data = ref<SearchResponse<Objective[]>>({
   currentPage: 1,
   rowsPerPage: 0,
 })
+const page = ref<number>(0)
 const overalProgress = ref(0);
 const createDialog = ref(false);
 const EditDialog = ref(false);

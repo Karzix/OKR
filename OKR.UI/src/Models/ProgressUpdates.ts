@@ -6,4 +6,5 @@ export class ProgressUpdates {
     createOn: Date | undefined;
     createBy: string | undefined;
     id: string | undefined;
+    unit: number | undefined;
 }
