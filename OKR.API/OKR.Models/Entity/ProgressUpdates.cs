@@ -17,7 +17,7 @@ namespace OKR.Models.Entity
         [ForeignKey("KeyResultId")]
         public KeyResults? KeyResults { get; set; }
 
-        public int NewPoint { get; set; }
-        public int OldPoint { get; set; }
+        public int? NewPoint { get; set; }
+        public int? OldPoint { get; set; }
     }
 }

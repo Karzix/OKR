@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-radio-group v-model="objective.targetTypeId" size="large">
+      <el-radio-group v-model="objective.targetType" size="large">
         <el-radio-button
           v-for="item in TargetTypes"
           :label="item.name"
@@ -98,7 +98,7 @@ const objective = ref<Objective>({
   startDay: undefined,
   deadline: undefined,
   listKeyResults: [],
-  targetTypeId: undefined,
+  targetType: undefined,
   targetTypeName: "",
   point: 0,
 });
@@ -108,8 +108,22 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "onSearchObjective"): void;
+  (e: "onClose"): void;
 }>();
-const TargetTypes = ref<TargetType[]>([]);
+const TargetTypes = ref([
+  {
+    id: 0,
+    name: "Individual",
+  },
+  {
+    id: 1,
+    name: "Branch",
+  },
+  {
+    id: 2,
+    name: "Team",
+  },
+]);
 const editKeyresultItme = ref<KeyResult>({
   id: undefined,
   description: "",
@@ -128,7 +142,9 @@ const handleAddKeyResult = (item: KeyResult) => {
   objective.value.listKeyResults.push(item);
 };
 const handleEditKeyResult = (item: KeyResult) => {
-  const index = objective.value.listKeyResults.findIndex(x => x.id === item.id);
+  const index = objective.value.listKeyResults.findIndex(
+    (x) => x.id === item.id
+  );
   if (index !== -1) {
     objective.value.listKeyResults.splice(index, 1, item);
   }
@@ -156,7 +172,7 @@ watch(
         startDay: undefined,
         deadline: undefined,
         listKeyResults: [],
-        targetTypeId: undefined,
+        targetType: undefined,
         targetTypeName: "",
         point: 0,
       };
@@ -171,6 +187,7 @@ const Save = () => {
         console.log(res);
         if (res.data.isSuccess) {
           emit("onSearchObjective");
+          emit("onClose");
         }
       })
       .catch((error) => {

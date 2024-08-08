@@ -3,7 +3,6 @@ using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
-using NetTopologySuite.Index.HPRtree;
 using OKR.DTO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
@@ -11,6 +10,7 @@ using OKR.Repository.Contract;
 using OKR.Service.Contract;
 using System.Data.Entity;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
+using static OKR.Infrastructure.Enum.FormatTargetType;
 
 namespace OKR.Service.Implementation
 {
@@ -19,17 +19,14 @@ namespace OKR.Service.Implementation
         private IHttpContextAccessor _contextAccessor;
         private IObjectivesRepository _objectiveRepository;
         private IMapper _mapper;
-        private ITargetTypeRepository _targetTypeRepository;
         private IKeyResultRepository _keyResultRepository;
         private ISidequestsRepository _questsRepository;
 
-        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
-            ITargetTypeRepository targetTypeRepository, IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository)
+        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper, IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
             _mapper = mapper;
-            _targetTypeRepository = targetTypeRepository;
             _keyResultRepository = keyResultRepository;
             _questsRepository = sidequestsRepository;
         }
@@ -40,11 +37,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                var targetType = _targetTypeRepository.FindBy(x=>x.Id == request.TargetTypeId);
-                if(targetType.Count() == 0)
-                {
-                    return result.BuildError("Need to select target type");
-                }
+                
                 if(request.ListKeyResults == null || request.ListKeyResults.Count == 0)
                 {
                     return result.BuildError("requires at least one keyResult");
@@ -179,8 +172,8 @@ namespace OKR.Service.Implementation
                         Name = x.Name,
                         Deadline = x.Deadline,
                         StartDay = x.StartDay,
-                        TargetTypeId = x.TargetTypeId,
-                        TargetTypeName = x.TargetType.Name,
+                        TargetType = x.TargetType,
+                        TargetTypeName = getTargetTypeName(x.TargetType),
                         ListKeyResults = _keyResultRepository.GetAll().Where(k=>k.ObjectivesId == x.Id)
                         .Select(k=> new KeyResultDto
                         {
@@ -291,7 +284,7 @@ namespace OKR.Service.Implementation
                 objectives.StartDay = request.StartDay.Value;
                 objectives.Deadline = request.Deadline.Value;
                 objectives.Name = request.Name;
-                objectives.TargetTypeId = request.TargetTypeId.Value;
+                objectives.TargetType = (TargetType)request.TargetType;
 
                 foreach (var item in listKeyResults)
                 {

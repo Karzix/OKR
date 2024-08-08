@@ -37,6 +37,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "onSaveUpdateProgress"): void;
+  (e: "onUpdateProgress", point : number, keyresultId : string): void;
 }>();
 const Save = () =>{
     axiosInstance.put("KeyResults", props.keyresults).then((res) => {
@@ -45,6 +46,7 @@ const Save = () =>{
         }
         else{
             emit("onSaveUpdateProgress")
+            emit("onUpdateProgress", props.keyresults.currentPoint ?? 0, props.keyresults.id ?? "")
         }
     })
 }

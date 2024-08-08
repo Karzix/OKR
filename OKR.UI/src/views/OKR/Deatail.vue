@@ -5,7 +5,7 @@
     </template>
   </el-page-header>
   <div>
-    <el-progress type="circle" :percentage="props.objective.point" />
+    <el-progress type="circle" :percentage="caculateObjective(props.objective)" />
     <div>
       <p>Start Day: {{ formatDate(props.objective.startDay) }}</p>
       <p>Deadline: {{ formatDate(props.objective.deadline) }}</p>
@@ -58,6 +58,7 @@
           visibleDialogProgressUpdate = false;
         }
       "
+      @onUpdateProgress="changePoint"
     ></UpdateProgress>
   </el-dialog>
 </template>
@@ -69,7 +70,7 @@ import { KeyResult } from "@/Models/KeyResult";
 import { ref } from "vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 import { deepCopy } from "../../Service/deepCopy";
-import { caculateKeyResult } from "../../Service/OKR/caculateKeyResult";
+import { caculateKeyResult , caculateObjective} from "../../Service/OKR/caculateKeyResult";
 import { Sidequest } from "@/Models/Sidequests";
 import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage } from "element-plus";
@@ -108,6 +109,9 @@ const handleChangeSidequest = (item: Sidequest) => {
     }
   });
 };
+const changePoint = (point : number, keyresultId : string) =>{
+  props.objective.listKeyResults.filter(x=>x.id == keyresultId)[0].currentPoint = point
+}
 </script>
 <style scoped>
 .custom-header {

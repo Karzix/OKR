@@ -9,7 +9,6 @@ import LoginVue from '@/views/Auth/Login.vue';
 import UserVue from '@/views/User/Index.vue'
 import BranchVue from '@/views/Department/Branch.vue'
 import TeamVue from '@/views/Department/Team.vue'
-import TargetTypeVue from '@/views/TargetType/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
 
 const router = createRouter({
@@ -35,10 +34,6 @@ const router = createRouter({
         {
           path: "Team",
           component: TeamVue,
-        },
-        {
-          path: "TargetType",
-          component: TargetTypeVue,
         },
       ],
     },

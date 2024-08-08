@@ -30,9 +30,9 @@ namespace OKR.Models.Context
         public DbSet<KeyResults> KeyResults { get; set; }
         public DbSet<ProgressUpdates> ProgressUpdates { get; set; }
         public DbSet<Sidequests> Sidequests { get; set; }
-        public DbSet<TargetType> TargetType { get; set; }
+        //public DbSet<TargetType> TargetType { get; set; }
         public DbSet<UserObjectives> UserObjectives { get; set; }
-        public DbSet<RefreshTokenModel> RefreshTokenModel { get; set; }
+        //public DbSet<RefreshTokenModel> RefreshTokenModel { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

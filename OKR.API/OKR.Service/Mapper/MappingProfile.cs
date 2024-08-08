@@ -15,7 +15,6 @@ namespace OKR.Service.Mapper
 		public void CreateMap()
 		{
 			CreateMap<DepartmentDto, Department>().ReverseMap();
-			CreateMap<TargetTypeDto, TargetType>().ReverseMap();
 			CreateMap<KeyResultDto, KeyResults>().ReverseMap();
 			CreateMap<ObjectiveDto, Objectives>().ReverseMap();
 			CreateMap<SidequestsDto, Sidequests>().ReverseMap();

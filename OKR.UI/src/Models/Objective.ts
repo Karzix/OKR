@@ -5,7 +5,7 @@ export class Objective {
     name: string | undefined;
     startDay: Date | undefined;
     deadline: Date | undefined;
-    targetTypeId: string | undefined;
+    targetType: number | undefined;
     targetTypeName: string | undefined;
     listKeyResults: KeyResult[]  = []; 
     point: number | undefined;   
@@ -15,7 +15,7 @@ export class Objective {
         this.name = Objective.name;
         this.startDay = Objective.startDay;
         this.deadline = Objective.deadline;
-        this.targetTypeId = Objective.targetTypeId;
+        this.targetType = Objective.targetType;
         this.targetTypeName = Objective.targetTypeName;
         this.listKeyResults = Objective.listKeyResults;
         this.point = Objective.point

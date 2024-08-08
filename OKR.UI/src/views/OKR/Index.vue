@@ -23,6 +23,7 @@
       :objective="editItem"
       :is-edit="EditDialog"
       @onSearchObjective="Search()"
+      @onClose ="() =>{ createDialog = false; EditDialog = false;}"
     ></CreateObjective>
   </el-dialog>
   <el-dialog v-model="DeatailDialog" class="dialogOKR">
@@ -56,7 +57,7 @@ const editItem = ref<Objective>({
   startDay: undefined,
   deadline: undefined,
   listKeyResults: [],
-  targetTypeId: undefined,
+  targetType: undefined,
   targetTypeName: "",
   point: 0,
 });

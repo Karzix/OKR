@@ -1,4 +1,5 @@
 import type { KeyResult } from "@/Models/KeyResult";
+import type { Objective } from "@/Models/Objective";
 
 export const caculateKeyResult = (keyResult: KeyResult) => {
     var point = 0;
@@ -21,4 +22,13 @@ export const caculateKeyResult = (keyResult: KeyResult) => {
         }
     }
     return point*100;
+}
+export const caculateObjective = (objective: Objective) => {
+    var point = 0;
+    if(objective.listKeyResults && objective.listKeyResults.length > 0){
+        objective.listKeyResults.forEach(x => {
+            point = point + caculateKeyResult(x);
+        })
+    }
+    return point / objective.listKeyResults.length;
 }

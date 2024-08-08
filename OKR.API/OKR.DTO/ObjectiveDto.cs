@@ -1,4 +1,5 @@
 ﻿using MayNghien.Infrastructure.Models;
+using OKR.Infrastructure.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,7 +15,7 @@ namespace OKR.DTO
         public DateTime? StartDay { get; set; }
         public DateTime? Deadline { get; set; }
         //public int MaximunPoint { get; set; }
-        public Guid? TargetTypeId { get; set; }
+        public TargetType? TargetType { get; set; }
         public string? TargetTypeName { get; set; }
         public List<KeyResultDto>? ListKeyResults { get; set; }
         public double? Point {  get; set; }

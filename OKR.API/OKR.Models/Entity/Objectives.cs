@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MayNghien.Infrastructure.Models.Entity;
+using OKR.Infrastructure.Enum;
 
 namespace OKR.Models.Entity
 {
@@ -13,11 +14,6 @@ namespace OKR.Models.Entity
         public string Name { get; set; }
         public DateTime StartDay { get; set; }
         public DateTime Deadline { get; set; }
-        //public int MaximunPoint { get; set; }
-
-        [ForeignKey("TargetType")]
-        public Guid TargetTypeId { get; set; }
-        [ForeignKey("TargetTypeId")]
-        public TargetType? TargetType { get; set; }
+        public TargetType TargetType { get; set; } = 0;
     }
 }
