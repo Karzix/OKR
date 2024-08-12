@@ -240,6 +240,7 @@ namespace OKR.Service.Implementation
                                 }
                             case "createOn":
                                 {
+                                    predicate = predicate.And(x => x.CreatedBy == filter.Value);
                                     break;
                                 }
                             case "targetType":
@@ -385,8 +386,12 @@ namespace OKR.Service.Implementation
             var filter = Filters.Where(x => x.FieldName == "targetType").First();
             var emumN = int.Parse(filter.Value);
             TargetType targetType = (TargetType)emumN;
+            if(targetType == TargetType.individual)
+            {
+                return predicate;
+            }
             predicate = predicate.And(x => x.TargetType == targetType);
-            var filterUserName = Filters.Where(x => x.FieldName == "userName").FirstOrDefault();
+            var filterUserName = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
             ApplicationUser user;
             if (filterUserName != null)
             {

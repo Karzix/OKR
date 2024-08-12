@@ -20,6 +20,7 @@ namespace OKR.API.Controllers
 
         [HttpPost]
         [Route("search")]
+        [AllowAnonymous]
         public IActionResult Search(SearchRequest request)
         {
             var result =_progressUpdatesService.Search(request);

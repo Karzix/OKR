@@ -3,9 +3,12 @@ using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
+using OKR.Repository.Implementation;
 using OKR.Service.Contract;
 using System;
 using System.Data.Entity;
@@ -19,12 +22,22 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private IProgressUpdatesRepository _progressUpdatesRepository;
         private IHttpContextAccessor _httpContextAccessor;
+        private UserManager<ApplicationUser> _userManager;
+        private IHttpContextAccessor _contextAccessor;
+        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
+        private IDepartmentRepository _departmentRepository;
 
-        public ProgressUpdatesService(IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IHttpContextAccessor httpContextAccessor)
+        public ProgressUpdatesService(IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository,
+            IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor,
+            IDepartmentObjectivesRepository departmentObjectivesRepository, IDepartmentRepository departmentRepository)
         {
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
+            _contextAccessor = contextAccessor;
+            _departmentObjectivesRepository = departmentObjectivesRepository;
+            _departmentRepository = departmentRepository;
         }
 
 
@@ -89,16 +102,33 @@ namespace OKR.Service.Implementation
                     {
                         switch (filter.FieldName)
                         {
-                            
+                            case "targetType":
+                                {
+                                    predicate = BuildFilterTargetType(predicate, Filters);
+                                    break;
+                                }
+                            case "createBy":
+                                {
+                                    var tg = Filters.Where(x => x.FieldName == "targetType").FirstOrDefault();
+                                    if (tg != null && tg.Value.Contains("0")){
+                                        predicate = predicate.And(x => x.CreatedBy == filter.Value);
+                                    }
+                                    break;
+                                }
                             default:
                                 break;
                         }
                     }
                 var userName = _httpContextAccessor.HttpContext.User.Identity.Name;
-                if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0)
                 {
-                    predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                    predicate = predicate.And(x => x.KeyResults.Objectives.TargetType == TargetType.individual);
+                    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                    {
+                        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                    }
                 }
+
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
             }
@@ -107,6 +137,36 @@ namespace OKR.Service.Implementation
 
                 throw;
             }
+        }
+        private ExpressionStarter<ProgressUpdates> BuildFilterTargetType(ExpressionStarter<ProgressUpdates> predicate, List<Filter> Filters)
+        {
+            var filter = Filters.Where(x => x.FieldName == "targetType").First();
+            var emumN = int.Parse(filter.Value);
+            TargetType targetType = (TargetType)emumN;
+            predicate = predicate.And(x => x.KeyResults.Objectives.TargetType == targetType);
+            if (targetType == TargetType.individual)
+            {
+                return predicate;
+            }
+            var filterUserName = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
+            ApplicationUser user;
+            if (filterUserName != null)
+            {
+                user = _userManager.Users.Where(x => x.UserName == filterUserName.Value).FirstOrDefault();
+            }
+            else
+            {
+                user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
+            }
+            var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
+            var departmentObjectiveIds = _departmentObjectivesRepository.GetAll()
+                 .Where(doj => doj.DepartmentId == department.Id)
+                 .Select(doj => doj.ObjectivesId);
+
+            predicate = predicate.And(x => departmentObjectiveIds.Contains(x.KeyResults.Objectives.Id));
+            
+
+            return predicate;
         }
     }
 }
