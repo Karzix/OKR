@@ -48,6 +48,17 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/",
+      component: layout1,
+      meta: { requiresAuth: false },
+      children: [
+        {
+          path: "UserName=:UserName",
+          component: HomePageView,
+        },
+      ],
+    },
   ]
 })
 

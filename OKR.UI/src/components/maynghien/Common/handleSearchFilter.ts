@@ -19,8 +19,11 @@ export function removeFilter(listFilter : Filter[], remove : Filter){
     }
 }
 
-export function handleFilterBeforSearch(listFilter : Filter[]) : Filter[]{
+export function handleFilterBeforSearch(listFilter? : Filter[]) : Filter[]{
     var result = [] as Filter[];
+    if(!listFilter){
+        listFilter = [] as Filter[];
+    }
     listFilter.forEach(x => {
         var newf = new Filter();
         newf.FieldName == x.FieldName;

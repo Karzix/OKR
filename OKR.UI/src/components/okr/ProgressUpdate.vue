@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import Cookie from "js-cookie";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";
@@ -42,11 +42,13 @@ const count = ref(10);
 const loading = ref(false);
 const noMore = ref(false);
 const disabled = computed(() => loading.value || noMore.value);
-
+const props = defineProps<{
+  searchRequest: SearchRequest;
+}>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
-  filters: [],
+  filters: props.searchRequest.filters ?? [],
   SortBy: undefined,
 });
 const searchResponse = ref<SearchResponse<ProgressUpdates[]>>({
@@ -56,10 +58,11 @@ const searchResponse = ref<SearchResponse<ProgressUpdates[]>>({
   currentPage: 1,
   rowsPerPage: 0,
 });
+
 const listProgressUpdate = ref<ProgressUpdates[]>([]);
-const searchProgressUpdate = () => {
+const searchProgressUpdate = async () => {
   try{
-    axiosInstance
+    await axiosInstance
     .post("ProgressUpdates/search", searchRequest.value)
     .then((response) => {
       if (!response.data.isSuccess) {
@@ -81,17 +84,12 @@ const searchProgressUpdate = () => {
     console.error(e);
   }
 };
-onMounted(() => {
-  var userName = route.params.userName;
-  if (userName && userName.toString() != "") {
-    var newFilter = new Filter();
-    newFilter.FieldName = "createBy";
-    newFilter.Value = userName.toString();
-    searchRequest.value.filters?.push(newFilter);
-  }
+watch(() => props.searchRequest.filters, () => {
+  searchRequest.value = props.searchRequest;
+  listProgressUpdate.value = [];
+  searchRequest.value.PageIndex = 1;
   searchProgressUpdate();
-});
-
+}, { deep: true })
 </script>
 
 <style scoped>

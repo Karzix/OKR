@@ -6,4 +6,5 @@ export class UserModel {
     role: string|unknown;
     token: string | undefined;
     refreshToken: string | undefined;
+    id: string | undefined;
 }
