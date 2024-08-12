@@ -36,6 +36,7 @@ import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { Right } from "@element-plus/icons-vue";
 import { formatDate, RecalculateTheDate } from "../../Service/formatDate";
 import { isNumberOrNumericString} from '@/Service/Number'
+import Cookies from "js-cookie";
 
 const route = useRoute();
 const count = ref(10);
@@ -90,6 +91,8 @@ watch(() => props.searchRequest.filters, () => {
   searchRequest.value.PageIndex = 1;
   searchProgressUpdate();
 }, { deep: true })
+
+
 </script>
 
 <style scoped>

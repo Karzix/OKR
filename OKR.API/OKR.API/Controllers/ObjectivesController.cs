@@ -45,6 +45,7 @@ namespace OKR.API.Controllers
         }
         [HttpPost]
         [Route("overal-progress")]
+        [AllowAnonymous]
         public IActionResult OverallProgress(SearchRequest request)
         {
             var result =  _objectiveService.CaculateOveralProgress(request);

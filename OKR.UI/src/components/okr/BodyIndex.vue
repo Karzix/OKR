@@ -1,8 +1,8 @@
 <template>
-  <el-card style="" v-for="item in props.data.data" @click="handleDeatail(item)">
+  <el-card style="" v-for="item in props.data.data" @click=" handleDeatail(item)">
     <div style="">
       <h3>
-        {{ item.name }} <el-icon @click="editObjective(item)"><Edit /></el-icon>
+        {{ item.name }} <el-icon @click="() =>{if(isLogin)editObjective(item)}"><Edit /></el-icon>
       </h3>
       <el-progress :percentage="item.point" :color="customColorMethod" />
     </div>
@@ -12,6 +12,8 @@
 <script setup lang="ts">
 import type { Objective } from '@/Models/Objective';
 import { SearchResponse } from '../../components/maynghien/BaseModels/SearchResponse';
+import Cookies from 'js-cookie';
+import { onMounted, ref } from 'vue';
 
 
 const props = defineProps<{
@@ -29,6 +31,7 @@ interface Tree {
   label: string;
   children?: Tree[];
 }
+const isLogin = ref(false)
 const customColorMethod = (percentage: number) => {
   if (percentage < 30) {
     return "#909399";
@@ -62,4 +65,12 @@ const buildTree = (objective: Objective) : Tree[] => {
   }
   return dataTreeTemp
 }
+onMounted(() => {
+  if(!Cookies.get("accessToken")){
+
+  }
+  else{
+    isLogin.value = true
+  }
+})
 </script>

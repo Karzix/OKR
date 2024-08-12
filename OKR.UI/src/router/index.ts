@@ -50,7 +50,7 @@ const router = createRouter({
     },
     {
       path: "/",
-      component: layout1,
+      component: LayoutBlank,
       meta: { requiresAuth: false },
       children: [
         {

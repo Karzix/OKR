@@ -22,7 +22,7 @@
           }}</el-tag>
         </div>
         <div class="header-extra flex items-center">
-          <el-button
+          <el-button v-if="isLogin"
             type="primary"
             class="ml-2"
             @click="handleProgressUpdate(item)"
@@ -67,13 +67,14 @@ import { Objective } from "@/Models/Objective";
 import { formatDate } from "../../Service/formatDate";
 import { Edit as EditIcon } from "@element-plus/icons-vue";
 import { KeyResult } from "@/Models/KeyResult";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 import { deepCopy } from "../../Service/deepCopy";
 import { caculateKeyResult , caculateObjective} from "../../Service/OKR/caculateKeyResult";
 import { Sidequest } from "@/Models/Sidequests";
 import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage } from "element-plus";
+import Cookies from "js-cookie";
 
 const props = defineProps<{
   objective: Objective;
@@ -94,6 +95,7 @@ const tempKeyResults = ref<KeyResult>({
   sidequests: [],
   note: "",
 });
+const isLogin = ref(false)
 const visibleDialogProgressUpdate = ref(false);
 const handleProgressUpdate = (keyresults: KeyResult) => {
   tempKeyResults.value = deepCopy(keyresults);
@@ -112,6 +114,14 @@ const handleChangeSidequest = (item: Sidequest) => {
 const changePoint = (point : number, keyresultId : string) =>{
   props.objective.listKeyResults.filter(x=>x.id == keyresultId)[0].currentPoint = point
 }
+onMounted(() => {
+  if(!Cookies.get("accessToken")){
+
+  }
+  else{
+    isLogin.value = true
+  }
+})
 </script>
 <style scoped>
 .custom-header {

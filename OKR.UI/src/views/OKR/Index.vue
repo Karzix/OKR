@@ -1,13 +1,12 @@
 <template>
   <el-card style="">
     <template #header>
-      
       <div class="card-header">
         <div class="dl-flex">
           <el-progress type="circle" :percentage="overalProgress" />
           <div class="buttons">
             <el-button-group>
-              <el-button type="primary" @click="CreateObjectives"
+              <el-button type="primary" @click="CreateObjectives" v-if="isLogin == true"
                 >new objective</el-button
               >
               <el-button type="primary" @click="page = 0">Home</el-button>
@@ -106,6 +105,7 @@ const data = ref<SearchResponse<Objective[]>>({
   currentPage: 1,
   rowsPerPage: 0,
 });
+const isLogin = ref<boolean>(false);
 const tableColumns = ref<TableColumn[]>([
   {
     key: "createOn",
@@ -212,6 +212,9 @@ onMounted(() => {
     fil.FieldName = 'createBy'
     fil.Value = route.params.UserName.toString();
     handleSearch.addFilter(searchRequest.value.filters as [],fil);
+  }
+  else{
+    isLogin.value = true
   }
   Search();
 })
