@@ -1,4 +1,5 @@
-﻿using LinqKit;
+﻿using AutoMapper;
+using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
@@ -20,15 +21,18 @@ namespace OKR.Service.Implementation
         private readonly RoleManager<IdentityRole> _roleManager;
         private IHttpContextAccessor _httpContextAccessor;
         private IDepartmentRepository _departmentRepository;
+        private IMapper _mappper;
 
         public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor, IDepartmentRepository departmentRepository)
+            RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor, IDepartmentRepository departmentRepository
+            , IMapper mapper)
         {
             _userRepository = userRepository;
             _userManager = userManager;
             _roleManager = roleManager;
             _httpContextAccessor = httpContextAccessor;
             _departmentRepository = departmentRepository;
+            _mappper = mapper;
         }
 
         public async Task<AppResponse<UserDto>> Create(UserDto request)
@@ -178,6 +182,7 @@ namespace OKR.Service.Implementation
                 }
 
                 await _userManager.UpdateAsync(user);
+                result.BuildResult(request);
             }
             catch (Exception ex)
             {
@@ -236,6 +241,48 @@ namespace OKR.Service.Implementation
 
                 throw;
             }
+        }
+
+        public AppResponse<List<UserDto>> GetAll()
+        {
+            var result = new AppResponse<List<UserDto>>();
+            try
+            {
+                var data = _userRepository.FindByPredicate(x => true).Select(x => new UserDto
+                {
+                    DepartmentId = x.DepartmentId,
+                    DepartmentName = x.Department.Name,
+                    Email = x.Email,
+                    Id = Guid.Parse(x.Id),
+                    UserName = x.UserName,
+                }).ToList();
+                result.BuildResult(data);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message + ex.StackTrace);
+            }
+            return result;
+        }
+        public async Task<AppResponse<UserDto>> Get(string userName)
+        {
+            var result = new AppResponse<UserDto>();
+            try
+            {
+                var applicationUser = await _userManager.FindByNameAsync(userName);
+                var userDto = _mappper.Map<UserDto>(applicationUser);
+                var department = _departmentRepository.FindBy(x=>x.Id == applicationUser.DepartmentId).FirstOrDefault();
+                if(department != null)
+                {
+                    userDto.DepartmentName = department.Name;
+                }
+                result.BuildResult(userDto);
+            }
+            catch(Exception ex)
+            {
+                result.BuildError(ex.Message + ex.StackTrace);
+            }
+            return result;
         }
     }
 }

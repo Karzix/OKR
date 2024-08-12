@@ -17,6 +17,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IKeyResultRepository, KeyResultRepository>();
             builder.Services.AddScoped<ISidequestsRepository, SidequestsRepository>();
             builder.Services.AddScoped<IProgressUpdatesRepository, ProgressUpdatesRepository>();
+            builder.Services.AddScoped<IDepartmentObjectivesRepository, DepartmentObjectivesRepository>();
 
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();

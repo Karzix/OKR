@@ -20,7 +20,7 @@ namespace OKR.Repository.Implementation
         {
         }
 
-        public void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
+        public void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests, Guid? DepartmentId)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -42,6 +42,32 @@ namespace OKR.Repository.Implementation
                         item.CreatedOn = DateTime.UtcNow;
                     }
                     _context.AddRange(sidequests);
+
+                    if(obj.TargetType == TargetType.individual)
+                    {
+                        var newUserObj = new UserObjectives
+                        {
+                            ApplicationUserId = _context.Users.Where(x => x.UserName == obj.CreatedBy).First().Id,
+                            CreatedBy = obj.CreatedBy,
+                            Id = Guid.NewGuid(),
+                            ObjectivesId = obj.Id,
+                            CreatedOn = DateTime.UtcNow,
+                        };
+                        _context.UserObjectives.Add(newUserObj);
+                    }
+                    else
+                    {
+                        var newDepartmentObj = new DepartmentObjectives
+                        {
+                            CreatedBy = obj.CreatedBy,
+                            DepartmentId = DepartmentId.Value,
+                            CreatedOn = DateTime.UtcNow,
+                            ObjectivesId = obj.Id,
+                            Id = Guid.NewGuid(),
+                        };
+                        _context.DepartmentObjectives.Add(newDepartmentObj);
+                    }
+
                     _context.SaveChanges();
                     transaction.Commit();
                 }

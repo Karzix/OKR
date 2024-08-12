@@ -39,14 +39,14 @@ namespace OKR.API.Controllers
         [Route("search")]
         public IActionResult Search(SearchRequest request)
         {
-            var result = _objectiveService.Search(request);
+            var result =  _objectiveService.Search(request);
             return Ok(result);
         }
         [HttpPost]
         [Route("overal-progress")]
         public IActionResult OverallProgress(SearchRequest request)
         {
-            var result = _objectiveService.CaculateOveralProgress(request);
+            var result =  _objectiveService.CaculateOveralProgress(request);
             return Ok(result);
         }
         [HttpPut]

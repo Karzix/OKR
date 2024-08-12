@@ -3,6 +3,7 @@ using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using OKR.DTO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
@@ -21,14 +22,22 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private IKeyResultRepository _keyResultRepository;
         private ISidequestsRepository _questsRepository;
+        private UserManager<ApplicationUser> _userManager;
+        private IDepartmentRepository _departmentRepository;
+        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
 
-        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper, IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository)
+        public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
+            IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository, UserManager<ApplicationUser> userManager,
+            IDepartmentRepository departmentRepository, IDepartmentObjectivesRepository departmentObjectivesRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
             _mapper = mapper;
             _keyResultRepository = keyResultRepository;
             _questsRepository = sidequestsRepository;
+            _userManager = userManager;
+            _departmentRepository = departmentRepository;
+            _departmentObjectivesRepository = departmentObjectivesRepository;
         }
 
         public AppResponse<ObjectiveDto> Create(ObjectiveDto request)
@@ -37,7 +46,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                
+                var user = _userManager.Users.Where(x=>x.UserName == userName).FirstOrDefault();
                 if(request.ListKeyResults == null || request.ListKeyResults.Count == 0)
                 {
                     return result.BuildError("requires at least one keyResult");
@@ -96,7 +105,7 @@ namespace OKR.Service.Implementation
                         });
                     }
                 }
-                _objectiveRepository.Add(objective,keyResults, ListSidequests);
+                _objectiveRepository.Add(objective,keyResults, ListSidequests, user.DepartmentId);
 
                 request.Id = objective.Id;
                 request.ListKeyResults = _mapper.Map<List<KeyResultDto>>(keyResults);
@@ -152,7 +161,7 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<SearchResponse<ObjectiveDto>>();
             try
             {
-                var query = BuildFilterExpression(request.Filters);
+                var query =  BuildFilterExpression(request.Filters);
                 var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
                 var model = _objectiveRepository.FindByPredicate(query);
                 if (request.SortBy != null)
@@ -197,7 +206,6 @@ namespace OKR.Service.Implementation
                     })
                     .ToList();
 
-
                 var searchUserResult = new SearchResponse<ObjectiveDto>
                 {
                     TotalRows = numOfRecords,
@@ -230,15 +238,29 @@ namespace OKR.Service.Implementation
                                     predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
                                     break;
                                 }
+                            case "createOn":
+                                {
+                                    break;
+                                }
+                            case "targetType":
+                                {
+                                   predicate = BuildFilterTargetType(predicate, Filters);
 
+                                    break;
+                                }
                             default:
                                 break;
                         }
                     }
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                
+                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0)
                 {
-                    predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                    predicate = predicate.And(x => x.TargetType == TargetType.individual);
+                    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                    {
+                        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                    }
                 }
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
@@ -356,6 +378,32 @@ namespace OKR.Service.Implementation
                 result.BuildError(ex.Message + " " + ex.StackTrace);
             }
             return result;
+        }
+
+        private ExpressionStarter<Objectives> BuildFilterTargetType(ExpressionStarter<Objectives> predicate, List<Filter> Filters)
+        {
+            var filter = Filters.Where(x => x.FieldName == "targetType").First();
+            var emumN = int.Parse(filter.Value);
+            TargetType targetType = (TargetType)emumN;
+            predicate = predicate.And(x => x.TargetType == targetType);
+            var filterUserName = Filters.Where(x => x.FieldName == "userName").FirstOrDefault();
+            ApplicationUser user;
+            if (filterUserName != null)
+            {
+                user =  _userManager.Users.Where(x=>x.UserName == filterUserName.Value).FirstOrDefault();
+            }
+            else
+            {
+                user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
+            }
+            var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
+            var departmentObjectiveIds = _departmentObjectivesRepository.GetAll()
+                 .Where(doj => doj.DepartmentId == department.Id)
+                 .Select(doj => doj.ObjectivesId);
+
+            predicate = predicate.And(x => departmentObjectiveIds.Contains(x.Id));
+
+            return predicate;
         }
     }
 }

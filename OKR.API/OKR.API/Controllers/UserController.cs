@@ -45,5 +45,18 @@ namespace OKR.API.Controllers
             var result =await _userService.Search(request);
             return Ok(result);
         }
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var result =_userService.GetAll();
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("{userName}")]
+        public async Task<IActionResult> Get(string userName)
+        {
+            var result = await _userService.Get(userName);
+            return Ok(result);
+        }
     }
 }

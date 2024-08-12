@@ -17,29 +17,24 @@ namespace OKR.Repository.Implementation
         {
         }
 
-        public Department GetParentOfChildDepartment(int levelParent, int levelChild, Guid idChild)
+        public Department GetParentOfChildDepartment(int levelParent, Guid idChild)
         {
-            var department = _context.Department
-                                     .Include(d => d.ParentDepartment)
-                                     .FirstOrDefault(d => d.Id == idChild);
-
-            if (department == null)
+            var query = _context.Department.Where(x => x.Id == idChild);
+            var childDepartment = query.FirstOrDefault();
+            if(childDepartment == null)
             {
                 return null;
             }
-            while (department.ParentDepartment != null && department.Level > levelParent)
+            for (int i = levelParent; i < childDepartment.Level; i++)
             {
-                department = _context.Department
-                                     .Include(d => d.ParentDepartment)
-                                     .FirstOrDefault(d => d.Id == department.ParentDepartmentId);
-
-                if (department.Level == levelParent)
-                {
-                    return department;
-                }
+                query = query.Join(_context.Department,
+                                    clD => clD.ParentDepartmentId,
+                                    prD => prD.Id,
+                                    (clD, prD) => prD);
             }
 
-            return null;
+            var department = query.FirstOrDefault();
+            return department;
         }
         public List<Department> GetAllChildDepartments(Guid parentId)
         {

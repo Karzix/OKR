@@ -10,7 +10,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class DepartmentController : Controller
     {
         private IDepartmentService _departmentService;

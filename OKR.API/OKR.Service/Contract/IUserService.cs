@@ -15,5 +15,7 @@ namespace OKR.Service.Contract
         Task<AppResponse<UserDto>> Update(UserDto request);
         Task<AppResponse<string>> LockAsync(UserDto request, int day = 30);
         Task<AppResponse<SearchResponse<UserDto>>> Search(SearchRequest request);
+        AppResponse<List<UserDto>> GetAll();
+        Task<AppResponse<UserDto>> Get(string iduserName);
     }
 }

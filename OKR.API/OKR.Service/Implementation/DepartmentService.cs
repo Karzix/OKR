@@ -99,6 +99,10 @@ namespace OKR.Service.Implementation
                 }).ToList();
                 data = BuildTree(data);
                 result.BuildResult(data);
+
+
+                var test = _departmentRepository.GetParentOfChildDepartment(3, Guid.Parse("f0adc7e4-0f54-49a2-9e22-91efcf18f069"));
+
             }
             catch (Exception ex)
             {

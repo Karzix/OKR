@@ -19,6 +19,7 @@ namespace OKR.Service.Mapper
 			CreateMap<ObjectiveDto, Objectives>().ReverseMap();
 			CreateMap<SidequestsDto, Sidequests>().ReverseMap();
 			CreateMap<ProgressUpdatesDto, ProgressUpdates>().ReverseMap();
+			CreateMap<UserDto, ApplicationUser>().ReverseMap();
 		}
 	}
 }
