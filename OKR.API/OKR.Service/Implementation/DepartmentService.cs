@@ -90,7 +90,7 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<List<DepartmentDto>>();
             try
             {
-                var data = _departmentRepository.GetAll().Select(x => new DepartmentDto
+                var data = _departmentRepository.AsQueryable().Select(x => new DepartmentDto
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -254,7 +254,7 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<List<DepartmentDto>>();
             try
             {
-                var data = _departmentRepository.GetAll().Where(x=>x.Level == (level - 1))
+                var data = _departmentRepository.AsQueryable().Where(x=>x.Level == (level - 1))
                     .Select(x=> new DepartmentDto
                     {
                         Id = x.Id,
@@ -300,7 +300,7 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<List<int>>();
             try
             {
-                var max = _departmentRepository.GetAll().Max(x=>x.Level);
+                var max = _departmentRepository.AsQueryable().Max(x=>x.Level);
                 var listINT = new List<int>();
                 for (int i = 1; i <= max; i++)
                 {

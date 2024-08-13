@@ -180,7 +180,7 @@ namespace Maynghien.Infrastructure.Repository
             return GetSet().Where(predicate).AsQueryable();
         }
 
-        public virtual IQueryable<TEntity> GetAll()
+        public virtual IQueryable<TEntity> AsQueryable()
         {
             return GetSet().AsQueryable();
         }

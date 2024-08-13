@@ -183,7 +183,7 @@ namespace OKR.Service.Implementation
                         StartDay = x.StartDay,
                         TargetType = x.TargetType,
                         TargetTypeName = getTargetTypeName(x.TargetType),
-                        ListKeyResults = _keyResultRepository.GetAll().Where(k=>k.ObjectivesId == x.Id)
+                        ListKeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id)
                         .Select(k=> new KeyResultDto
                         {
                             Active = k.Active,
@@ -193,7 +193,7 @@ namespace OKR.Service.Implementation
                             Id = k.Id,
                             MaximunPoint = k.MaximunPoint,
                             Unit = k.Unit,
-                            Sidequests = _questsRepository.GetAll().Where(s => s.KeyResultsId == k.Id).
+                            Sidequests = _questsRepository.AsQueryable().Where(s => s.KeyResultsId == k.Id).
                             Select(s=> new SidequestsDto
                             {
                                 Id=s.Id,
@@ -268,7 +268,6 @@ namespace OKR.Service.Implementation
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -302,7 +301,7 @@ namespace OKR.Service.Implementation
                 var objectives = _objectiveRepository.Get(request.Id.Value);
                 var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
                 var listkrID = listKeyResults.Select(x=>x.Id).ToList();
-                var listSidequests = _questsRepository.GetAll().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
+                var listSidequests = _questsRepository.AsQueryable().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
 
                 objectives.StartDay = request.StartDay.Value;
                 objectives.Deadline = request.Deadline.Value;
@@ -384,8 +383,8 @@ namespace OKR.Service.Implementation
         private ExpressionStarter<Objectives> BuildFilterTargetType(ExpressionStarter<Objectives> predicate, List<Filter> Filters)
         {
             var filter = Filters.Where(x => x.FieldName == "targetType").First();
-            var emumN = int.Parse(filter.Value);
-            TargetType targetType = (TargetType)emumN;
+            var enumN = int.Parse(filter.Value);
+            TargetType targetType = (TargetType)enumN;
             if(targetType == TargetType.individual)
             {
                 return predicate;
@@ -401,8 +400,8 @@ namespace OKR.Service.Implementation
             {
                 user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
             }
-            var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
-            var departmentObjectiveIds = _departmentObjectivesRepository.GetAll()
+            var department = _departmentRepository.GetParentOfChildDepartment(enumN, user.DepartmentId.Value);
+            var departmentObjectiveIds = _departmentObjectivesRepository.AsQueryable()
                  .Where(doj => doj.DepartmentId == department.Id)
                  .Select(doj => doj.ObjectivesId);
 

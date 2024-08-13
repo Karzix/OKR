@@ -30,7 +30,7 @@ namespace Maynghien.Infrastructure.Repository
         Task BulkInsert(IList<T> entities, CancellationToken cancellationToken);
         Task BulkUpdate(IList<T> entities, CancellationToken cancellationToken);
         IQueryable<T> FindBy(Expression<Func<T, bool>> predicate);
-        IQueryable<T> GetAll();
+        IQueryable<T> AsQueryable();
         IQueryable<T> FindByPredicate(Expression<Func<T, bool>> predicate);
         int CountRecordsByPredicate(Expression<Func<T, bool>> predicate);
         IQueryable<T> addSort(IQueryable<T> input, SortByInfo sortByInfo);
