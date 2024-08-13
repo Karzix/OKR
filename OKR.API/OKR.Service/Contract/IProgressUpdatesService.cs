@@ -12,5 +12,6 @@ namespace OKR.Service.Contract
     public interface IProgressUpdatesService
     {
         AppResponse<SearchResponse<ProgressUpdatesDto>> Search(SearchRequest request);
+        AppResponse<List<DataChart>> GetDataChart(SearchRequest request);
     }
 }

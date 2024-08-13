@@ -50,7 +50,7 @@ const router = createRouter({
     },
     {
       path: "/",
-      component: LayoutBlank,
+      component: layout1,
       meta: { requiresAuth: false },
       children: [
         {
@@ -62,18 +62,18 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated: boolean = !!Cookies.get('accessToken');
-  const userRoles: string[] = getRolesFromToken() ??[];
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated: boolean = !!Cookies.get('accessToken');
+//   const userRoles: string[] = getRolesFromToken() ??[];
 
-  if (to.meta.requiresAuth && isAuthenticated == false) {
-    next('/login'); 
-  } else if (to.meta.roles && !hasPermission(userRoles, to.meta.roles as string[])) {
-    next('/'); 
-  } else {
-    next();
-  }
-});
+//   if (to.meta.requiresAuth && isAuthenticated == false) {
+//     next('/login'); 
+//   } else if (to.meta.roles && !hasPermission(userRoles, to.meta.roles as string[])) {
+//     next('/'); 
+//   } else {
+//     next();
+//   }
+// });
 
 function hasPermission(userRoles: string[], requiredRoles: string[]): boolean {
   for (const requiredRole of requiredRoles) {

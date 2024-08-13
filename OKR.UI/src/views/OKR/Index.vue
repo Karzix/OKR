@@ -6,7 +6,7 @@
           <el-progress type="circle" :percentage="overalProgress" />
           <div class="buttons">
             <el-button-group>
-              <el-button type="primary" @click="CreateObjectives" v-if="isLogin == true"
+              <el-button type="primary" @click="CreateObjectives" 
                 >new objective</el-button
               >
               <el-button type="primary" @click="page = 0">Home</el-button>
@@ -61,7 +61,6 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import { AppResponse } from "../../components/maynghien/adminTable/Models/AppRespone";
 import { SearchResponse } from "../../components/maynghien/BaseModels/SearchResponse";
 import { Objective } from "../../Models/Objective";
 import { axiosInstance } from "../../Service/axiosConfig";
@@ -74,7 +73,6 @@ import Deatail from "@/views/OKR/Deatail.vue";
 import BodyIndex from "@/components/okr/BodyIndex.vue";
 import ProgressUpdates from "@/components/okr/ProgressUpdate.vue";
 import MnActionPane from "@/components/maynghien/adminTable/MnActionPane.vue";
-import { CustomAction } from "@/components/maynghien/adminTable/Models/CustomAction";
 import { TableColumn } from "@/components/maynghien/adminTable/Models/TableColumn";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
@@ -105,7 +103,7 @@ const data = ref<SearchResponse<Objective[]>>({
   currentPage: 1,
   rowsPerPage: 0,
 });
-const isLogin = ref<boolean>(false);
+
 const tableColumns = ref<TableColumn[]>([
   {
     key: "createOn",
@@ -214,7 +212,7 @@ onMounted(() => {
     handleSearch.addFilter(searchRequest.value.filters as [],fil);
   }
   else{
-    isLogin.value = true
+    
   }
   Search();
 })

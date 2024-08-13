@@ -115,6 +115,11 @@ namespace OKR.Service.Implementation
                                     }
                                     break;
                                 }
+                            case "keyresultId":
+                                {
+                                    predicate = predicate.And(x=>x.KeyResultId.Equals(filter.Value));
+                                    break;
+                                }
                             default:
                                 break;
                         }
@@ -129,7 +134,7 @@ namespace OKR.Service.Implementation
                     }
                 }
 
-                predicate = predicate.And(x => x.IsDeleted != true);
+                predicate = predicate.And(x => x.KeyResults.Objectives.IsDeleted != true);
                 return predicate;
             }
             catch (Exception)
@@ -159,7 +164,7 @@ namespace OKR.Service.Implementation
                 user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
             }
             var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
-            var departmentObjectiveIds = _departmentObjectivesRepository.GetAll()
+            var departmentObjectiveIds = _departmentObjectivesRepository.AsQueryable()
                  .Where(doj => doj.DepartmentId == department.Id)
                  .Select(doj => doj.ObjectivesId);
 
@@ -167,6 +172,41 @@ namespace OKR.Service.Implementation
             
 
             return predicate;
+        }
+
+        public AppResponse<List<DataChart>> GetDataChart(SearchRequest request)
+        {
+            var result = new AppResponse<List<DataChart>>();
+            try
+            {
+                var filter = request.Filters.FirstOrDefault(x=>x.FieldName == "objectivesId" || x.FieldName == "keyresultsId");
+                if (filter == null)
+                {
+                    return result.BuildError("");
+                }
+                IQueryable<ProgressUpdates> QueryProgresses = _progressUpdatesRepository.AsQueryable();
+                if(filter.FieldName == "objectivesId")
+                {
+                    QueryProgresses = _progressUpdatesRepository.AsQueryable().Where(x=>x.KeyResults.ObjectivesId.Equals(Guid.Parse(filter.Value))).AsQueryable();
+                }
+                else if(filter.FieldName == "keyresultsId")
+                {
+                    QueryProgresses = _progressUpdatesRepository.AsQueryable().Where(x => x.KeyResultId.Equals(Guid.Parse(filter.Value))).AsQueryable();
+                }
+                var progresses = QueryProgresses.OrderByDescending(x=>x.CreatedOn).Select(x=> new DataChart
+                {
+                    Date = (DateTime)x.CreatedOn,
+                    Lable = x.Note,
+                    Point = (int)x.NewPoint,
+                    UserName = x.CreatedBy
+                }).ToList();
+                result.BuildResult(progresses);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message+" " + ex.StackTrace);
+            }
+            return result;
         }
     }
 }
