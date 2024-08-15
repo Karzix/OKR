@@ -11,5 +11,6 @@ namespace OKR.Repository.Contract
 {
     public interface IKeyResultRepository : IGenericRepository<KeyResults,OKRDBContext,ApplicationUser>
     {
+        int caculatePercentKeyResults(KeyResults input);
     }
 }

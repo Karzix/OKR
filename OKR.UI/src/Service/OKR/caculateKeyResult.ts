@@ -21,7 +21,7 @@ export const caculateKeyResult = (keyResult: KeyResult) => {
             point = pointKeyResult
         }
     }
-    return point*100;
+    return Math.round(point*100);
 }
 export const caculateObjective = (objective: Objective) => {
     var point = 0;
@@ -30,5 +30,5 @@ export const caculateObjective = (objective: Objective) => {
             point = point + caculateKeyResult(x);
         })
     }
-    return point / objective.listKeyResults.length;
+    return Math.round(point / objective.listKeyResults.length);
 }

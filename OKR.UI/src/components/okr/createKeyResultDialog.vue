@@ -107,6 +107,7 @@ import { KeyResult } from "@/Models/KeyResult";
 import { Sidequest } from "@/Models/Sidequests";
 import { Close } from "@element-plus/icons-vue";
 import { getUtcOffsetInHours } from "@/Service/formatDate";
+import { deepCopy } from "@/Service/deepCopy";
 const sidequestsName = ref("");
 const keyResult = ref<KeyResult>({
   id: undefined,
@@ -132,7 +133,7 @@ const props = defineProps<{
 }>();
 const handleAddItem = (item: KeyResult) => {
   if (!props.isEdit) {
-    emit("onAddItem", item);
+    emit("onAddItem", deepCopy(item));
   }
   else{
     emit("onEditItem", item);

@@ -7,8 +7,7 @@
           <div class="buttons">
             <el-button-group>
               <el-button type="primary" @click="CreateObjectives" 
-                >new objective</el-button
-              >
+                >new objective</el-button>
               <el-button type="primary" @click="page = 0">Home</el-button>
               <el-button type="primary" @click="page = 1">progress</el-button>
             </el-button-group>
@@ -19,8 +18,6 @@
             </el-button-group>
           </div>
         </div>
-    
-   
         <div class="filter-search">
           <MnActionPane
             :allowAdd="false"
@@ -56,7 +53,7 @@
     ></CreateObjective>
   </el-dialog>
   <el-dialog v-model="DeatailDialog" class="dialogOKR">
-    <Deatail :objective="editItem" @onSearchObjective="Search()"></Deatail>
+    <Deatail :objective="editItem" @onSearchObjective="Search()" v-if="DeatailDialog"></Deatail>
   </el-dialog>
 </template>
 <script lang="ts" setup>
@@ -69,7 +66,7 @@ import CreateObjective from "./CreateOKR.vue";
 import { Edit } from "@element-plus/icons-vue";
 import { deepCopy } from "../../Service/deepCopy";
 import { RecalculateTheDate } from "../../Service/formatDate";
-import Deatail from "@/views/OKR/Deatail.vue";
+import Deatail from "@/views/OKR/DeatailObjectives.vue";
 import BodyIndex from "@/components/okr/BodyIndex.vue";
 import ProgressUpdates from "@/components/okr/ProgressUpdate.vue";
 import MnActionPane from "@/components/maynghien/adminTable/MnActionPane.vue";

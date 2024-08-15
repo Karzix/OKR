@@ -254,8 +254,7 @@ namespace OKR.Service.Implementation
                         }
                     }
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                
-                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0)
+                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
                 {
                     predicate = predicate.And(x => x.TargetType == TargetType.individual);
                     if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)

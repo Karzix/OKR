@@ -15,21 +15,23 @@ namespace OKR.Service.Implementation
         private IHttpContextAccessor _contextAccessor;
         private IMapper _mapper;
         private IProgressUpdatesRepository _progressUpdatesRepository;
+        private IObjectivesRepository _objectivesRepository;
 
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
-            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository)
+            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository)
         {
             _keyResultRepository = keyResultRepository;
             _contextAccessor = httpContextAccessor;
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
+            _objectivesRepository = objectivesRepository;
         }
 
         public AppResponse<KeyResultDto> Update(KeyResultDto request)
         {
             var result = new AppResponse<KeyResultDto>();
             try
-            {
+            {   
                 
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
@@ -45,14 +47,15 @@ namespace OKR.Service.Implementation
                 progressUpdates.KeyResultId = keyresult.Id;
                 progressUpdates.OldPoint = keyresult.CurrentPoint;
                 progressUpdates.NewPoint = request.CurrentPoint.Value;
+                
 
                 keyresult.MaximunPoint = (int)request.MaximunPoint;
                 keyresult.CurrentPoint = (int)request.CurrentPoint;
                 keyresult.Description = request.Description;
                 _keyResultRepository.Edit(keyresult);
-                
-
-                
+                progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
+                Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
+                progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
                 _progressUpdatesRepository.Add(progressUpdates);
 
                 result.BuildResult(request);

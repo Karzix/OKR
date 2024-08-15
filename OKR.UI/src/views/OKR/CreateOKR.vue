@@ -3,9 +3,9 @@
     <div>
       <el-radio-group v-model="objective.targetType" size="large">
         <el-radio-button
-          v-for="item in TargetTypes"
-          :label="item.name"
-          :value="item.id"
+          v-for="item in targetTypeValues"
+          :label="TargetType[item]"
+          :value="item"
         />
       </el-radio-group>
     </div>
@@ -87,10 +87,11 @@ import createKeyResultDialog from "@/components/okr/createKeyResultDialog.vue";
 import { KeyResult } from "@/Models/KeyResult";
 import { Objective } from "@/Models/Objective";
 import { axiosInstance } from "../../Service/axiosConfig";
-import { TargetType } from "@/Models/TargetType";
+// import { TargetType } from "@/Models/TargetType";
 import { CloseBold } from "@element-plus/icons-vue";
 import { formatDate } from "../../Service/formatDate";
 import { deepCopy } from "../../Service/deepCopy";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const objective = ref<Objective>({
   id: undefined,
@@ -110,20 +111,24 @@ const emit = defineEmits<{
   (e: "onSearchObjective"): void;
   (e: "onClose"): void;
 }>();
-const TargetTypes = ref([
-  {
-    id: 0,
-    name: "Individual",
-  },
-  {
-    id: 1,
-    name: "Branch",
-  },
-  {
-    id: 2,
-    name: "Team",
-  },
-]);
+// const TargetTypes = ref([
+//   {
+//     id: 0,
+//     name: "Individual",
+//   },
+//   {
+//     id: 1,
+//     name: "Branch",
+//   },
+//   {
+//     id: 2,
+//     name: "Team",
+//   },
+// ]);
+const targetTypeValues = Object.keys(TargetType)
+    .map(key => Number(key))
+    .filter(value => !isNaN(value));
+
 const editKeyresultItme = ref<KeyResult>({
   id: undefined,
   description: "",
@@ -149,13 +154,13 @@ const handleEditKeyResult = (item: KeyResult) => {
     objective.value.listKeyResults.splice(index, 1, item);
   }
 };
-const GetGeneralData = () => {
-  axiosInstance.get("TargetType").then((res) => {
-    TargetTypes.value = res.data.data;
-  });
-};
+// const GetGeneralData = () => {
+//   axiosInstance.get("TargetType").then((res) => {
+//     TargetTypes.value = res.data.data;
+//   });
+// };
 onMounted(() => {
-  GetGeneralData();
+  // GetGeneralData();
   if (props.isEdit) {
     objective.value = props.objective;
   }

@@ -193,18 +193,21 @@ namespace OKR.Service.Implementation
                 {
                     QueryProgresses = _progressUpdatesRepository.AsQueryable().Where(x => x.KeyResultId.Equals(Guid.Parse(filter.Value))).AsQueryable();
                 }
-                var progresses = QueryProgresses.OrderByDescending(x=>x.CreatedOn).Select(x=> new DataChart
+                var progresses = QueryProgresses.OrderBy(x=>x.CreatedOn).Select(x=> new DataChart
                 {
-                    Date = (DateTime)x.CreatedOn,
-                    Lable = x.Note,
-                    Point = (int)x.NewPoint,
-                    UserName = x.CreatedBy
+                    Date = x.CreatedOn,
+                    Label = x.Note,
+                    NewPoint = x.NewPoint,
+                    OldPoint = x.OldPoint,
+                    UserName = x.CreatedBy,
+                    KeyresultCompletionRate = x.KeyresultCompletionRate,
+                    ObjectivesCompletionRate = x.ObjectivesCompletionRate,
                 }).ToList();
                 result.BuildResult(progresses);
             }
             catch (Exception ex)
             {
-                result.BuildError(ex.Message+" " + ex.StackTrace);
+                result.BuildError(ex.Message+ " " + ex.StackTrace);
             }
             return result;
         }

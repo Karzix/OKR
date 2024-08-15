@@ -8,9 +8,12 @@ namespace OKR.DTO
 {
     public class DataChart
     {
-        public int Point { get; set; }
-        public string Lable { get; set;}
-        public DateTime Date { get; set; }
+        public int? OldPoint { get; set; }
+        public int? NewPoint { get; set; }
+        public string Label { get; set;}
+        public DateTime? Date { get; set; }
         public string UserName { get; set; }
+        public int ObjectivesCompletionRate { get; set; }
+        public int KeyresultCompletionRate { get; set; }
     }
 }
