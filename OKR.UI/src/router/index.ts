@@ -10,6 +10,7 @@ import UserVue from '@/views/User/Index.vue'
 import BranchVue from '@/views/Department/Branch.vue'
 import TeamVue from '@/views/Department/Team.vue'
 import { LoginResult } from '@/Models/LoginResult';
+import UserInfor from '@/views/OKR/UserInfor.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,7 +56,7 @@ const router = createRouter({
       children: [
         {
           path: "UserName=:UserName",
-          component: HomePageView,
+          component: UserInfor,
         },
       ],
     },
