@@ -17,6 +17,7 @@
           <el-card v-for="item in Individual">
             {{ item.name }}
             <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
           </el-card>
           more.....
         </el-card>
@@ -31,6 +32,7 @@
           <el-card v-for="item in Branch">
             {{ item.name }}
             <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
           </el-card>
           more.....
         </el-card>
@@ -45,6 +47,7 @@
           <el-card v-for="item in Team">
             {{ item.name }}
             <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
           </el-card>
           more.....
         </el-card>
@@ -64,6 +67,7 @@ import {
   removeFilter,
 } from "@/components/maynghien/Common/handleSearchFilter";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
+import { buildTree } from '@/Service/OKR/buildTree'
 
 const percentage = ref(50);
 
