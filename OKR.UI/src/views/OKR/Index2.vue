@@ -77,7 +77,7 @@ import CreateObjective from "./CreateOKR.vue";
 import { Edit } from "@element-plus/icons-vue";
 import { deepCopy } from "../../Service/deepCopy";
 import { RecalculateTheDate } from "../../Service/formatDate";
-import Deatail from "@/views/OKR/DeatailObjectives.vue";
+import Deatail from "@/components/okr/DeatailObjectives.vue";
 import BodyIndex from "@/components/okr/BodyIndex.vue";
 import ProgressUpdates from "@/components/okr/ProgressUpdate.vue";
 import MnActionPane from "@/components/maynghien/adminTable/MnActionPane.vue";
