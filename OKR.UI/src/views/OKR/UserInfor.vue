@@ -19,7 +19,7 @@
             <el-progress :percentage="item.point" :color="customColors" />
             <el-tree :data="buildTree(item)" :props="defaultProps" />
           </el-card>
-          more.....
+          <p @click="showDialog = true">more....</p>
         </el-card>
         <el-card>
           <template #header>
@@ -54,6 +54,13 @@
       </el-card>
     </div>
   </div>
+  <el-dialog v-model="showDialog">
+    <DialogListObjectives
+      :filters="DialogListObjectives_SearchRequest.filters"
+      :title="TargetType.Individual"
+      :showDialog="showDialog"
+    ></DialogListObjectives>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
@@ -67,10 +74,12 @@ import {
   removeFilter,
 } from "@/components/maynghien/Common/handleSearchFilter";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
-import { buildTree } from '@/Service/OKR/buildTree'
+import { buildTree } from "@/Service/OKR/buildTree";
+import DialogListObjectives from "@/components/okr/DialogListObjectives.vue";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const percentage = ref(50);
-
+const showDialog = ref(false);
 const customColors = [
   { color: "#909399", percentage: 40 },
   { color: "#e6a23c", percentage: 70 },
@@ -83,6 +92,12 @@ const defaultProps = {
 const Individual = ref<Objective[]>([]);
 const Branch = ref<Objective[]>([]);
 const Team = ref<Objective[]>([]);
+const DialogListObjectives_SearchRequest = ref<SearchRequest>({
+  PageIndex: 1,
+  PageSize: 10,
+  filters: [],
+  SortBy: undefined,
+});
 
 const Search = async (searchRequest: SearchRequest): Promise<Objective[]> => {
   let data = new SearchResponse<Objective>();
@@ -113,12 +128,14 @@ onMounted(async () => {
   searchRequest.filters = [];
   filter.Value = "1";
   addFilter(searchRequest.filters, filter);
-  Branch.value =await Search(searchRequest);
+  Branch.value = await Search(searchRequest);
   searchRequest.filters = [];
   filter.Value = "2";
   addFilter(searchRequest.filters, filter);
-  Team.value =await Search(searchRequest);
+  Team.value = await Search(searchRequest);
 });
+
+const handleShowDialog = (TargetType: string) => {};
 </script>
 <style>
 #info-user {
@@ -128,4 +145,5 @@ onMounted(async () => {
 .list-objcetive .el-card .el-card {
   margin: 5px;
 }
-</style>async 
+</style>
+async

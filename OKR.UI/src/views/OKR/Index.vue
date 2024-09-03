@@ -31,8 +31,8 @@
         </div>
       </div>
     </template>
-    <BodyIndex
-      :data="data"
+    <BodyIndex   
+      :search-request="searchRequest"
       @onEditObjective="editObjective"
       @onDeatail="handleDeatail"
       v-if="page == 0"
@@ -93,13 +93,6 @@ const editItem = ref<Objective>({
   targetTypeName: "",
   point: 0,
 });
-const data = ref<SearchResponse<Objective[]>>({
-  data: undefined,
-  totalRows: 0,
-  totalPages: 0,
-  currentPage: 1,
-  rowsPerPage: 0,
-});
 
 const tableColumns = ref<TableColumn[]>([
   {
@@ -154,18 +147,7 @@ const DeatailDialog = ref(false);
 const route = useRoute()
 const Search = async () => {
   handleSearch.handleFilterBeforSearch(searchRequest.value.filters);
-  var responeSeach = await axiosInstance.post(
-    "Objectives/search",
-    searchRequest.value
-  );
-  data.value = responeSeach.data.data;
-  data.value.data?.forEach((item) => {
-    item.deadline = RecalculateTheDate(item.deadline);
-    item.startDay = RecalculateTheDate(item.startDay);
-    item.listKeyResults?.forEach((keyResult) => {
-      keyResult.deadline = RecalculateTheDate(keyResult.deadline);
-    });
-  });
+ 
   var responeOverallProgress = await axiosInstance.post(
     "Objectives/overal-progress",
     searchRequest.value
