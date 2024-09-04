@@ -1,59 +1,89 @@
 <template>
-  <el-card >
+  <el-card class="profile-card">
     <template #header>
+      <div class="filter-search">
+        <MnActionPane
+          :allowAdd="false"
+          :tableColumns="tableColumns"
+          :isEdit="false"
+          @onBtnSearchClicked="AddFilterAndSearch"
+          :CustomActions="[]"
+          :openDialog="() => {}"
+        />
+      </div>
+
       <div class="card-header">
-        <div class="dl-flex">
-          <el-progress type="circle" :percentage="overalProgress" />
-        </div>
-        <el-button type="primary" @click="CreateObjectives" 
-        >new objective</el-button>
-        <div class="filter-search">
-          <MnActionPane
-            :allowAdd="false"
-            :tableColumns="tableColumns"
-            :isEdit="false"
-            @onBtnSearchClicked="AddFilterAndSearch"
-            :CustomActions="[]"
-            :openDialog="() => {}"
-          />
+        <div class="progress-container">
+          <el-progress type="dashboard" :percentage="overalProgress">
+            <template #default="{ percentage }">
+              <span class="percentage-value">{{ percentage }}%</span>
+              <span class="percentage-label">Progressing</span>
+            </template>
+          </el-progress>
+          <el-button type="primary" @click="CreateObjectives" class="new-objective-btn">New Objective</el-button>
         </div>
       </div>
     </template>
-    <el-tabs v-model="targetType">
-      <el-tab-pane label="Individual" name="0">
-        <div class="tab-content">
-          <el-button-group>
-            <el-button type="primary" @click="page = 0">Home</el-button>
-            <el-button type="primary" @click="page = 1">Progress</el-button>
-          </el-button-group>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="Branch" name="1">
-        <div class="tab-content">
-          <el-button-group>
-            <el-button type="primary" @click="page = 0">Home</el-button>
-            <el-button type="primary" @click="page = 1">Progress</el-button>
-          </el-button-group>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="Team" name="2">
-        <div class="tab-content">
-          <el-button-group>
-            <el-button type="primary" @click="page = 0">Home</el-button>
-            <el-button type="primary" @click="page = 1">Progress</el-button>
-          </el-button-group>
-        </div>
-      </el-tab-pane>
-    </el-tabs>
 
-    <BodyIndex
-      :search-request="searchRequest"
-      @onEditObjective="editObjective"
-      @onDeatail="handleDeatail"
-      v-if="page == 0"
-      :key="targetType"
-    />
-    <ProgressUpdates v-if="page == 1" :search-request="searchRequest" />
+    <div class="sidebar">
+        <el-button-group class="mb-2 button-group">
+          <el-button type="primary" plain @click="page = 0">Home</el-button>
+          <el-button type="primary" plain @click="page = 1">Progress</el-button>
+        </el-button-group>
+      </div>
+    <div class="content-container">
+      <div class="tabs-container">
+        <el-tabs v-model="targetType" tab-position="left" class="custom-tabs">
+          <el-tab-pane label="Individual" name="0">
+            <div class="tab-content">
+              <div v-if="page == 0">
+                <BodyIndex
+                  :search-request="searchRequest"
+                  @onEditObjective="editObjective"
+                  @onDeatail="handleDeatail"
+                  :key="targetType"
+                />
+              </div>
+              <div v-if="page == 1">
+                <ProgressUpdates :search-request="searchRequest" />
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <el-tab-pane label="Branch" name="1">
+            <div class="tab-content">
+              <div v-if="page == 0">
+                <BodyIndex
+                  :search-request="searchRequest"
+                  @onEditObjective="editObjective"
+                  @onDeatail="handleDeatail"
+                  :key="targetType"
+                />
+              </div>
+              <div v-if="page == 1">
+                <ProgressUpdates :search-request="searchRequest" />
+              </div>
+            </div>
+          </el-tab-pane>
+
+          <el-tab-pane label="Team" name="2">
+            <div class="tab-content">
+              <div v-if="page == 0">
+                <BodyIndex
+                  :search-request="searchRequest"
+                  @onEditObjective="editObjective"
+                  @onDeatail="handleDeatail"
+                  :key="targetType"
+                />
+              </div>
+              <div v-if="page == 1">
+                <ProgressUpdates :search-request="searchRequest" />
+              </div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </div>
   </el-card>
 
   <el-dialog v-model="createDialog" class="dialogOKR">
@@ -68,6 +98,7 @@
     <Deatail :objective="editItem" @onSearchObjective="Search()" v-if="DeatailDialog" />
   </el-dialog>
 </template>
+
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { SearchResponse } from "../../components/maynghien/BaseModels/SearchResponse";
@@ -92,7 +123,7 @@ const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
   filters: [],
-  SortBy: undefined,
+  SortBy: undefined, 
 });
 const test = ref("");
 const editItem = ref<Objective>({
@@ -193,7 +224,6 @@ const AddFilterTargetType = (emunTarget: string) => {
   filterTargetType.FieldName = "targetType";
   filterTargetType.Value = emunTarget;
   handleSearch.addFilter(searchRequest.value.filters ?? [], filterTargetType);
-  // Search();
 };
 
 onMounted(() => {
@@ -219,30 +249,113 @@ watch(() => targetType.value, () => {
   }
 }
 </style>
+
 <style scoped>
-.sidequests {
-  display: flex;
-  flex-direction: column;
+.profile-card {
+  max-width: 9000px;
+  margin: auto;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-.buttons {
+
+.card-header {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  align-content: center;
+}
+
+.filter-search {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.progress-container {
+  display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-.buttons .el-button {
-  width: 100px;
+.new-objective-btn {
+  margin-top: 20px;
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
 }
-.dl-flex {
+
+.content-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  margin-top: 20px;
 }
-.tab-content {
+
+.sidebar {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  margin-right: 20px;
+}
+
+.tabs-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.custom-tabs {
+  flex-grow: 1;
+}
+
+.tab-content {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+}
+
+.button-group .el-button {
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.percentage-value {
+  display: block;
+  margin-top: 10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.percentage-label {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  color: #909399;
+}
+
+@media screen and (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .filter-search {
+    width: 100%;
+  }
+  .content-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    flex-direction: row;
+    margin-bottom: 20px;
+  }
+  .tabs-container {
+    width: 100%;
+  }
 }
 </style>
