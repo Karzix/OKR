@@ -38,7 +38,8 @@ namespace OKR.Models.Context
             if (!optionsBuilder.IsConfigured)
             {
                 var appSetting = JsonConvert.DeserializeObject<AppSetting>(File.ReadAllText("appsettings.json"));
-                optionsBuilder.UseSqlServer(appSetting.ConnectionString);
+                optionsBuilder.UseMySql(appSetting.ConnectionString,
+            new MySqlServerVersion(new Version(8, 0, 21)));
             }
 
 
