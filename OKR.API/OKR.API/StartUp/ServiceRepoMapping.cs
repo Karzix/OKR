@@ -18,6 +18,8 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<ISidequestsRepository, SidequestsRepository>();
             builder.Services.AddScoped<IProgressUpdatesRepository, ProgressUpdatesRepository>();
             builder.Services.AddScoped<IDepartmentObjectivesRepository, DepartmentObjectivesRepository>();
+            builder.Services.AddScoped<IEvaluateTargetRepository, EvaluateTargetRepository>();
+            builder.Services.AddScoped<IUserObjectivesRepository, UserObjectivesRepository>();
 
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
@@ -27,6 +29,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IKeyResultsService, KeyResultsService>();
             builder.Services.AddScoped<IProgressUpdatesService, ProgressUpdatesService>();
             builder.Services.AddScoped<ISidequestsService, SidequestsService>();
+            builder.Services.AddScoped<IEvaluateTargetService, EvaluateTargetService>();
 
         }
     }
