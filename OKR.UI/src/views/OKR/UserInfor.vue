@@ -2,7 +2,7 @@
   <div id="info-user" style="display: flex; justify-content: space-between;">
     <div style="width: 100%" class="list-objcetive">
       <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <el-card style="width: 100%;">
+        <el-card style="width: 100%; text-align: center;">
             <p style="text-align: left">Name: karzix</p>
             <p style="text-align: left;">Department: cc</p>
         </el-card>
@@ -170,12 +170,6 @@ const handleShowDialog = (TargetType: string) => {};
 p {
   color: #409eff;
   cursor: pointer;
-  text-align: right;
-  margin: 10px 0;
-}
-
-p:hover {
-  text-decoration: underline;
 }
 
 .el-tree {
