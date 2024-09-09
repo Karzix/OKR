@@ -2,9 +2,9 @@
   <div id="info-user" style="display: flex; justify-content: space-between;">
     <div style="width: 100%" class="list-objcetive">
       <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <el-card style="width: 100%; text-align: center;">
-          <p>Name: karzix</p>
-          <p>Department: cc</p>
+        <el-card style="width: 100%;">
+            <p style="text-align: left">Name: karzix</p>
+            <p style="text-align: left;">Department: cc</p>
         </el-card>
     </div>
       <el-card>

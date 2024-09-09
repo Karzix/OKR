@@ -278,6 +278,7 @@ watch(() => targetType.value, () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
 }
 
 .new-objective-btn {
@@ -296,6 +297,7 @@ watch(() => targetType.value, () => {
   display: flex;
   flex-direction: column;
   margin-right: 20px;
+
 }
 
 .tabs-container {
@@ -303,6 +305,7 @@ watch(() => targetType.value, () => {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+
 }
 
 .custom-tabs {
@@ -312,11 +315,13 @@ watch(() => targetType.value, () => {
 .tab-content {
   margin-top: 10px;
   padding-left: 20px;
+
 }
 
 .button-group {
   display: flex;
   flex-direction: row;
+
 }
 
 .button-group .el-button {
@@ -330,6 +335,7 @@ watch(() => targetType.value, () => {
   margin-top: 10px;
   font-size: 28px;
   font-weight: bold;
+
 }
 
 .percentage-label {
@@ -337,6 +343,7 @@ watch(() => targetType.value, () => {
   margin-top: 5px;
   font-size: 14px;
   color: #909399;
+
 }
 
 @media screen and (max-width: 768px) {
@@ -357,5 +364,5 @@ watch(() => targetType.value, () => {
   .tabs-container {
     width: 100%;
   }
-}
+} 
 </style>
