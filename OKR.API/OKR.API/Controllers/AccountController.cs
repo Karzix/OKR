@@ -36,6 +36,7 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
         [HttpGet]
+        [AllowAnonymous]
         [Route("test")]
         public IActionResult test()
         {
