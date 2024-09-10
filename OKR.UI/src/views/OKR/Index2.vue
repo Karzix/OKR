@@ -14,7 +14,7 @@
 
       <div class="card-header">
         <div class="progress-container">
-          <el-progress type="dashboard" :percentage="overalProgress">
+          <el-progress type="dashboard" :percentage="overalProgress" stroke-width="10">
             <template #default="{ percentage }">
               <span class="percentage-value">{{ percentage }}%</span>
               <span class="percentage-label">Progressing</span>
@@ -205,10 +205,12 @@ const editObjective = (objective: Objective) => {
   EditDialog.value = true;
   createDialog.value = true;
 };
+
 const CreateObjectives = () => {
   EditDialog.value = false;
   createDialog.value = true;
 };
+
 const handleDeatail = (objective: Objective) => {
   console.log(objective);
   editItem.value = deepCopy(objective);
@@ -219,6 +221,7 @@ const AddFilterAndSearch = (filters: Filter[]) => {
   searchRequest.value.filters = filters;
   Search();
 };
+
 const AddFilterTargetType = (emunTarget: string) => {
   var filterTargetType = new Filter();
   filterTargetType.FieldName = "targetType";
@@ -278,6 +281,10 @@ watch(() => targetType.value, () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
+  position: relative;
+  width: 200px;
+  height: 200px;
 }
 
 .new-objective-btn {
@@ -327,9 +334,10 @@ watch(() => targetType.value, () => {
 
 .percentage-value {
   display: block;
-  margin-top: 10px;
-  font-size: 28px;
+  margin-left: 30px;
+  font-size: 27px;
   font-weight: bold;
+  color: #409eff;
 }
 
 .percentage-label {
@@ -337,6 +345,7 @@ watch(() => targetType.value, () => {
   margin-top: 5px;
   font-size: 14px;
   color: #909399;
+  margin-left: 30%;
 }
 
 @media screen and (max-width: 768px) {
@@ -357,5 +366,5 @@ watch(() => targetType.value, () => {
   .tabs-container {
     width: 100%;
   }
-}
+} 
 </style>
