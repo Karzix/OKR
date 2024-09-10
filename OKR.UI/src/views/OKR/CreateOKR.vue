@@ -22,7 +22,7 @@
       />
     </div>
     <div class="form-item">
-      <p class="form-label">start Day</p>
+      <p class="form-label">end Day</p>
       <el-date-picker
         format="DD/MM/YYYY"
         v-model="objective.deadline"
