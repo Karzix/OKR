@@ -41,11 +41,11 @@
                   :search-request="searchRequest"
                   @onEditObjective="editObjective"
                   @onDeatail="handleDeatail"
-                  :key="targetType"
+                  :key="searchKey"
                 />
               </div>
               <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest" />
+                <ProgressUpdates :search-request="searchRequest"  :key="searchKey"/>
               </div>
             </div>
           </el-tab-pane>
@@ -190,13 +190,26 @@ const EditDialog = ref(false);
 const DeatailDialog = ref(false);
 const route = useRoute();
 const targetType = ref<string>("0");
+const searchKey = ref<string>("");
+const bodyIndexKey = ref(0);
+const progressUpdatesKey = ref(0);
+
 const Search = async () => {
+  createDialog.value = false; EditDialog.value = false; 
   handleSearch.handleFilterBeforSearch(searchRequest.value.filters);
   var responeOverallProgress = await axiosInstance.post(
     "Objectives/overal-progress",
     searchRequest.value
   );
   overalProgress.value = responeOverallProgress.data.data;
+
+  
+  if (page.value === 0) {
+    bodyIndexKey.value++;
+  } else if (page.value === 1) {
+    progressUpdatesKey.value++;
+  }
+  searchKey.value = `${targetType.value}-${page.value}-${bodyIndexKey.value}-${progressUpdatesKey.value}`;
 };
 
 const editObjective = (objective: Objective) => {

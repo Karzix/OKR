@@ -19,7 +19,7 @@
           <el-progress :percentage="item.point" :color="customColors" />
           <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
-        <p @click="showDialog = true">Read More</p>
+        <p @click="handleShowDialog('0')">Read More</p>
       </el-card>
       <el-card>
         <template #header>
@@ -33,7 +33,7 @@
           <el-progress :percentage="item.point" :color="customColors" />
           <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
-        <p>Read More</p>
+        <p @click="handleShowDialog('2')">Read More</p>
       </el-card>
       <el-card>
         <template #header>
@@ -47,7 +47,7 @@
           <el-progress :percentage="item.point" :color="customColors" />
           <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
-        <p>Read More</p>
+        <p @click="handleShowDialog('1')">Read More</p>
       </el-card>
     </div>
   </div>
@@ -133,7 +133,13 @@ onMounted(async () => {
   Team.value = await Search(searchRequest);
 });
 
-const handleShowDialog = (TargetType: string) => {};
+const handleShowDialog = (TargetType: string) => {
+  var filter = new Filter();
+  filter.FieldName = "targetType";
+  filter.Value = TargetType;
+  DialogListObjectives_SearchRequest.value.filters?.push(filter);
+  showDialog.value = true;
+};
 </script>
 <style>
 #info-user {
