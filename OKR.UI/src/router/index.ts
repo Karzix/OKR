@@ -11,6 +11,7 @@ import BranchVue from '@/views/Department/Branch.vue'
 import TeamVue from '@/views/Department/Team.vue'
 import { LoginResult } from '@/Models/LoginResult';
 import UserInfor from '@/views/OKR/UserInfor.vue'
+import SeeObjectives from '@/views/OKR/SeeObjectives.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,10 @@ const router = createRouter({
         {
           path: "UserName=:UserName",
           component: UserInfor,
+        },
+        {
+          path: "Objectives=:ObjectiveId",
+          component: SeeObjectives,
         },
       ],
     },

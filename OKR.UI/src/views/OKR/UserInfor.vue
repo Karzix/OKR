@@ -14,7 +14,7 @@
             <el-progress :percentage="percentage" :color="customColors" />
           </div>
         </template>
-        <el-card v-for="item in Individual">
+        <el-card v-for="item in Individual" @click="DeatailObjectives(item)">
           {{ item.name }}
           <el-progress :percentage="item.point" :color="customColors" />
           <el-tree :data="buildTree(item)" :props="defaultProps" />
@@ -77,6 +77,10 @@ import DialogListObjectives from "@/components/okr/DialogListObjectives.vue";
 import { TargetType } from "@/Models/Enum/TargetType";
 import * as handleSearch  from "@/components/maynghien/Common/handleSearchFilter";
 import SeeObjectives from "./SeeObjectives.vue"
+import { useRoute } from "vue-router";
+import router from "@/router";
+
+const route = useRoute();
 const percentage = ref(50);
 const showDialog = ref(false);
 const customColors = [
@@ -119,6 +123,11 @@ onMounted(async () => {
   searchRequest.PageSize = 5;
   searchRequest.filters = [];
   var filter = new Filter();
+
+  filter.FieldName = "createBy";
+  filter.Value = route.params.UserName.toString();
+  addFilter(searchRequest.filters, filter);
+
   filter.FieldName = "targetType";
   filter.Value = "0";
 
@@ -141,6 +150,10 @@ const handleShowDialog = (TargetType: string) => {
   handleSearch.addFilter(DialogListObjectives_SearchRequest.value.filters as [], filter);
   showDialog.value = true;
 };
+
+const DeatailObjectives = (objective: Objective) => {
+  router.push('objectives=' + objective.id);
+}
 </script>
 <style scoped>
 #info-user {
