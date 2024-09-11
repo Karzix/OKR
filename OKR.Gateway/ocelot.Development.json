@@ -2,11 +2,11 @@
     "Routes": [
         {
             "DownstreamPathTemplate": "/{everything}",
-            "DownstreamScheme": "https",
+            "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 7223
+                    "Port": 5020
                 }
             ],
             "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ],
@@ -29,7 +29,7 @@
                 {
                     "Name": "API OKR",
                     "Version": "v1",
-                    "Url": "https://localhost:7223/swagger/v1/swagger.json"
+                    "Url": "http://localhost:5020/swagger/v1/swagger.json"
                 }
             ]
         }

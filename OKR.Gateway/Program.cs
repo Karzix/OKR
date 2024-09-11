@@ -16,10 +16,10 @@ IConfigurationRoot configuration = new ConfigurationBuilder()
     .Build(); ;
 
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    //.Enrich.FromLogContext()
-    .CreateLogger();
+//Log.Logger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    //.Enrich.FromLogContext()
+//    .CreateLogger();
 
 //builder.Host.UseSerilog();
 builder.Services.AddControllers();
@@ -38,7 +38,7 @@ app.UseSwaggerForOcelotUI();
 //}
 //app.UseCors(builder => builder.WithOrigins("https://localhost:7231/").AllowAnyHeader().AllowAnyMethod());
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-app.UseMiddleware<RequestLoggingMiddleware>();
+//app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseOcelot().Wait();
 
