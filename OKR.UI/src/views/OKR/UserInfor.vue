@@ -187,11 +187,6 @@ const DeatailObjectives = (objective: Objective) => {
   margin-top: 10px;
 }
 
-p {
-  color: #409eff;
-  cursor: pointer;
-}
-
 .el-tree {
   margin-top: 10px;
 }
