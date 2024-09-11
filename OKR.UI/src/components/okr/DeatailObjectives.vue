@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <LineChart :searchRequest="searchRequest" />
+  <LineChart :searchRequest="searchRequest" :key="keyChart"/>
 
   <el-dialog v-model="visibleDialogProgressUpdate">
     <UpdateProgress
@@ -104,7 +104,7 @@ const searchRequest = ref<SearchRequest>({
     Ascending: true,
   },
 });
-
+const keyChart = ref(0);
 const handleProgressUpdate = (keyresults: KeyResult) => {
   tempKeyResults.value = deepCopy(keyresults);
   visibleDialogProgressUpdate.value = true;
@@ -121,6 +121,7 @@ const handleChangeSidequest = (item: Sidequest) => {
 };
 
 const changePoint = (point: number, keyresultId: string) => {
+  keyChart.value += 1;
   props.objective.listKeyResults.filter(x => x.id === keyresultId)[0].currentPoint = point;
 };
 

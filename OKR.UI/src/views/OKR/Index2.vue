@@ -27,8 +27,8 @@
 
     <div class="sidebar">
         <el-button-group class="mb-2 button-group">
-          <el-button type="primary" plain @click="page = 0">Home</el-button>
-          <el-button type="primary" plain @click="page = 1">Progress</el-button>
+          <el-button type="primary" plain @click="page = 0" :class="page == 0 ? 'page-select': '' ">Objectives</el-button>
+          <el-button type="primary" plain @click="page = 1"  :class="page == 1 ? 'page-select': '' ">Progress</el-button>
         </el-button-group>
       </div>
     <div class="content-container">
@@ -41,11 +41,11 @@
                   :search-request="searchRequest"
                   @onEditObjective="editObjective"
                   @onDeatail="handleDeatail"
-                  :key="targetType"
+                  :key="searchKey"
                 />
               </div>
               <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest" />
+                <ProgressUpdates :search-request="searchRequest"  :key="searchKey"/>
               </div>
             </div>
           </el-tab-pane>
@@ -190,13 +190,26 @@ const EditDialog = ref(false);
 const DeatailDialog = ref(false);
 const route = useRoute();
 const targetType = ref<string>("0");
+const searchKey = ref<string>("");
+const bodyIndexKey = ref(0);
+const progressUpdatesKey = ref(0);
+
 const Search = async () => {
+  createDialog.value = false; EditDialog.value = false; 
   handleSearch.handleFilterBeforSearch(searchRequest.value.filters);
   var responeOverallProgress = await axiosInstance.post(
     "Objectives/overal-progress",
     searchRequest.value
   );
   overalProgress.value = responeOverallProgress.data.data;
+
+  
+  if (page.value === 0) {
+    bodyIndexKey.value++;
+  } else if (page.value === 1) {
+    progressUpdatesKey.value++;
+  }
+  searchKey.value = `${targetType.value}-${page.value}-${bodyIndexKey.value}-${progressUpdatesKey.value}`;
 };
 
 const editObjective = (objective: Objective) => {
@@ -367,4 +380,8 @@ watch(() => targetType.value, () => {
     width: 100%;
   }
 } 
+.page-select{
+  background-color: #007bff;
+  color: #fff;
+}
 </style>

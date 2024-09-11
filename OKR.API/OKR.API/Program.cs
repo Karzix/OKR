@@ -14,8 +14,10 @@ builder.Configuration.AddConfiguration(sharedConfig);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<OKRDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 21))
+    ));
 new ServiceRepoMapping().Mapping(builder);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
