@@ -27,8 +27,8 @@
 
     <div class="sidebar">
         <el-button-group class="mb-2 button-group">
-          <el-button type="primary" plain @click="page = 0">Home</el-button>
-          <el-button type="primary" plain @click="page = 1">Progress</el-button>
+          <el-button type="primary" plain @click="page = 0" :class="page == 0 ? 'page-select': '' ">Objectives</el-button>
+          <el-button type="primary" plain @click="page = 1"  :class="page == 1 ? 'page-select': '' ">Progress</el-button>
         </el-button-group>
       </div>
     <div class="content-container">
@@ -380,4 +380,8 @@ watch(() => targetType.value, () => {
     width: 100%;
   }
 } 
+.page-select{
+  background-color: #007bff;
+  color: #fff;
+}
 </style>

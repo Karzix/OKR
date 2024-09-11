@@ -1,64 +1,80 @@
 <template>
-  <div id="info-user" style="display: flex; justify-content: space-between;">
-    <div style="width: 100%" class="list-objcetive">
-      <div style="width: 100%; display: flex; justify-content: flex-end;">
-        <el-card style="width: 100%; text-align: center;">
-            <p style="text-align: left">Name: karzix</p>
-            <p style="text-align: left;">Department: cc</p>
+  <div id="info-user" class="info-user">
+    <div class="list-objective">
+      <!-- Thẻ thông tin người dùng -->
+      <div class="user-card">
+        <el-card class="card">
+          <p><strong>Name:</strong> Karzix</p>
+          <p><strong>Department:</strong> CC</p>
         </el-card>
-    </div>
-      <el-card>
+      </div>
+
+      <!-- Thẻ mục tiêu cá nhân -->
+      <el-card class="objective-card">
         <template #header>
           <div class="card-header">
             <span>Individual</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="percentageIndividual" :color="customColors" />
           </div>
         </template>
-        <el-card v-for="item in Individual">
-          {{ item.name }}
-          <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" />
+        <el-card v-for="item in Individual" :key="item.name" class="sub-card">
+          <div class="objective-content">
+            <h4>{{ item.name }}</h4>
+            <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
+          </div>
         </el-card>
-        <p @click="handleShowDialog('0')">Read More</p>
+        <p class="read-more" @click="handleShowDialog('0')">Read More</p>
       </el-card>
-      <el-card>
+
+      <!-- Thẻ mục tiêu chi nhánh -->
+      <el-card class="objective-card">
         <template #header>
           <div class="card-header">
             <span>Branch</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="percentageBranch" :color="customColors" />
           </div>
         </template>
-        <el-card v-for="item in Branch">
-          {{ item.name }}
-          <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" />
+        <el-card v-for="item in Branch" :key="item.name" class="sub-card">
+          <div class="objective-content">
+            <h4>{{ item.name }}</h4>
+            <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
+          </div>
         </el-card>
-        <p @click="handleShowDialog('2')">Read More</p>
+        <p class="read-more" @click="handleShowDialog('2')">Read More</p>
       </el-card>
-      <el-card>
+
+      <!-- Thẻ mục tiêu nhóm -->
+      <el-card class="objective-card">
         <template #header>
           <div class="card-header">
             <span>Team</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="percentageTeam" :color="customColors" />
           </div>
         </template>
-        <el-card v-for="item in Team">
-          {{ item.name }}
-          <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" />
+        <el-card v-for="item in Team" :key="item.name" class="sub-card">
+          <div class="objective-content">
+            <h4>{{ item.name }}</h4>
+            <el-progress :percentage="item.point" :color="customColors" />
+            <el-tree :data="buildTree(item)" :props="defaultProps" />
+          </div>
         </el-card>
-        <p @click="handleShowDialog('1')">Read More</p>
+        <p class="read-more" @click="handleShowDialog('1')">Read More</p>
       </el-card>
     </div>
   </div>
-  <el-dialog v-model="showDialog">
+
+  <!-- Hộp thoại hiển thị chi tiết -->
+  <el-dialog v-model="showDialog" v-if="showDialog" class="dialog-custom">
     <DialogListObjectives
       :filters="DialogListObjectives_SearchRequest.filters"
       :title="TargetType.Individual"
       :showDialog="showDialog"
-    ></DialogListObjectives>
+    />
   </el-dialog>
 </template>
+
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
@@ -75,8 +91,11 @@ import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { buildTree } from "@/Service/OKR/buildTree";
 import DialogListObjectives from "@/components/okr/DialogListObjectives.vue";
 import { TargetType } from "@/Models/Enum/TargetType";
+import * as handleSearch  from "@/components/maynghien/Common/handleSearchFilter";
 
-const percentage = ref(50);
+const percentageIndividual = ref(50);
+const percentageTeam = ref(0);
+const percentageBranch = ref(0);
 const showDialog = ref(false);
 const customColors = [
   { color: "#909399", percentage: 40 },
@@ -137,60 +156,78 @@ const handleShowDialog = (TargetType: string) => {
   var filter = new Filter();
   filter.FieldName = "targetType";
   filter.Value = TargetType;
-  DialogListObjectives_SearchRequest.value.filters?.push(filter);
+  // DialogListObjectives_SearchRequest.value.filters?.push(filter);
+  handleSearch.addFilter(DialogListObjectives_SearchRequest.value.filters as [], filter);
   showDialog.value = true;
 };
 </script>
-<style>
-#info-user {
-  display: flex;
-  gap: 20px;
+<style scoped>
+.info-user {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f5f5f5;
 }
 
-.el-card {
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
+.list-objective {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.user-card .card {
+  margin-bottom: 20px;
+  background-color: #e0f7fa;
+  border: 1px solid #00838f;
+}
+
+.objective-card {
   padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: bold;
-  font-size: 18px;
-  color: #333;
 }
 
-.el-progress {
-  width: 100px;
-}
-
-.el-card .el-progress {
+.objective-content {
   margin-top: 10px;
+}
+
+.sub-card {
+  margin-bottom: 10px;
+  padding: 15px;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.read-more {
+  margin-top: 10px;
+  color: #007bff;
+  cursor: pointer;
+  text-align: right;
+  transition: color 0.3s;
+}
+
+.read-more:hover {
+  color: #0056b3;
+}
+
+.dialog-custom .el-dialog__body {
+  padding: 20px;
+}
+
+h4 {
+  margin: 0 0 10px 0;
+  color: #424242;
 }
 
 p {
-  color: #409eff;
-  cursor: pointer;
-}
-
-.el-tree {
-  margin-top: 10px;
-}
-
-.list-objcetive {
-  width: 80%;
-}
-
-.list-objcetive .el-card {
-  margin-bottom: 20px;
-}
-
-.list-objcetive .el-card .el-card {
-  margin-bottom: 15px;
+  margin: 0;
+  color: #757575;
 }
 </style>
