@@ -347,7 +347,6 @@ watch(() => targetType.value, () => {
 
 .percentage-value {
   display: block;
-  margin-left: 30px;
   font-size: 27px;
   font-weight: bold;
   color: #409eff;
@@ -358,7 +357,6 @@ watch(() => targetType.value, () => {
   margin-top: 5px;
   font-size: 14px;
   color: #909399;
-  margin-left: 30%;
 }
 
 @media screen and (max-width: 768px) {

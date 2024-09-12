@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="objective_form">
+    <div class="objective_el-radio-group">
       <el-radio-group v-model="objective.targetType" size="large">
         <el-radio-button
           v-for="item in targetTypeValues"
@@ -9,64 +9,28 @@
         />
       </el-radio-group>
     </div>
-    <div class="form-item">
-      <p class="form-label">Objective name</p>
-      <el-input v-model="objective.name" />
-    </div>
-    <div class="form-item">
-      <p class="form-label">start Day</p>
-      <el-date-picker
-        format="DD/MM/YYYY"
-        v-model="objective.startDay"
-        type="date"
-      />
-    </div>
-    <div class="form-item">
-      <p class="form-label">end Day</p>
-      <el-date-picker
-        format="DD/MM/YYYY"
-        v-model="objective.deadline"
-        type="date"
-      />
-    </div>
-  </div>
-  <div id="add-keyResult">
-    <div
-      v-for="(o, index) in objective.listKeyResults"
-      :key="o.id"
-      class="key-result-item"
-    >
-      <div class="key-result-header">
-        <p class="key-result-description">
-          <strong>Description:</strong> {{ o.description }}
-        </p>
-        <el-button @click="deleteKeyResult(index)"
-          ><el-icon><CloseBold /></el-icon
-        ></el-button>
-        <el-button @click="editKeyresult(index)"
-          ><el-icon>Edit</el-icon></el-button
-        >
-      </div>
-      <p class="key-result-info">
-        <strong>Deadline:</strong>
-        {{ o.deadline ? formatDate(o.deadline) : "No deadline" }}
-      </p>
-      <p class="key-result-info">
-        <strong>Current Point:</strong> {{ o.currentPoint }}
-      </p>
-      <p class="key-result-info">
-        <strong>Maximum Point:</strong> {{ o.maximunPoint }}
-      </p>
-      <p class="key-result-info"><strong>Unit:</strong> {{ o.unit }}</p>
-      <div v-if="o.sidequests.length > 0" class="sidequests">
-        <p><strong>Sidequests:</strong></p>
-        <ul>
-          <li v-for="sq in o.sidequests" :key="sq.id">
-            {{ sq.name }} - Status: {{ sq.status ? "Completed" : "Incomplete" }}
-          </li>
-        </ul>
+
+    <div class="objective_form-item">
+      <p class="objective_form-label">Objective Name</p>
+      <div class="objective_input-container">
+        <el-input v-model="objective.name" />
       </div>
     </div>
+
+    <div class="objective_form-item">
+      <p class="objective_form-label">Start Day</p>
+      <div class="objective_input-container">
+        <el-date-picker format="DD/MM/YYYY" v-model="objective.startDay" type="date" />
+      </div>
+    </div>
+
+    <div class="objective_form-item">
+      <p class="objective_form-label">End Day</p>
+      <div class="objective_input-container">
+        <el-date-picker format="DD/MM/YYYY" v-model="objective.deadline" type="date" />
+      </div>
+    </div>
+
     <createKeyResultDialog
       @on-add-item="handleAddKeyResult"
       :is-edit="isEditKeyresults"
@@ -75,12 +39,14 @@
       @on-turn-off-dialog="handleClose"
       @on-edit-item="handleEditKeyResult"
     />
-    <el-button plain @click="createKeyResultDialogVisible = true">
-      Add
-    </el-button>
+
+    <div class="objective_buttons">
+      <el-button plain @click="createKeyResultDialogVisible = true">Add</el-button>
+      <el-button type="primary" @click="Save()">Confirm</el-button>
+    </div>
   </div>
-  <el-button type="primary" @click="Save()">Confirm</el-button>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import createKeyResultDialog from "@/components/okr/createKeyResultDialog.vue";
@@ -224,28 +190,72 @@ function handleClose() {
 }
 </script>
 <style scoped>
-.key-result-item {
-  border: 1px solid #dcdcdc;
-  border-radius: 5px;
+.objective_form {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  margin: auto;
   padding: 10px;
+  border-radius: 10px;
+}
+
+.objective_el-radio-group {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.objective_form-item {
+  display: flex;
+  align-items: center;
   margin-bottom: 10px;
 }
-.key-result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.key-result-description {
-  font-size: 16px;
+
+.objective_form-label {
   font-weight: bold;
+  width: 200px;
+  font-size: 16px;
 }
-.key-result-info {
-  margin: 5px 0;
+
+.objective_input-container {
+  width: 60%;
 }
-.sidequests {
+
+.el-input__inner,
+.el-date-editor.el-input__inner {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.objective_buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   margin-top: 10px;
 }
-.sidequests ul {
-  padding-left: 20px;
+
+.objective_buttons .el-button {
+  margin: 0 5px;
+}
+
+.el-button.primary {
+  background-color: #67c23a;
+  border-color: #67c23a;
+  color: white;
+}
+
+.el-button.primary:hover {
+  background-color: #85e3a1;
+  border-color: #85e3a1;
+}
+
+.el-button.plain {
+  border: 1px solid #409eff;
+  color: #409eff;
+}
+
+.el-button.plain:hover {
+  background-color: #ecf5ff;
 }
 </style>
