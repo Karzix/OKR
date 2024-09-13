@@ -1,5 +1,5 @@
 <template>
-  <div class="line-chart-container">
+  <div class="line-chart-container" style="max-width: 800px;">
     <div class="line-chart">
       <canvas id="acquisitions"></canvas>
     </div>

@@ -8,69 +8,46 @@
   <div class="objective-container">
     <el-progress type="circle" :percentage="caculateObjective(props.objective)" />
     <div class="objective-details">
+      <p><strong>Create by:</strong> {{ props.objective.createBy ?? "karzix demo" }} </p>
       <p><strong>Start Day:</strong> {{ formatDate(props.objective.startDay) }}</p>
       <p><strong>Deadline:</strong> {{ formatDate(props.objective.deadline) }}</p>
     </div>
   </div>
+  <el-tabs v-model="page">
+    <el-tab-pane label="Objectives" name="Objectives">
+      <keyresultsOfObjectives :objective="props.objective" @on-search-objective="() => {keyChart++ ;emit('onSearchObjective')}" :is-guest="props.isGuest"></keyresultsOfObjectives>
+      <LineChart :searchRequest="searchRequest" :key="keyChart"/>
+    </el-tab-pane>
+    <el-tab-pane label="Progress Update" name="ProgressUpdate">
+      <ProgressUpdate :search-request="searchRequest" :key="page"></ProgressUpdate>
+    </el-tab-pane>
+    <el-tab-pane label="Comment" name="Comment">
+      Comment
+    </el-tab-pane>
+  </el-tabs>
+  
 
-  <div class="key-results">
-    <div v-for="item in props.objective.listKeyResults" :key="item.id" class="key-result">
-      <el-progress :percentage="caculateKeyResult(item)" />
-      <div class="custom-header">
-        <div class="header-content">
-          <span class="text-large font-600 mr-3">{{ item.description }}</span>
-          <el-tag>{{ item.unit == 0 ? "Percent" : item.unit == 1 ? "Value" : "Checked" }}</el-tag>
-        </div>
-        <div class="header-extra">
-          <el-button v-if="isLogin" type="primary" class="ml-2" @click="handleProgressUpdate(item)">
-            <el-icon><EditIcon /></el-icon>
-          </el-button>
-        </div>
-      </div>
-      <el-descriptions :column="3" class="mt-4">
-        <el-descriptions-item label="Progress">{{ item.currentPoint }}/{{ item.maximunPoint }}</el-descriptions-item>
-      </el-descriptions>
-      <div class="sidequests">
-        <el-checkbox
-          size="large"
-          v-for="sidequest in item.sidequests"
-          :key="sidequest.id"
-          :label="sidequest.name"
-          v-model="sidequest.status"
-          @change="handleChangeSidequest(sidequest)"
-        />
-      </div>
-    </div>
-  </div>
-
-  <LineChart :searchRequest="searchRequest" />
-
-  <el-dialog v-model="visibleDialogProgressUpdate">
-    <UpdateProgress
-      :keyresults="tempKeyResults"
-      @onSaveUpdateProgress="() => { emit('onSearchObjective'); visibleDialogProgressUpdate = false; }"
-      @onUpdateProgress="changePoint"
-    />
-  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { Objective } from "@/Models/Objective";
 import { formatDate } from "../../Service/formatDate";
-import { Edit as EditIcon } from "@element-plus/icons-vue";
 import { KeyResult } from "@/Models/KeyResult";
 import { onMounted, ref } from "vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
-import { deepCopy } from "../../Service/deepCopy";
 import { caculateKeyResult, caculateObjective } from "../../Service/OKR/caculateKeyResult";
-import { Sidequest } from "@/Models/Sidequests";
-import { axiosInstance } from "../../Service/axiosConfig";
-import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 import LineChart from "@/components/okr/LineChart.vue";
+import keyresultsOfObjectives from "./Objectives/keyresults.vue";
+import ProgressUpdate from "./ProgressUpdate.vue";
+import { Filter } from "../maynghien/BaseModels/Filter";
+import { handleFilterBeforSearch, addFilter } from "../maynghien/Common/handleSearchFilter";
 
-const props = defineProps<{ objective: Objective }>();
+const props = defineProps<{
+   objective: Objective,
+   isGuest? : boolean,
+  }>();
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "onSearchObjective"): void;
@@ -105,21 +82,8 @@ const searchRequest = ref<SearchRequest>({
   },
 });
 
-const handleProgressUpdate = (keyresults: KeyResult) => {
-  tempKeyResults.value = deepCopy(keyresults);
-  visibleDialogProgressUpdate.value = true;
-};
-
-const handleChangeSidequest = (item: Sidequest) => {
-  axiosInstance.put("Sidequests", item).then((res) => {
-    if (res.data.isSuccess) {
-      emit("onSearchObjective");
-    } else {
-      ElMessage.error(res.data.message);
-    }
-  });
-};
-
+const page = ref("Objectives");
+const keyChart = ref(0);
 const changePoint = (point: number, keyresultId: string) => {
   props.objective.listKeyResults.filter(x => x.id === keyresultId)[0].currentPoint = point;
 };
@@ -128,6 +92,10 @@ onMounted(() => {
   if (Cookies.get("accessToken")) {
     isLogin.value = true;
   }
+  var filter = new Filter();
+  filter.FieldName = "objectivesId";
+  filter.Value = props.objective.id;
+  addFilter(searchRequest.value.filters as [], filter);
 });
 </script>
 

@@ -1,67 +1,65 @@
 <template>
-  <div id="info-user">
-    <el-card style="width: 20%">
-      <p>Name: karzix</p>
-      <p>Department: cc</p>
-    </el-card>
-    <div style="width: 80%" class="list-objcetive">
+  <div id="info-user" style="display: flex; justify-content: space-between;">
+    <div style="width: 100%" class="list-objcetive">
+      <div style="width: 100%; display: flex; justify-content: flex-end;">
+        <el-card style="width: 100%; text-align: center;">
+            <p style="text-align: left">Name: karzix</p>
+            <p style="text-align: left;">Department: cc</p>
+        </el-card>
+    </div>
       <el-card>
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>Individual</span>
-              <el-progress :percentage="percentage" :color="customColors" />
-            </div>
-          </template>
-
-          <el-card v-for="item in Individual">
-            {{ item.name }}
-            <el-progress :percentage="item.point" :color="customColors" />
-            <el-tree :data="buildTree(item)" :props="defaultProps" />
-          </el-card>
-          <p @click="showDialog = true">more....</p>
+        <template #header>
+          <div class="card-header">
+            <span>Individual</span>
+            <el-progress :percentage="percentage" :color="customColors" />
+          </div>
+        </template>
+        <el-card v-for="item in Individual" @click="DeatailObjectives(item)">
+          {{ item.name }}
+          <el-progress :percentage="item.point" :color="customColors" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>Branch</span>
-              <el-progress :percentage="percentage" :color="customColors" />
-            </div>
-          </template>
-
-          <el-card v-for="item in Branch">
-            {{ item.name }}
-            <el-progress :percentage="item.point" :color="customColors" />
-            <el-tree :data="buildTree(item)" :props="defaultProps" />
-          </el-card>
-          more.....
+        <p @click="handleShowDialog('0')">Read More</p>
+      </el-card>
+      <el-card>
+        <template #header>
+          <div class="card-header">
+            <span>Branch</span>
+            <el-progress :percentage="percentage" :color="customColors" />
+          </div>
+        </template>
+        <el-card v-for="item in Branch">
+          {{ item.name }}
+          <el-progress :percentage="item.point" :color="customColors" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>Team</span>
-              <el-progress :percentage="percentage" :color="customColors" />
-            </div>
-          </template>
-
-          <el-card v-for="item in Team">
-            {{ item.name }}
-            <el-progress :percentage="item.point" :color="customColors" />
-            <el-tree :data="buildTree(item)" :props="defaultProps" />
-          </el-card>
-          more.....
+        <p @click="handleShowDialog('1')">Read More</p>
+      </el-card>
+      <el-card>
+        <template #header>
+          <div class="card-header">
+            <span>Team</span>
+            <el-progress :percentage="percentage" :color="customColors" />
+          </div>
+        </template>
+        <el-card v-for="item in Team">
+          {{ item.name }}
+          <el-progress :percentage="item.point" :color="customColors" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" />
         </el-card>
+        <p @click="handleShowDialog('2')">Read More</p>
       </el-card>
     </div>
   </div>
   <el-dialog v-model="showDialog">
-    <DialogListObjectives
+    <DialogListObjectives v-if="showDialog"
       :filters="DialogListObjectives_SearchRequest.filters"
       :title="TargetType.Individual"
       :showDialog="showDialog"
     ></DialogListObjectives>
   </el-dialog>
 </template>
+
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { Minus, Plus } from "@element-plus/icons-vue";
@@ -77,7 +75,12 @@ import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { buildTree } from "@/Service/OKR/buildTree";
 import DialogListObjectives from "@/components/okr/DialogListObjectives.vue";
 import { TargetType } from "@/Models/Enum/TargetType";
+import * as handleSearch  from "@/components/maynghien/Common/handleSearchFilter";
+import SeeObjectives from "./SeeObjectives.vue"
+import { useRoute } from "vue-router";
+import router from "@/router";
 
+const route = useRoute();
 const percentage = ref(50);
 const showDialog = ref(false);
 const customColors = [
@@ -120,6 +123,11 @@ onMounted(async () => {
   searchRequest.PageSize = 5;
   searchRequest.filters = [];
   var filter = new Filter();
+
+  filter.FieldName = "createBy";
+  filter.Value = route.params.UserName.toString();
+  addFilter(searchRequest.filters, filter);
+
   filter.FieldName = "targetType";
   filter.Value = "0";
 
@@ -135,14 +143,68 @@ onMounted(async () => {
   Team.value = await Search(searchRequest);
 });
 
-const handleShowDialog = (TargetType: string) => {};
+const handleShowDialog = (TargetType: string) => {
+  var filter = new Filter();
+  filter.FieldName = "targetType";
+  filter.Value = TargetType;
+  handleSearch.addFilter(DialogListObjectives_SearchRequest.value.filters as [], filter);
+  showDialog.value = true;
+};
+
+const DeatailObjectives = (objective: Objective) => {
+  router.push('objectives=' + objective.id);
+}
 </script>
-<style>
+<style scoped>
 #info-user {
   display: flex;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.el-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  color: #333;
+}
+
+.el-progress {
+  width: 100px;
+}
+
+.el-card .el-progress {
+  margin-top: 10px;
+}
+
+p {
+  color: #409eff;
+  cursor: pointer;
+}
+
+.el-tree {
+  margin-top: 10px;
+}
+
+.list-objcetive {
+  width: 80%;
+}
+
+.list-objcetive .el-card {
+  margin-bottom: 20px;
 }
 
 .list-objcetive .el-card .el-card {
-  margin: 5px;
+  margin-bottom: 15px;
 }
 </style>

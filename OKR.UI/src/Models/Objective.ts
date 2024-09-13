@@ -8,7 +8,9 @@ export class Objective {
     targetType: number | undefined;
     targetTypeName: string | undefined;
     listKeyResults: KeyResult[]  = []; 
-    point: number | undefined;   
+    point: number | undefined;
+    createBy?: string | undefined;
+    createOn?: Date | undefined;
 
     constructor(Objective: Objective) {
         this.id = Objective.id;

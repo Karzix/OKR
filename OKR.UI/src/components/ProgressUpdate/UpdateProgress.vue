@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { KeyResult } from "@/Models/KeyResult";
 import { axiosInstance } from "../../Service/axiosConfig";
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from "element-plus";
 
 const props = defineProps<{
   keyresults: KeyResult;
@@ -37,20 +37,28 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "close"): void;
   (e: "onSaveUpdateProgress"): void;
-  (e: "onUpdateProgress", point : number, keyresultId : string): void;
+  (e: "onUpdateProgress", point: number, keyresultId: string): void;
 }>();
-const Save = () =>{
-    axiosInstance.put("KeyResults", props.keyresults).then((res) => {
-        if(!res.data.isSuccess){
-            ElMessage.error(res.data.message)
-        }
-        else{
-            emit("onSaveUpdateProgress")
-            emit("onUpdateProgress", props.keyresults.currentPoint ?? 0, props.keyresults.id ?? "")
-        }
-    })
-}
-
+const Save = async () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: "Loading",
+    background: "rgba(0, 0, 0, 0.7)",
+  });
+  await axiosInstance.put("KeyResults", props.keyresults).then((res) => {
+    if (!res.data.isSuccess) {
+      ElMessage.error(res.data.message);
+    } else {
+      emit("onSaveUpdateProgress");
+      emit(
+        "onUpdateProgress",
+        props.keyresults.currentPoint ?? 0,
+        props.keyresults.id ?? ""
+      );
+    }
+  });
+  loading.close();
+};
 </script>
 <style scoped>
 .keyresult-container {
