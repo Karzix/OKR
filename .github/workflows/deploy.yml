@@ -24,10 +24,10 @@ jobs:
 
       - name: Build and push API image
         run: |
-          docker build -t karzix/api:latest ./OKR.API
-          docker push karzix/api:latest
+          docker build -t karzix/okrapi:latest ./
+          docker push karzix/okrapi:latest
 
       - name: Build and push Vue image
         run: |
-          docker build -t karzix/vue:latest ./OKR.UI
-          docker push karzix/vue:latest
+          docker build -t karzix/okrui:latest ./OKR.UI
+          docker push karzix/okrui:latest
