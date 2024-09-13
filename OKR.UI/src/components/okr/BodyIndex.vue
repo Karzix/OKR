@@ -89,7 +89,8 @@ const Search = async () => {
     props.searchRequest
   );
   searchResponseObjectives.value = responeSeach.data.data;
-  if(!searchResponseObjectives.value.data){
+  if(!searchResponseObjectives.value){
+    searchResponseObjectives.value = new SearchResponse()
     searchResponseObjectives.value.data = []
   }
   searchResponseObjectives.value.data?.forEach((item) => {

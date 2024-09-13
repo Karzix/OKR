@@ -34,8 +34,8 @@
     <div class="content-container">
       <div class="tabs-container">
         <el-tabs v-model="targetType" tab-position="left" class="custom-tabs">
-          <el-tab-pane label="Individual" name="0">
-            <div class="tab-content">
+          <el-tab-pane v-for="item in targetTypeValues" :key="item" :label="TargetType[item]" :name="item.toString()">
+            <div class="tab-content" v-if="targetType == item.toString()">
               <div v-if="page == 0">
                 <BodyIndex
                   :search-request="searchRequest"
@@ -45,39 +45,7 @@
                 />
               </div>
               <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest"  :key="searchKey"/>
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane label="Branch" name="1">
-            <div class="tab-content">
-              <div v-if="page == 0">
-                <BodyIndex
-                  :search-request="searchRequest"
-                  @onEditObjective="editObjective"
-                  @onDeatail="handleDeatail"
-                  :key="targetType"
-                />
-              </div>
-              <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest" />
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane label="Team" name="2">
-            <div class="tab-content">
-              <div v-if="page == 0">
-                <BodyIndex
-                  :search-request="searchRequest"
-                  @onEditObjective="editObjective"
-                  @onDeatail="handleDeatail"
-                  :key="targetType"
-                />
-              </div>
-              <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest" />
+                <ProgressUpdates :search-request="searchRequest"   :test="TargetType[item]"/>
               </div>
             </div>
           </el-tab-pane>
@@ -118,6 +86,7 @@ import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import Cookies from "js-cookie";
 import { useRoute, useRouter } from "vue-router";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -125,7 +94,7 @@ const searchRequest = ref<SearchRequest>({
   filters: [],
   SortBy: undefined, 
 });
-const test = ref("");
+
 const editItem = ref<Objective>({
   id: undefined,
   name: "",
@@ -152,36 +121,6 @@ const tableColumns = ref<TableColumn[]>([
     inputType: "date",
     dropdownData: null,
   },
-  {
-    key: "targetType",
-    label: "Target Type",
-    enableEdit: true,
-    enableCreate: true,
-    hidden: false,
-    width: 300,
-    required: true,
-    sortable: false,
-    showSearch: true,
-    inputType: "dropdown",
-    dropdownData: {
-      displayMember: "name",
-      keyMember: "id",
-      data: [
-        {
-          id: "0",
-          name: "Percent",
-        },
-        {
-          id: "1",
-          name: "Value",
-        },
-        {
-          id: "2",
-          name: "Checked",
-        },
-      ],
-    },
-  },
 ]);
 const page = ref<number>(0);
 const overalProgress = ref(0);
@@ -193,7 +132,9 @@ const targetType = ref<string>("0");
 const searchKey = ref<string>("");
 const bodyIndexKey = ref(0);
 const progressUpdatesKey = ref(0);
-
+const targetTypeValues = Object.keys(TargetType)
+    .map(key => Number(key))
+    .filter(value => !isNaN(value));
 const Search = async () => {
   createDialog.value = false; EditDialog.value = false; 
   handleSearch.handleFilterBeforSearch(searchRequest.value.filters);
@@ -231,7 +172,10 @@ const handleDeatail = (objective: Objective) => {
 };
 
 const AddFilterAndSearch = (filters: Filter[]) => {
-  searchRequest.value.filters = filters;
+  filters.forEach((filter) => {
+    handleSearch.addFilter(searchRequest.value.filters as [], filter);
+  })
+  // searchRequest.value.filters?.push(...filters);
   Search();
 };
 
@@ -347,7 +291,6 @@ watch(() => targetType.value, () => {
 
 .percentage-value {
   display: block;
-  margin-left: 30px;
   font-size: 27px;
   font-weight: bold;
   color: #409eff;
@@ -358,7 +301,6 @@ watch(() => targetType.value, () => {
   margin-top: 5px;
   font-size: 14px;
   color: #909399;
-  margin-left: 30%;
 }
 
 @media screen and (max-width: 768px) {
