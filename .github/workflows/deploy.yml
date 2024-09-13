@@ -31,3 +31,13 @@ jobs:
         run: |
           docker build -t karzix/okrui:latest ./OKR.UI
           docker push karzix/okrui:latest
+
+      - name: Deploy to remote server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}  # Lưu địa chỉ IP/hostname của server SSH trong Secrets
+          username: ${{ secrets.SSH_USERNAME }}  # Lưu username của server SSH trong Secrets
+          password: ${{ secrets.SSH_PASSWORD }}  # Lưu password của server SSH trong Secrets hoặc sử dụng private key
+          port: 22  # Cổng SSH (mặc định là 22)
+          script: |
+            /bin/bash /home/deploy.sh
