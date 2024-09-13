@@ -1,5 +1,4 @@
 <template>
-  <!-- Chỉ render DeatailObjectives sau khi dữ liệu đã được tải xong -->
   <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true"></DeatailObjectives>
 </template>
 
@@ -11,7 +10,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from "vue-router";
 
 const route = useRoute();
-const isLoading = ref(true); // Biến trạng thái để theo dõi quá trình tải dữ liệu
+const isLoading = ref(true); 
 
 const objectives = ref<Objective>({
   id: undefined,

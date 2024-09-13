@@ -167,6 +167,9 @@ namespace OKR.Service.Implementation
                     {
                         switch (filter.FieldName)
                         {
+                            case "objectivesId":
+                                predicate = predicate.And(x => x.DepartmentObjectivesId == Guid.Parse(filter.Value) || x.UserObjectivesId == Guid.Parse(filter.Value));
+                                break;
                             default:
                                 break;
                         }
