@@ -18,7 +18,7 @@ RUN npm run build
 
 # Bước 2: Sử dụng hình ảnh Nginx để phục vụ ứng dụng đã xây dựng
 FROM nginx:alpine
-
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Sao chép các tệp đã xây dựng từ bước 1 vào thư mục phục vụ của Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
