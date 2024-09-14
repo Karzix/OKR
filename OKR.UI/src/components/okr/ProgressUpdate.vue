@@ -21,6 +21,7 @@
       </li>
     </ul>
   </div>
+  <p v-if="noMore">nomore</p>
 </template>
 
 <script lang="ts" setup>
@@ -29,7 +30,7 @@ import Cookie from "js-cookie";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
-import type { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
+import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
 import { ElMessage } from "element-plus";
 import { useRoute } from "vue-router";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
@@ -40,11 +41,12 @@ import Cookies from "js-cookie";
 
 const route = useRoute();
 const count = ref(10);
-const loading = ref(false);
+const loading = ref(true);
 const noMore = ref(false);
-const disabled = computed(() => loading.value || noMore.value);
+const disabled = ref(true);
 const props = defineProps<{
   searchRequest: SearchRequest;
+  test?: string;
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -61,7 +63,10 @@ const searchResponse = ref<SearchResponse<ProgressUpdates[]>>({
 });
 
 const listProgressUpdate = ref<ProgressUpdates[]>([]);
+
 const searchProgressUpdate = async () => {
+  if (loading.value && noMore.value) return; 
+  loading.value = true;
   try{
     await axiosInstance
     .post("ProgressUpdates/search", searchRequest.value)
@@ -69,8 +74,14 @@ const searchProgressUpdate = async () => {
       if (!response.data.isSuccess) {
         console.log(response.data.message);
         ElMessage.error(response.data.message);
+        noMore.value = true;
+        disabled.value = true;
       } else {
         searchResponse.value = response.data.data;
+        if(!searchResponse.value){
+          searchResponse.value = new SearchResponse();
+          searchResponse.value.data = [];
+        }
         searchResponse.value.data?.forEach((item) => {
           item.createOn = RecalculateTheDate(item.createOn);
         })
@@ -78,11 +89,19 @@ const searchProgressUpdate = async () => {
           searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
           listProgressUpdate.value.push(...searchResponse.value.data!);
         }
+        else{
+          noMore.value = true;
+          disabled.value = true;
+        }
       }
     });
   }
   catch(e){
     console.error(e);
+  } finally {
+    loading.value = false; 
+    disabled.value = false;
+    disabled.value = noMore.value;
   }
 };
 watch(() => props.searchRequest.filters, () => {
@@ -91,7 +110,10 @@ watch(() => props.searchRequest.filters, () => {
   searchRequest.value.PageIndex = 1;
   searchProgressUpdate();
 }, { deep: true })
-
+onMounted(() => {
+  console.log(props.test);
+  searchProgressUpdate();
+})
 
 </script>
 

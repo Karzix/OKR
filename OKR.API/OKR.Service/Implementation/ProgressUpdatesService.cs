@@ -85,7 +85,7 @@ namespace OKR.Service.Implementation
             }
             catch (Exception ex)
             {
-                result.BuildError(ex.Message + " " + ex.StackTrace);
+                result.BuildError(ex.Message );
             }
             return result;
         }
@@ -162,6 +162,10 @@ namespace OKR.Service.Implementation
             else
             {
                 user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
+            }
+            if(user.DepartmentId == null)
+            {
+                throw new Exception("User does not have a department.");
             }
             var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
             var departmentObjectiveIds = _departmentObjectivesRepository.AsQueryable()

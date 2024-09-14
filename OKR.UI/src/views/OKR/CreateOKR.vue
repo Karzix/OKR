@@ -72,11 +72,12 @@
       :is-edit="isEditKeyresults"
       :keyresults="editKeyresultItme"
       :dialog-visible="createKeyResultDialogVisible"
+      v-if="createKeyResultDialogVisible"
       @on-turn-off-dialog="handleClose"
       @on-edit-item="handleEditKeyResult"
     />
     <el-button plain @click="createKeyResultDialogVisible = true">
-      Add
+      Add key result
     </el-button>
   </div>
   <el-button type="primary" @click="Save()">Confirm</el-button>
@@ -99,7 +100,7 @@ const objective = ref<Objective>({
   startDay: undefined,
   deadline: undefined,
   listKeyResults: [],
-  targetType: undefined,
+  targetType: 0,
   targetTypeName: "",
   point: 0,
 });
@@ -147,12 +148,12 @@ const handleAddKeyResult = (item: KeyResult) => {
   objective.value.listKeyResults.push(item);
 };
 const handleEditKeyResult = (item: KeyResult) => {
-  const index = objective.value.listKeyResults.findIndex(
-    (x) => x.id === item.id
-  );
-  if (index !== -1) {
-    objective.value.listKeyResults.splice(index, 1, item);
-  }
+  // const index = objective.value.listKeyResults.findIndex(
+  //   (x) => x.id === item.id
+  // );
+  // if (index !== -1) {
+  //   objective.value.listKeyResults.splice(index, 1, item);
+  // }
 };
 // const GetGeneralData = () => {
 //   axiosInstance.get("TargetType").then((res) => {
@@ -215,8 +216,13 @@ function deleteKeyResult(index: number) {
   objective.value.listKeyResults.splice(index, 1);
 }
 function editKeyresult(index: number) {
-  editKeyresultItme.value = deepCopy(objective.value.listKeyResults[index]);
+  editKeyresultItme.value = objective.value.listKeyResults[index]
   isEditKeyresults.value = true;
+  createKeyResultDialogVisible.value = true;
+}
+function addKeyresult() {
+  isEditKeyresults.value = false;
+  editKeyresultItme.value = new KeyResult();
   createKeyResultDialogVisible.value = true;
 }
 function handleClose() {
