@@ -30,7 +30,7 @@ import Cookie from "js-cookie";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
-import type { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
+import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
 import { ElMessage } from "element-plus";
 import { useRoute } from "vue-router";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
@@ -78,6 +78,10 @@ const searchProgressUpdate = async () => {
         disabled.value = true;
       } else {
         searchResponse.value = response.data.data;
+        if(!searchResponse.value){
+          searchResponse.value = new SearchResponse();
+          searchResponse.value.data = [];
+        }
         searchResponse.value.data?.forEach((item) => {
           item.createOn = RecalculateTheDate(item.createOn);
         })
