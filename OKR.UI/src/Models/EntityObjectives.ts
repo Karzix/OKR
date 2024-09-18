@@ -1,6 +1,6 @@
 import type { KeyResult } from "./KeyResult";
 
-export class Objective {
+export class EntityObjectives {
     id: string | undefined;
     name: string | undefined;
     startDay: Date | undefined;
@@ -11,6 +11,7 @@ export class Objective {
     point: number | undefined;
     createBy?: string | undefined;
     createOn?: Date | undefined;
+    objectiveId?: string | undefined;
 
     // constructor() {}
 }

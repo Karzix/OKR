@@ -102,11 +102,11 @@ const DialogListObjectives_SearchRequest = ref<SearchRequest>({
   SortBy: undefined,
 });
 
-const Search = async (searchRequest: SearchRequest): Promise<Objective[]> => {
+const Search = async (searchRequest: SearchRequest, url: string): Promise<Objective[]> => {
   let data = new SearchResponse<Objective>();
   data.data = [];
   try {
-    await axiosInstance.post("Objectives/search", searchRequest).then((res) => {
+    await axiosInstance.post(url, searchRequest).then((res) => {
       data = res.data.data;
       console.log(data);
     });
@@ -132,15 +132,15 @@ onMounted(async () => {
   filter.Value = "0";
 
   addFilter(searchRequest.filters, filter);
-  Individual.value = await Search(searchRequest);
+  Individual.value = await Search(searchRequest,"UserObjectives/search");
   searchRequest.filters = [];
   filter.Value = "1";
   addFilter(searchRequest.filters, filter);
-  Branch.value = await Search(searchRequest);
+  Branch.value = await Search(searchRequest,"Objectives/search");
   searchRequest.filters = [];
   filter.Value = "2";
   addFilter(searchRequest.filters, filter);
-  Team.value = await Search(searchRequest);
+  Team.value = await Search(searchRequest,"Objectives/search");
 });
 
 const handleShowDialog = (TargetType: string) => {
@@ -152,7 +152,7 @@ const handleShowDialog = (TargetType: string) => {
 };
 
 const DeatailObjectives = (objective: Objective) => {
-  router.push('objectives=' + objective.id);
+  router.push('objectives=' + objective.id+ '&'+objective.targetType);
 }
 </script>
 <style scoped>

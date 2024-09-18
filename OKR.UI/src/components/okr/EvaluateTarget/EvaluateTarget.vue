@@ -15,6 +15,10 @@
       <p class="comment-body">{{ item.content }}</p>
     </div>
   </div>
+  <div>
+    <el-input v-model="content"/>
+    <el-button @click="AddEvaluateTarget">Add</el-button>
+  </div>
 </template>
 <script setup lang="ts">
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
@@ -25,7 +29,7 @@ import { useRoute } from "vue-router";
 import axios from "axios";
 import { axiosInstance } from "@/Service/axiosConfig";
 import type { SearchResponse } from "@/Models/SearchResponse";
-import type { EvaluateTarget } from "@/Models/EvaluateTarget";
+import { EvaluateTarget } from "@/Models/EvaluateTarget";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDate, RecalculateTheDate } from "@/Service/formatDate";
 
@@ -42,6 +46,7 @@ const searchResponse = ref<SearchResponse<EvaluateTarget>>({
 });
 const props = defineProps<{
   searchRequest: SearchRequest;
+  targetType: string
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -50,6 +55,7 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 });
 const listEvaluateTarget = ref<EvaluateTarget[]>([]);
+const content = ref("");
 const search = async () => {
   axiosInstance
     .post("EvaLuateTarget/search", searchRequest.value)
@@ -74,9 +80,9 @@ const search = async () => {
 };
 
 onMounted(() => {
-  var filter = new Filter();
-  filter.FieldName = "objectivesId";
-  filter.Value = route.params.ObjectiveId.toString();
+  // var filter = new Filter();
+  // filter.FieldName = "objectivesId";
+  // filter.Value = prop;
   search();
 });
 watch(() => props.searchRequest.filters, () => {
@@ -85,10 +91,45 @@ watch(() => props.searchRequest.filters, () => {
   searchRequest.value.PageIndex = 1;
   search();
 }, { deep: true })
+
+
+const AddEvaluateTarget = async () => {
+  // const evaluateTarget = new EvaluateTarget();
+  const evaluateTarget = new EvaluateTarget();
+  if(props.targetType == '0'){
+    evaluateTarget.userObjectivesId = props.searchRequest.filters?.filter(x => x.FieldName == "objectivesId")[0].Value as string;
+  }
+  else{
+    evaluateTarget.departmentObjectivesId = props.searchRequest.filters?.filter(x => x.FieldName == "objectivesId")[0].Value as string;
+  }
+  evaluateTarget.content = content.value;
+  console.log(evaluateTarget)
+  await axiosInstance.post("EvaLuateTarget", evaluateTarget).then((res) => {
+    if(res.data.isSuccess){
+      ElMessage({
+        message: "Add success",
+        type: "success",
+        plain: true,
+      });
+      listEvaluateTarget.value = [];
+      searchRequest.value.PageIndex = 1;
+      search();
+    }
+    else{
+      ElMessage({
+        message: res.data.message,
+        type: "error",
+        plain: true,
+      });
+    }
+  })
+
+  console.log(props.searchRequest)
+}
 </script>
 <style scoped>
 .infinite-list-wrapper {
-  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   /* overflow: auto; */
   padding: 0 20px;
 }

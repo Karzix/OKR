@@ -53,7 +53,7 @@
     ></CreateObjective>
   </el-dialog>
   <el-dialog v-model="DeatailDialog" class="dialogOKR">
-    <Deatail :objective="editItem" @onSearchObjective="Search()" v-if="DeatailDialog"></Deatail>
+    <Deatail :objective="editItem" @onSearchObjective="Search()" :target-type="'0'" v-if="DeatailDialog"></Deatail>
   </el-dialog>
 </template>
 <script lang="ts" setup>

@@ -1,5 +1,5 @@
 <template>
-  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true"></DeatailObjectives>
+  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true" :target-type="targetType"></DeatailObjectives>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +11,9 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const isLoading = ref(true); 
-
+// const props = defineProps<{
+//   objective: Objective
+// }>();
 const objectives = ref<Objective>({
   id: undefined,
   name: "",
@@ -22,7 +24,7 @@ const objectives = ref<Objective>({
   targetTypeName: "",
   point: 0,
 });
-
+const targetType = ref<string>("");
 const search = async () => {
   const id = route.params.ObjectiveId.toString();
   await axiosInstance.get(`Objectives/${id}`).then((res) => {
@@ -37,6 +39,7 @@ const search = async () => {
 
 onMounted(() => {
   search();
+  targetType.value = route.params.targetTpye.toString();
 });
 </script>
 

@@ -60,7 +60,7 @@ const router = createRouter({
           component: UserInfor,
         },
         {
-          path: "Objectives=:ObjectiveId",
+          path: "Objectives=:ObjectiveId&:targetTpye",
           component: SeeObjectives,
         },
       ],

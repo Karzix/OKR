@@ -119,7 +119,7 @@ onMounted(() => {
 
 <style scoped>
 .infinite-list-wrapper {
-  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   /* overflow: auto; */
   padding: 0 20px;
 }

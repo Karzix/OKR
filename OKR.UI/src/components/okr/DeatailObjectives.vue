@@ -22,7 +22,7 @@
       <ProgressUpdate :search-request="searchRequest" :key="page"></ProgressUpdate>
     </el-tab-pane>
     <el-tab-pane label="Comment" name="Comment">
-      Comment
+      <EvaluateTarget :search-request="searchRequest" :target-type="props.targetType"></EvaluateTarget>
     </el-tab-pane>
   </el-tabs>
   
@@ -43,10 +43,13 @@ import keyresultsOfObjectives from "./Objectives/keyresults.vue";
 import ProgressUpdate from "./ProgressUpdate.vue";
 import { Filter } from "../maynghien/BaseModels/Filter";
 import { handleFilterBeforSearch, addFilter } from "../maynghien/Common/handleSearchFilter";
+import SeeObjectives from "@/views/OKR/SeeObjectives.vue";
+import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
 
 const props = defineProps<{
    objective: Objective,
    isGuest? : boolean,
+   targetType: string
   }>();
 const emit = defineEmits<{
   (e: "close"): void;

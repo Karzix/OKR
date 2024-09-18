@@ -53,7 +53,7 @@
     </div>
   </el-card>
 
-  <el-dialog v-model="createDialog" class="dialogOKR">
+  <el-dialog v-model="createDialog" class="OKR-Index2-dialogOKR">
     <CreateObjective
       :objective="editItem"
       :is-edit="EditDialog"
@@ -61,8 +61,8 @@
       @onClose="() => { createDialog = false; EditDialog = false; }"
     />
   </el-dialog>
-  <el-dialog v-model="DeatailDialog" class="dialogOKR">
-    <Deatail :objective="editItem" @onSearchObjective="Search()" v-if="DeatailDialog" />
+  <el-dialog v-model="DeatailDialog" class="OKR-Index2-dialogOKR">
+    <Deatail :objective="editItem" @onSearchObjective="Search()" :target-type="targetType" v-if="DeatailDialog" />
   </el-dialog>
 </template>
 
@@ -324,5 +324,12 @@ watch(() => targetType.value, () => {
 .page-select{
   background-color: #007bff;
   color: #fff;
+}
+
+</style>
+<style>
+.OKR-Index2-dialogOKR{
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 </style>

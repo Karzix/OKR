@@ -30,9 +30,10 @@
       </li>
     </ul>
   </div>
+  <p v-if="noMore">noMore</p>
 </template>
 <script setup lang="ts">
-import type { Objective } from "@/Models/Objective";
+import { Objective } from "@/Models/Objective";
 import { SearchResponse } from "../../components/maynghien/BaseModels/SearchResponse";
 import Cookies from "js-cookie";
 import { onMounted, ref } from "vue";
@@ -41,6 +42,7 @@ import type { SearchRequest } from "../maynghien/BaseModels/SearchRequest";
 import { RecalculateTheDate } from "@/Service/formatDate";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import { ElMessage } from "element-plus";
+import {EntityObjectives} from "@/Models/EntityObjectives";
 
 const props = defineProps<{
   searchRequest: SearchRequest;
@@ -58,8 +60,8 @@ interface Tree {
   children?: Tree[];
 }
 const isLogin = ref(false);
-const searchResponseObjectives = ref<SearchResponse<Objective[]>>({
-  data: [] as Objective[],
+const searchResponseObjectives = ref<SearchResponse<EntityObjectives[]>>({
+  data: [] as EntityObjectives[],
   totalRows: 0,
   totalPages: 0,
   currentPage: 1,
@@ -68,7 +70,7 @@ const searchResponseObjectives = ref<SearchResponse<Objective[]>>({
 const loading = ref(true);
 const noMore = ref(false);
 const disabled = ref(true);
-const listObjectives = ref<Objective[]>([]);
+const listObjectives = ref<EntityObjectives[]>([]);
 const customColorMethod = (percentage: number) => {
   if (percentage < 30) {
     return "#909399";
@@ -84,13 +86,31 @@ const searchRequest = ref<SearchRequest>({
   filters: props.searchRequest.filters ?? [],
   SortBy: undefined,
 });
-const editObjective = (objective: Objective) => {
+const editObjective = (entityObjectives: EntityObjectives) => {
+  var objective = new Objective();
+  objective.id = entityObjectives.objectiveId;
+  objective.name = entityObjectives.name;
+  objective.point = entityObjectives.point;
+  objective.startDay = entityObjectives.startDay;
+  objective.deadline = entityObjectives.deadline;
+  objective.listKeyResults = entityObjectives.listKeyResults;
+  objective.targetType = entityObjectives.targetType;
+  objective.targetTypeName = entityObjectives.targetTypeName;
   emit("onEditObjective", objective);
 };
-const handleDeatail = (objective: Objective) => {
+const handleDeatail = (entityObjectives: EntityObjectives) => {
+  var objective = new Objective();
+  objective.id = entityObjectives.objectiveId;
+  objective.name = entityObjectives.name;
+  objective.point = entityObjectives.point;
+  objective.startDay = entityObjectives.startDay;
+  objective.deadline = entityObjectives.deadline;
+  objective.listKeyResults = entityObjectives.listKeyResults;
+  objective.targetType = entityObjectives.targetType;
+  objective.targetTypeName = entityObjectives.targetTypeName;
   emit("onDeatail", objective);
 };
-const buildTree = (objective: Objective): Tree[] => {
+const buildTree = (objective: EntityObjectives): Tree[] => {
   var dataTreeTemp = [] as Tree[];
   for (let i = 0; i < objective.listKeyResults?.length; i++) {
     var newTree = {
@@ -122,7 +142,7 @@ const Search = async () => {
   if (loading.value && noMore.value) return; 
   loading.value = true;
   try {
-    await axiosInstance.post("Objectives/search",searchRequest.value)
+    await axiosInstance.post("EntityObjectives/search",searchRequest.value)
     .then((response) => {
       if(!response.data.isSuccess){
         console.log(response.data.message);
@@ -172,7 +192,7 @@ onMounted(() => {
 </script>
 <style scoped>
 .infinite-list-wrapper {
-  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   /* overflow: auto; */
   padding: 0 20px;
 }
