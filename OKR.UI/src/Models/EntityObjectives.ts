@@ -11,7 +11,7 @@ export class EntityObjectives {
     point: number | undefined;
     createBy?: string | undefined;
     createOn?: Date | undefined;
-    objectiveId?: string | undefined;
+    objectivesId?: string | undefined;
 
     // constructor() {}
 }

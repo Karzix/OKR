@@ -88,7 +88,7 @@ const searchRequest = ref<SearchRequest>({
 });
 const editObjective = (entityObjectives: EntityObjectives) => {
   var objective = new Objective();
-  objective.id = entityObjectives.objectiveId;
+  objective.id = entityObjectives.objectivesId;
   objective.name = entityObjectives.name;
   objective.point = entityObjectives.point;
   objective.startDay = entityObjectives.startDay;
@@ -100,7 +100,7 @@ const editObjective = (entityObjectives: EntityObjectives) => {
 };
 const handleDeatail = (entityObjectives: EntityObjectives) => {
   var objective = new Objective();
-  objective.id = entityObjectives.objectiveId;
+  objective.id = entityObjectives.objectivesId;
   objective.name = entityObjectives.name;
   objective.point = entityObjectives.point;
   objective.startDay = entityObjectives.startDay;
@@ -143,14 +143,14 @@ const Search = async () => {
   loading.value = true;
   try {
     await axiosInstance.post("EntityObjectives/search",searchRequest.value)
-    .then((response) => {
-      if(!response.data.isSuccess){
-        console.log(response.data.message);
-        ElMessage.error(response.data.message);
+    .then((rs) => {
+      if(!rs.data.isSuccess){
+        console.log(rs.data.message);
+        ElMessage.error(rs.data.message);
         noMore.value = true;
         disabled.value = true;
       }else{
-        searchResponseObjectives.value = response.data.data;
+        searchResponseObjectives.value = rs.data.data;
         if(!searchResponseObjectives.value){
           searchResponseObjectives.value = new SearchResponse();
           searchResponseObjectives.value.data = [];

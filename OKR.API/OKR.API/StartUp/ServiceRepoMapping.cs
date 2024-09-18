@@ -30,7 +30,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IProgressUpdatesService, ProgressUpdatesService>();
             builder.Services.AddScoped<ISidequestsService, SidequestsService>();
             builder.Services.AddScoped<IEvaluateTargetService, EvaluateTargetService>();
-
+            builder.Services.AddScoped<IEntityObjectivesService, EntityObjectivesService>();
         }
     }
 }

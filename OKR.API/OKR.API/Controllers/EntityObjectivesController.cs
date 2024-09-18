@@ -21,7 +21,7 @@ namespace OKR.API.Controllers
         public IActionResult Search(SearchRequest request)
         {
             var result  = _userObjectivesService.Search(request);
-            return Ok(request);
+            return Ok(result);
         }
     }
 }
