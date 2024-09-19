@@ -23,5 +23,13 @@ namespace OKR.API.Controllers
             var result  = _userObjectivesService.Search(request);
             return Ok(result);
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult Get(Guid id)
+        {
+            var result = _userObjectivesService.Get(id);
+            return Ok(result);
+        }
     }
 }

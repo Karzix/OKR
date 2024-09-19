@@ -132,15 +132,15 @@ onMounted(async () => {
   filter.Value = "0";
 
   addFilter(searchRequest.filters, filter);
-  Individual.value = await Search(searchRequest,"UserObjectives/search");
+  Individual.value = await Search(searchRequest,"EntityObjectives/search");
   searchRequest.filters = [];
   filter.Value = "1";
   addFilter(searchRequest.filters, filter);
-  Branch.value = await Search(searchRequest,"Objectives/search");
+  Branch.value = await Search(searchRequest,"EntityObjectives/search");
   searchRequest.filters = [];
   filter.Value = "2";
   addFilter(searchRequest.filters, filter);
-  Team.value = await Search(searchRequest,"Objectives/search");
+  Team.value = await Search(searchRequest,"EntityObjectives/search");
 });
 
 const handleShowDialog = (TargetType: string) => {

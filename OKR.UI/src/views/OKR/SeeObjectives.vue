@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import DeatailObjectives from '@/components/okr/DeatailObjectives.vue';
+import { EntityObjectives } from '@/Models/EntityObjectives';
 import type { Objective } from '@/Models/Objective';
 import { axiosInstance } from '@/Service/axiosConfig';
 import { onMounted, ref } from 'vue';
@@ -26,10 +27,21 @@ const objectives = ref<Objective>({
 });
 const targetType = ref<string>("");
 const search = async () => {
-  const id = route.params.ObjectiveId.toString();
-  await axiosInstance.get(`Objectives/${id}`).then((res) => {
+  const id = route.params.EntityObjectiveId.toString();
+  var entityObjectives = new EntityObjectives();
+  await axiosInstance.get(`EntityObjectives/${id}`).then((res) => {
     if (res.data.isSuccess) {
-      objectives.value = res.data.data;
+      entityObjectives = res.data.data;
+      objectives.value.id = entityObjectives.objectivesId;
+      objectives.value.name = entityObjectives.name;
+      objectives.value.point = entityObjectives.point;
+      objectives.value.startDay = entityObjectives.startDay;
+      objectives.value.deadline = entityObjectives.deadline;
+      objectives.value.listKeyResults = entityObjectives.listKeyResults;
+      objectives.value.targetType = entityObjectives.targetType;
+      objectives.value.targetTypeName = entityObjectives.targetTypeName;
+      objectives.value.createBy = entityObjectives.createBy;
+      objectives.value.createOn = entityObjectives.createOn;
     } else {
       console.log(res.data.message);
     }

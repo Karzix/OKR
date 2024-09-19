@@ -133,19 +133,24 @@ namespace OKR.Service.Implementation
                                     predicate = predicate.And(x => x.CreatedBy == filter.Value);
                                     break;
                                 }
+                            case "targetType":
+                                {
+                                    predicate = BuildFilterTargetType(predicate, Filters);
+                                    break;
+                                }
                             default:
                                 break;
                         }
                     }
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                //if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
-                //{
-                //    predicate = predicate.And(x => x.TargetType == TargetType.individual);
-                //    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
-                //    {
-                //        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
-                //    }
-                //}
+                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
+                {
+                    predicate = predicate.And(x => x.Objectives.TargetType == TargetType.individual);
+                    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                    {
+                        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                    }
+                }
                 if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
                 {
                     predicate = predicate.And(x => x.CreatedBy.Equals(userName));
@@ -193,6 +198,92 @@ namespace OKR.Service.Implementation
             return predicate;
         }
 
+        public AppResponse<EntityObjectivesDto> Get(Guid id)
+        {
+            var result = new AppResponse<EntityObjectivesDto>();
+            try
+            {
+                EntityObjectivesDto dto = new EntityObjectivesDto();
+                var userObjectivesAsquery = _userObjectivesRepository.AsQueryable().Where(x => x.Id == id);
+               
+                if (userObjectivesAsquery.Count() > 0)
+                {
+                    var objectId_point = _userObjectivesRepository.caculatePercentObjectives(userObjectivesAsquery);
+                    dto = userObjectivesAsquery.Include(x => x.Objectives).Select(x=> new EntityObjectivesDto
+                    {
+                        Deadline = x.Objectives.Deadline,
+                        Id = x.Id,
+                        ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)
+                        .Select(k => new KeyResultDto
+                        {
+                            Active = k.Active,
+                            CurrentPoint = k.CurrentPoint,
+                            Deadline = k.Deadline,
+                            Description = k.Description,
+                            Id = k.Id,
+                            MaximunPoint = k.MaximunPoint,
+                            Unit = k.Unit,
+                            Sidequests = _questsRepository.AsQueryable().Where(s => s.KeyResultsId == k.Id).
+                            Select(s => new SidequestsDto
+                            {
+                                Id = s.Id,
+                                Name = s.Name,
+                                Status = s.Status,
+                                KeyResultsId = s.KeyResultsId,
+                            }).ToList(),
 
+                        }).ToList(),
+                        Name = x.Objectives.Name,
+                        ObjectivesId = x.ObjectivesId,
+                        Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0,
+                        StartDay = x.Objectives.StartDay,
+                        TargetType = x.Objectives.TargetType,
+                    }).First();
+                    return result.BuildResult(dto);
+                }
+                var departmentObjectivesAsquery = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == id);
+                if (departmentObjectivesAsquery.Count() > 0)
+                {
+                    var objectivesAsquery = departmentObjectivesAsquery.Select(x => x.Objectives);
+                    var objectId_point = _objectiveRepository.caculatePercentObjectives(objectivesAsquery);
+                    dto = departmentObjectivesAsquery.Include(x=>x.Objectives).Select(x => new EntityObjectivesDto
+                    {
+                        Deadline = x.Objectives.Deadline,
+                        Id = x.Id,
+                        ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)
+                        .Select(k => new KeyResultDto
+                        {
+                            Active = k.Active,
+                            CurrentPoint = k.CurrentPoint,
+                            Deadline = k.Deadline,
+                            Description = k.Description,
+                            Id = k.Id,
+                            MaximunPoint = k.MaximunPoint,
+                            Unit = k.Unit,
+                            Sidequests = _questsRepository.AsQueryable().Where(s => s.KeyResultsId == k.Id).
+                            Select(s => new SidequestsDto
+                            {
+                                Id = s.Id,
+                                Name = s.Name,
+                                Status = s.Status,
+                                KeyResultsId = s.KeyResultsId,
+                            }).ToList(),
+
+                        }).ToList(),
+                        Name = x.Objectives.Name,
+                        ObjectivesId = x.ObjectivesId,
+                        Point = objectId_point.ContainsKey(x.ObjectivesId) ? objectId_point[x.ObjectivesId] : 0,
+                        StartDay = x.Objectives.StartDay,
+                        TargetType = x.Objectives.TargetType,
+                    }).First();
+                    return result.BuildResult(dto);
+                }
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
+        }
     }
 }

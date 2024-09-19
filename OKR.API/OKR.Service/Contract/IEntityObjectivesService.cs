@@ -12,5 +12,6 @@ namespace OKR.Service.Contract
     public interface IEntityObjectivesService
     {
         AppResponse<SearchResponse<EntityObjectivesDto>> Search(SearchRequest request);
+        AppResponse<EntityObjectivesDto> Get(Guid id);
     }
 }
