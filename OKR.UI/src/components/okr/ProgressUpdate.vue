@@ -31,7 +31,7 @@ import { axiosInstance } from "@/Service/axiosConfig";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
 import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
-import { ElMessage } from "element-plus";
+import { ElLoading, ElMessage } from "element-plus";
 import { useRoute } from "vue-router";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { Right } from "@element-plus/icons-vue";
@@ -46,7 +46,7 @@ const noMore = ref(false);
 const disabled = ref(true);
 const props = defineProps<{
   searchRequest: SearchRequest;
-  test?: string;
+  // test?: string;
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -68,6 +68,7 @@ const searchProgressUpdate = async () => {
   if (loading.value && noMore.value) return; 
   loading.value = true;
   try{
+    // ElLoading.service({ lock: true, text: "Loading", background: "rgba(0, 0, 0, 0.7)" });
     await axiosInstance
     .post("ProgressUpdates/search", searchRequest.value)
     .then((response) => {
@@ -85,7 +86,7 @@ const searchProgressUpdate = async () => {
         searchResponse.value.data?.forEach((item) => {
           item.createOn = RecalculateTheDate(item.createOn);
         })
-        if(searchResponse.value.data && searchResponse.value.data != null){
+        if(searchResponse.value.data && searchResponse.value.data != null && searchResponse.value.data.length > 0){
           searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
           listProgressUpdate.value.push(...searchResponse.value.data!);
         }
@@ -95,6 +96,7 @@ const searchProgressUpdate = async () => {
         }
       }
     });
+    // ElLoading.service().close();
   }
   catch(e){
     console.error(e);
@@ -111,7 +113,7 @@ watch(() => props.searchRequest.filters, () => {
   searchProgressUpdate();
 }, { deep: true })
 onMounted(() => {
-  console.log(props.test);
+  // console.log(props.test);
   searchProgressUpdate();
 })
 

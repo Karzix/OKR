@@ -19,10 +19,10 @@
       <LineChart :searchRequest="searchRequest" :key="keyChart"/>
     </el-tab-pane>
     <el-tab-pane label="Progress Update" name="ProgressUpdate">
-      <ProgressUpdate :search-request="searchRequest" :key="page"></ProgressUpdate>
+      <ProgressUpdate :search-request="searchRequest" :key="page" v-if="page === 'ProgressUpdate'"></ProgressUpdate>
     </el-tab-pane>
     <el-tab-pane label="Comment" name="Comment">
-      <EvaluateTarget :search-request="searchRequest" :target-type="props.targetType"></EvaluateTarget>
+      <EvaluateTarget :search-request="searchRequest" :target-type="props.targetType" v-if="page === 'Comment'"></EvaluateTarget>
     </el-tab-pane>
   </el-tabs>
   
@@ -49,7 +49,8 @@ import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
 const props = defineProps<{
    objective: Objective,
    isGuest? : boolean,
-   targetType: string
+   targetType: string,
+   entityObjectivesId: string
   }>();
 const emit = defineEmits<{
   (e: "close"): void;
@@ -98,6 +99,9 @@ onMounted(() => {
   var filter = new Filter();
   filter.FieldName = "objectivesId";
   filter.Value = props.objective.id;
+  addFilter(searchRequest.value.filters as [], filter);
+  filter.FieldName = "entityObjectivesId";
+  filter.Value = props.entityObjectivesId;
   addFilter(searchRequest.value.filters as [], filter);
 });
 </script>

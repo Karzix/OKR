@@ -5,18 +5,19 @@
       class="list"
       :infinite-scroll-disabled="disabled"
     >
-  
-  </ul>
-    <div class="comment" v-for="item in listEvaluateTarget" :key="item.id">
-      <p class="comment-header">
-        <strong>{{ item.createBy }}</strong> -
-        <span class="timestamp">{{ formatDate(item.createOn) }}</span>
-      </p>
-      <p class="comment-body">{{ item.content }}</p>
-    </div>
+      <div class="comment" v-for="item in listEvaluateTarget" :key="item.id">
+        <p class="comment-header">
+          <strong>{{ item.createBy }}</strong> -
+          <span class="timestamp">{{ formatDate(item.createOn) }}</span>
+        </p>
+        <p class="comment-body">{{ item.content }}</p>
+      </div>
+      <p v-if="loading" class="loading-av"><el-icon class="spinning-icon"><Loading /></el-icon></p>
+      <p v-if="noMore">nomore</p>
+    </ul>
   </div>
   <div>
-    <el-input v-model="content"/>
+    <el-input v-model="content" />
     <el-button @click="AddEvaluateTarget">Add</el-button>
   </div>
 </template>
@@ -30,13 +31,14 @@ import axios from "axios";
 import { axiosInstance } from "@/Service/axiosConfig";
 import type { SearchResponse } from "@/Models/SearchResponse";
 import { EvaluateTarget } from "@/Models/EvaluateTarget";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import { formatDate, RecalculateTheDate } from "@/Service/formatDate";
+import { Loading } from "@element-plus/icons-vue";
 
 const route = useRoute();
 const loading = ref(false);
 const noMore = ref(false);
-const disabled = computed(() => loading.value || noMore.value);
+const disabled = ref(true);
 const searchResponse = ref<SearchResponse<EvaluateTarget>>({
   data: [],
   totalRows: 0,
@@ -46,7 +48,7 @@ const searchResponse = ref<SearchResponse<EvaluateTarget>>({
 });
 const props = defineProps<{
   searchRequest: SearchRequest;
-  targetType: string
+  targetType: string;
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -57,55 +59,91 @@ const searchRequest = ref<SearchRequest>({
 const listEvaluateTarget = ref<EvaluateTarget[]>([]);
 const content = ref("");
 const search = async () => {
-  axiosInstance
-    .post("EvaLuateTarget/search", searchRequest.value)
-    .then((res) => {
-      if (res.data.isSuccess) {
-        searchResponse.value = res.data.data;
-        searchResponse.value.data?.forEach((item) => {
-          item.createOn = RecalculateTheDate(item.createOn);
-        })
-        if(searchResponse.value.data && searchResponse.value.data != null){
-          searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
-          listEvaluateTarget.value.push(...searchResponse.value.data!);
+  if (loading.value && noMore.value) return;
+  loading.value = true;
+  try {
+    // setTimeout(() => {
+      
+    // },5000);
+    // ElLoading.service({ lock: true, text: "Loading", background: "rgba(0, 0, 0, 0.7)" });
+    await axiosInstance
+      .post("EvaLuateTarget/search", searchRequest.value)
+      .then((res) => {
+        if (res.data.isSuccess) {
+          searchResponse.value = res.data.data;
+          searchResponse.value.data?.forEach((item) => {
+            item.createOn = RecalculateTheDate(item.createOn);
+          });
+          if (
+            searchResponse.value.data &&
+            searchResponse.value.data != null &&
+            searchResponse.value.data.length > 0
+          ) {
+            searchRequest.value.PageIndex != undefined
+              ? (searchRequest.value.PageIndex += 1)
+              : (searchRequest.value.PageIndex = 1);
+            listEvaluateTarget.value.push(...searchResponse.value.data!);
+          } else {
+            noMore.value = true;
+            disabled.value = true;
+          }
+        } else {
+          ElMessage({
+            message: res.data.message,
+            type: "error",
+            plain: true,
+          });
+          noMore.value = true;
+          disabled.value = true;
         }
-      } else {
-        ElMessage({
-          message: res.data.message,
-          type: "error",
-          plain: true,
-        });
-      }
-    });
+        // ElLoading.service().close();
+      });
+  } catch (e) {
+    console.error(e);
+  } finally {
+    loading.value = false;
+    disabled.value = false;
+    disabled.value = noMore.value;
+  }
 };
 
+// onMounted(() => {
+//   // var filter = new Filter();
+//   // filter.FieldName = "objectivesId";
+//   // filter.Value = prop;
+//   search();
+// });
+watch(
+  () => props.searchRequest.filters,
+  () => {
+    searchRequest.value = props.searchRequest;
+    listEvaluateTarget.value = [];
+    searchRequest.value.PageIndex = 1;
+    search();
+  },
+  { deep: true }
+);
 onMounted(() => {
-  // var filter = new Filter();
-  // filter.FieldName = "objectivesId";
-  // filter.Value = prop;
+  console.log(props.targetType);
   search();
 });
-watch(() => props.searchRequest.filters, () => {
-  searchRequest.value = props.searchRequest;
-  listEvaluateTarget.value = [];
-  searchRequest.value.PageIndex = 1;
-  search();
-}, { deep: true })
-
 
 const AddEvaluateTarget = async () => {
   // const evaluateTarget = new EvaluateTarget();
   const evaluateTarget = new EvaluateTarget();
-  if(props.targetType == '0'){
-    evaluateTarget.userObjectivesId = props.searchRequest.filters?.filter(x => x.FieldName == "objectivesId")[0].Value as string;
-  }
-  else{
-    evaluateTarget.departmentObjectivesId = props.searchRequest.filters?.filter(x => x.FieldName == "objectivesId")[0].Value as string;
+  if (props.targetType == "0") {
+    evaluateTarget.userObjectivesId = props.searchRequest.filters?.filter(
+      (x) => x.FieldName == "entityObjectivesId"
+    )[0].Value as string;
+  } else {
+    evaluateTarget.departmentObjectivesId = props.searchRequest.filters?.filter(
+      (x) => x.FieldName == "entityObjectivesId"
+    )[0].Value as string;
   }
   evaluateTarget.content = content.value;
-  console.log(evaluateTarget)
+  console.log(evaluateTarget);
   await axiosInstance.post("EvaLuateTarget", evaluateTarget).then((res) => {
-    if(res.data.isSuccess){
+    if (res.data.isSuccess) {
       ElMessage({
         message: "Add success",
         type: "success",
@@ -113,19 +151,20 @@ const AddEvaluateTarget = async () => {
       });
       listEvaluateTarget.value = [];
       searchRequest.value.PageIndex = 1;
+      noMore.value = false;
       search();
-    }
-    else{
+      content.value = "";
+    } else {
       ElMessage({
         message: res.data.message,
         type: "error",
         plain: true,
       });
     }
-  })
+  });
 
-  console.log(props.searchRequest)
-}
+  console.log(props.searchRequest);
+};
 </script>
 <style scoped>
 .infinite-list-wrapper {
@@ -164,5 +203,21 @@ const AddEvaluateTarget = async () => {
   line-height: 1.6;
   color: #555;
   margin-top: 8px;
+}
+p.loading-av {
+    text-align: center;
+    font-size: 25px;
+}
+.spinning-icon {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

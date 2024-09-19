@@ -48,8 +48,8 @@ const props = defineProps<{
   searchRequest: SearchRequest;
 }>();
 const emit = defineEmits<{
-  (e: "onEditObjective", objective: Objective): void;
-  (e: "onDeatail", objective: Objective): void;
+  (e: "onEditObjective", objective: EntityObjectives): void;
+  (e: "onDeatail", objective: EntityObjectives): void;
 }>();
 const defaultProps = {
   children: "children",
@@ -87,28 +87,28 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 });
 const editObjective = (entityObjectives: EntityObjectives) => {
-  var objective = new Objective();
-  objective.id = entityObjectives.objectivesId;
-  objective.name = entityObjectives.name;
-  objective.point = entityObjectives.point;
-  objective.startDay = entityObjectives.startDay;
-  objective.deadline = entityObjectives.deadline;
-  objective.listKeyResults = entityObjectives.listKeyResults;
-  objective.targetType = entityObjectives.targetType;
-  objective.targetTypeName = entityObjectives.targetTypeName;
-  emit("onEditObjective", objective);
+  // var objective = new Objective();
+  // objective.id = entityObjectives.objectivesId;
+  // objective.name = entityObjectives.name;
+  // objective.point = entityObjectives.point;
+  // objective.startDay = entityObjectives.startDay;
+  // objective.deadline = entityObjectives.deadline;
+  // objective.listKeyResults = entityObjectives.listKeyResults;
+  // objective.targetType = entityObjectives.targetType;
+  // objective.targetTypeName = entityObjectives.targetTypeName;
+  emit("onEditObjective", entityObjectives);
 };
 const handleDeatail = (entityObjectives: EntityObjectives) => {
-  var objective = new Objective();
-  objective.id = entityObjectives.objectivesId;
-  objective.name = entityObjectives.name;
-  objective.point = entityObjectives.point;
-  objective.startDay = entityObjectives.startDay;
-  objective.deadline = entityObjectives.deadline;
-  objective.listKeyResults = entityObjectives.listKeyResults;
-  objective.targetType = entityObjectives.targetType;
-  objective.targetTypeName = entityObjectives.targetTypeName;
-  emit("onDeatail", objective);
+  // var objective = new Objective();
+  // objective.id = entityObjectives.objectivesId;
+  // objective.name = entityObjectives.name;
+  // objective.point = entityObjectives.point;
+  // objective.startDay = entityObjectives.startDay;
+  // objective.deadline = entityObjectives.deadline;
+  // objective.listKeyResults = entityObjectives.listKeyResults;
+  // objective.targetType = entityObjectives.targetType;
+  // objective.targetTypeName = entityObjectives.targetTypeName;
+  emit("onDeatail", entityObjectives);
 };
 const buildTree = (objective: EntityObjectives): Tree[] => {
   var dataTreeTemp = [] as Tree[];
@@ -162,7 +162,7 @@ const Search = async () => {
             keyResult.deadline = RecalculateTheDate(keyResult.deadline);
           });
         });
-        if(searchResponseObjectives.value.data && searchResponseObjectives.value.data != null){
+        if(searchResponseObjectives.value.data && searchResponseObjectives.value.data != null && searchResponseObjectives.value.data.length > 0){
           searchRequest.value.PageIndex != undefined ? searchRequest.value.PageIndex  += 1 : searchRequest.value.PageIndex = 1;
           listObjectives.value.push(...searchResponseObjectives.value.data!);
         }

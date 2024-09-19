@@ -14,27 +14,53 @@
 
       <div class="card-header">
         <div class="progress-container">
-          <el-progress type="dashboard" :percentage="overalProgress" stroke-width="10">
+          <el-progress
+            type="dashboard"
+            :percentage="overalProgress"
+            stroke-width="10"
+          >
             <template #default="{ percentage }">
               <span class="percentage-value">{{ percentage }}%</span>
               <span class="percentage-label">Progressing</span>
             </template>
           </el-progress>
-          <el-button type="primary" @click="CreateObjectives" class="new-objective-btn">New Objective</el-button>
+          <el-button
+            type="primary"
+            @click="CreateObjectives"
+            class="new-objective-btn"
+            >New Objective</el-button
+          >
         </div>
       </div>
     </template>
 
     <div class="sidebar">
-        <el-button-group class="mb-2 button-group">
-          <el-button type="primary" plain @click="page = 0" :class="page == 0 ? 'page-select': '' ">Objectives</el-button>
-          <el-button type="primary" plain @click="page = 1"  :class="page == 1 ? 'page-select': '' ">Progress</el-button>
-        </el-button-group>
-      </div>
+      <el-button-group class="mb-2 button-group">
+        <el-button
+          type="primary"
+          plain
+          @click="page = 0"
+          :class="page == 0 ? 'page-select' : ''"
+          >Objectives</el-button
+        >
+        <el-button
+          type="primary"
+          plain
+          @click="page = 1"
+          :class="page == 1 ? 'page-select' : ''"
+          >Progress</el-button
+        >
+      </el-button-group>
+    </div>
     <div class="content-container">
       <div class="tabs-container">
         <el-tabs v-model="targetType" tab-position="left" class="custom-tabs">
-          <el-tab-pane v-for="item in targetTypeValues" :key="item" :label="TargetType[item]" :name="item.toString()">
+          <el-tab-pane
+            v-for="item in targetTypeValues"
+            :key="item"
+            :label="TargetType[item]"
+            :name="item.toString()"
+          >
             <div class="tab-content" v-if="targetType == item.toString()">
               <div v-if="page == 0">
                 <BodyIndex
@@ -44,7 +70,10 @@
                 />
               </div>
               <div v-if="page == 1">
-                <ProgressUpdates :search-request="searchRequest"   :test="TargetType[item]"/>
+                <ProgressUpdates
+                  :search-request="searchRequest"
+                  :test="TargetType[item]"
+                />
               </div>
             </div>
           </el-tab-pane>
@@ -58,11 +87,22 @@
       :objective="editItem"
       :is-edit="EditDialog"
       @onSearchObjective="Search()"
-      @onClose="() => { createDialog = false; EditDialog = false; }"
+      @onClose="
+        () => {
+          createDialog = false;
+          EditDialog = false;
+        }
+      "
     />
   </el-dialog>
   <el-dialog v-model="DeatailDialog" class="OKR-Index2-dialogOKR">
-    <Deatail :objective="editItem" @onSearchObjective="Search()" :target-type="targetType" v-if="DeatailDialog" />
+    <Deatail
+      :objective="editItem"
+      @onSearchObjective="Search()"
+      :target-type="targetType"
+      :entity-objectives-id="entityObjectivesId"
+      v-if="DeatailDialog"
+    />
   </el-dialog>
 </template>
 
@@ -86,12 +126,13 @@ import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter"
 import Cookies from "js-cookie";
 import { useRoute, useRouter } from "vue-router";
 import { TargetType } from "@/Models/Enum/TargetType";
+import type { EntityObjectives } from "@/Models/EntityObjectives";
 
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
   filters: [],
-  SortBy: undefined, 
+  SortBy: undefined,
 });
 
 const editItem = ref<Objective>({
@@ -104,7 +145,6 @@ const editItem = ref<Objective>({
   targetTypeName: "",
   point: 0,
 });
-
 
 const tableColumns = ref<TableColumn[]>([
   {
@@ -131,11 +171,13 @@ const targetType = ref<string>("0");
 const searchKey = ref<string>("");
 const bodyIndexKey = ref(0);
 const progressUpdatesKey = ref(0);
+const entityObjectivesId = ref("");
 const targetTypeValues = Object.keys(TargetType)
-    .map(key => Number(key))
-    .filter(value => !isNaN(value));
+  .map((key) => Number(key))
+  .filter((value) => !isNaN(value));
 const Search = async () => {
-  createDialog.value = false; EditDialog.value = false; 
+  createDialog.value = false;
+  EditDialog.value = false;
   handleSearch.handleFilterBeforSearch(searchRequest.value.filters);
   var responeOverallProgress = await axiosInstance.post(
     "Objectives/overal-progress",
@@ -143,7 +185,6 @@ const Search = async () => {
   );
   overalProgress.value = responeOverallProgress.data.data;
 
-  
   if (page.value === 0) {
     bodyIndexKey.value++;
   } else if (page.value === 1) {
@@ -152,9 +193,18 @@ const Search = async () => {
   searchKey.value = `${targetType.value}-${page.value}-${bodyIndexKey.value}-${progressUpdatesKey.value}`;
 };
 
-const editObjective = (objective: Objective) => {
-  console.log(objective);
-  editItem.value = deepCopy(objective);
+const editObjective = (entityObjectives: EntityObjectives) => {
+  entityObjectivesId.value = entityObjectives.id ?? "";
+  var objective = new Objective();
+  objective.id = entityObjectives.objectivesId;
+  objective.name = entityObjectives.name;
+  objective.point = entityObjectives.point;
+  objective.startDay = entityObjectives.startDay;
+  objective.deadline = entityObjectives.deadline;
+  objective.listKeyResults = entityObjectives.listKeyResults;
+  objective.targetType = entityObjectives.targetType;
+  objective.targetTypeName = entityObjectives.targetTypeName;
+  editItem.value = objective;
   EditDialog.value = true;
   createDialog.value = true;
 };
@@ -164,16 +214,25 @@ const CreateObjectives = () => {
   createDialog.value = true;
 };
 
-const handleDeatail = (objective: Objective) => {
-  console.log(objective);
-  editItem.value = deepCopy(objective);
+const handleDeatail = (entityObjectives: EntityObjectives) => {
+  entityObjectivesId.value = entityObjectives.id ?? "";
+  var objective = new Objective();
+  objective.id = entityObjectives.objectivesId;
+  objective.name = entityObjectives.name;
+  objective.point = entityObjectives.point;
+  objective.startDay = entityObjectives.startDay;
+  objective.deadline = entityObjectives.deadline;
+  objective.listKeyResults = entityObjectives.listKeyResults;
+  objective.targetType = entityObjectives.targetType;
+  objective.targetTypeName = entityObjectives.targetTypeName;
+  editItem.value = objective;
   DeatailDialog.value = true;
 };
 
 const AddFilterAndSearch = (filters: Filter[]) => {
   filters.forEach((filter) => {
     handleSearch.addFilter(searchRequest.value.filters as [], filter);
-  })
+  });
   // searchRequest.value.filters?.push(...filters);
   Search();
 };
@@ -195,11 +254,14 @@ onMounted(() => {
   }
   Search();
 });
-watch(() => targetType.value, () => {
-    searchRequest.value.PageIndex = 1
+watch(
+  () => targetType.value,
+  () => {
+    searchRequest.value.PageIndex = 1;
     AddFilterTargetType(targetType.value);
     Search();
-})
+  }
+);
 </script>
 <style>
 @media screen and (max-width: 600px) {
@@ -320,15 +382,14 @@ watch(() => targetType.value, () => {
   .tabs-container {
     width: 100%;
   }
-} 
-.page-select{
+}
+.page-select {
   background-color: #007bff;
   color: #fff;
 }
-
 </style>
 <style>
-.OKR-Index2-dialogOKR{
+.OKR-Index2-dialogOKR {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }

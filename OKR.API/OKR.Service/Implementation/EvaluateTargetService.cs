@@ -115,19 +115,19 @@ namespace OKR.Service.Implementation
             {
                 var query = BuildFilterExpression(request.Filters);
                 var numOfRecords = _evaluateTargetRepository.CountRecordsByPredicate(query);
-                var users = _evaluateTargetRepository.FindByPredicate(query);
-                if (request.SortBy != null)
-                {
-                    users = _evaluateTargetRepository.addSort(users, request.SortBy);
-                }
-                else
-                {
-                    users = users.OrderByDescending(x => x.CreatedOn);
-                }
+                var evaluatarget = _evaluateTargetRepository.FindByPredicate(query);
+                //if (request.SortBy != null)
+                //{
+                //    users = _evaluateTargetRepository.addSort(users, request.SortBy);
+                //}
+                //else
+                //{
+                    evaluatarget = evaluatarget.OrderByDescending(x => x.CreatedOn);
+                //}
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = users.Skip(startIndex).Take(pageSize);
+                var UserList = evaluatarget.Skip(startIndex).Take(pageSize);
                 var dtoList = UserList.Select(x => new EvaluateTargetDto
                 {
                     Id = x.Id,
@@ -168,7 +168,7 @@ namespace OKR.Service.Implementation
                         switch (filter.FieldName)
                         {
                             case "objectivesId":
-                                predicate = predicate.And(x => x.DepartmentObjectivesId == Guid.Parse(filter.Value) || x.UserObjectivesId == Guid.Parse(filter.Value));
+                                predicate = predicate.And(x => x.DepartmentObjectives.ObjectivesId == Guid.Parse(filter.Value) || x.UserObjectives.ObjectivesId == Guid.Parse(filter.Value));
                                 break;
                             default:
                                 break;
