@@ -18,6 +18,18 @@
                   </el-icon>
                   <span>User</span>
                 </el-menu-item>
+                <el-menu-item index="3" @click="handleAsideClick('Team')">
+                  <!-- <el-icon>
+                    <User />
+                  </el-icon> -->
+                  <span>Team</span>
+                </el-menu-item>
+                <el-menu-item index="4" @click="handleAsideClick('Branch')">
+                  <!-- <el-icon>
+                    <User />
+                  </el-icon> -->
+                  <span>Branch</span>
+                </el-menu-item>
               </el-menu>
             </el-col>
           </el-row>

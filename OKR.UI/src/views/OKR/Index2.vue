@@ -265,8 +265,8 @@ watch(
 </script>
 <style>
 @media screen and (max-width: 600px) {
-  .dialogOKR {
-    width: 100% !important;
+  .OKR-Index2-dialogOKR {
+  width: 100% !important;
   }
 }
 </style>
@@ -382,6 +382,7 @@ watch(
   .tabs-container {
     width: 100%;
   }
+  
 }
 .page-select {
   background-color: #007bff;
