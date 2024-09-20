@@ -1,5 +1,5 @@
 <template>
-  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true" :target-type="targetType"></DeatailObjectives>
+  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true" :target-type="targetType" :entity-objectives-id="route.params.EntityObjectiveId.toString()"></DeatailObjectives>
 </template>
 
 <script setup lang="ts">
