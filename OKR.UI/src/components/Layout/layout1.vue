@@ -98,6 +98,7 @@ const handleAsideClick = (action: string) => {
       router.push("/user");
       break;
     default:
+      router.push("/" + action)
       break;
   }
 };
