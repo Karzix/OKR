@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OKR.API.StartUp;
+using OKR.Infrastructure;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Service.Mapper;
+using RabbitMQ.Client;
 using Serilog;
 using SharedSettings;
 using System.Security.Claims;
@@ -30,7 +32,16 @@ Log.Logger = new LoggerConfiguration()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.SetIsOriginAllowed(origin => true)
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
 
@@ -38,20 +49,34 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>() // Add roles services
     .AddEntityFrameworkStores<OKRDBContext>()
     .AddApiEndpoints();
-
+//SignalR
+builder.Services.AddSignalR();
+builder.Services.AddSignalR();
+//RabbitMQ
+var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
+builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
+{
+    HostName = rabbitMQConfig["HostName"],
+    UserName = rabbitMQConfig["UserName"],
+    Password = rabbitMQConfig["Password"],
+    VirtualHost = rabbitMQConfig["VirtualHost"],
+    Port = int.Parse(rabbitMQConfig["Port"])
+});
+builder.Services.AddSingleton<RabbitMQ.Client.IConnection>(sp => sp.GetRequiredService<IConnectionFactory>().CreateConnection());
+builder.Services.AddSingleton<RabbitMQ.Client.IModel>(sp => sp.GetRequiredService<RabbitMQ.Client.IConnection>().CreateModel());
 var app = builder.Build();
+app.UseRouting();
 app.MapControllers();
-// Configure the HTTP request pipeline.
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseCors(builder => builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 
 app.MapIdentityApi<ApplicationUser>();
-
+app.MapHub<WeightUpdateNotification>("/weightUpdateNotification");
 app.Run();
