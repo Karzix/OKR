@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+    <ProjectReference Include="..\OKR.API\OKR.Models\OKR.Models.csproj" />
     <ProjectReference Include="..\OKR.Infrastructure\OKR.Infrastructure.csproj" />
   </ItemGroup>
 

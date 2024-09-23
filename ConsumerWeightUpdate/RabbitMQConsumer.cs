@@ -1,22 +1,24 @@
-﻿
+﻿using ConsumerWeightUpdate.Repository;
 using Microsoft.Extensions.Options;
 using OKR.Infrastructure;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
-using System.Threading.Channels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConsumerWeightUpdate
 {
-
     public class RabbitMQConsumer : BackgroundService
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly RabbitMQSettings _rabbitMQSettings;
-        public RabbitMQConsumer(IOptions<RabbitMQSettings> rabbitMQSettings)
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+
+        public RabbitMQConsumer(IOptions<RabbitMQSettings> rabbitMQSettings, IServiceScopeFactory serviceScopeFactory)
         {
             _rabbitMQSettings = rabbitMQSettings.Value;
+            _serviceScopeFactory = serviceScopeFactory;
 
             var factory = new ConnectionFactory()
             {
@@ -30,11 +32,12 @@ namespace ConsumerWeightUpdate
             _channel = _connection.CreateModel();
 
             _channel.QueueDeclare(queue: RabbitMQQueue.QueueWeightUpdate,
-                                 durable: false,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+                                  durable: false,
+                                  exclusive: false,
+                                  autoDelete: false,
+                                  arguments: null);
         }
+
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var consumer = new EventingBasicConsumer(_channel);
@@ -44,7 +47,16 @@ namespace ConsumerWeightUpdate
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine($"Received: {message}");
 
-                // Xử lý message ở đây (deserialize message nếu cần)
+                // Tạo một scope mới để sử dụng các scoped services
+                using (var scope = _serviceScopeFactory.CreateScope())
+                {
+                    var keyResultRepository = scope.ServiceProvider.GetRequiredService<IKeyResultRepository>();
+                    var objectivesRepository = scope.ServiceProvider.GetRequiredService<IObjectivesRepository>();
+                    var progressUpdatesRepository = scope.ServiceProvider.GetRequiredService<IProgressUpdatesRepository>();
+
+                    // Xử lý message với các repository
+                    SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, message);
+                }
             };
 
             _channel.BasicConsume(queue: RabbitMQQueue.QueueWeightUpdate,
@@ -52,6 +64,16 @@ namespace ConsumerWeightUpdate
                                  consumer: consumer);
 
             return Task.CompletedTask;
+        }
+
+        private void SaveWeightUpdate(
+            IKeyResultRepository _keyResultRepository,
+            IObjectivesRepository _objectivesRepository,
+            IProgressUpdatesRepository _progressUpdatesRepository,
+            string message)
+        {
+            var test = _objectivesRepository.AsQueryable().First();
+            Console.WriteLine(test.ToString());
         }
     }
 }
