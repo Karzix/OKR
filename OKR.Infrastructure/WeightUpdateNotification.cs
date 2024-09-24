@@ -10,9 +10,9 @@ namespace OKR.Infrastructure
         {
             _configuration = configuration;
         }
-        public async Task SendMessage(string message)
+        public async Task ReceiveMessageWeightUpdate(string connectionID,string message)
         {
-            await Clients.All.SendAsync(SignalRMessage.WeightUpdate, message);
+            await Clients.All.SendAsync(SignalRMessage.WeightUpdate + connectionID, message);
         }
     }
 }

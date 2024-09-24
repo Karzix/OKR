@@ -13,5 +13,6 @@ namespace OKR.Infrastructure
         public string? Note { get; set; }
         public int? AddedPoints { get; set; }
         public string? CreateBy { get; set; }
+        public string? ConnectionId { get; set; }
     }
 }

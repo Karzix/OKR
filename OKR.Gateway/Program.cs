@@ -20,7 +20,16 @@ Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     //.Enrich.FromLogContext()
     .CreateLogger();
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.SetIsOriginAllowed(origin => true)
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
 //builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -37,7 +46,7 @@ app.UseSwagger();
 app.UseSwaggerForOcelotUI();
 //}
 //app.UseCors(builder => builder.WithOrigins("https://localhost:7231/").AllowAnyHeader().AllowAnyMethod());
-app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseCors();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseOcelot().Wait();

@@ -38,6 +38,9 @@
     "Password": "guest",
     "VirtualHost": "/",
     "Port": 5672
+  },
+  "signalr": {
+    "url": "https://localhost:7223/weightUpdateNotification",
   }
 
 }

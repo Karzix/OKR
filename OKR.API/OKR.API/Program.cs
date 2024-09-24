@@ -51,7 +51,6 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddApiEndpoints();
 //SignalR
 builder.Services.AddSignalR();
-builder.Services.AddSignalR();
 //RabbitMQ
 var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
 builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()

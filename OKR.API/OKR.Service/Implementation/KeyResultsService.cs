@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
 using OKR.Infrastructure;
@@ -22,8 +24,11 @@ namespace OKR.Service.Implementation
         private IProgressUpdatesRepository _progressUpdatesRepository;
         private IObjectivesRepository _objectivesRepository;
         private readonly IModel _channel;
+        private readonly HubConnection _hubConnection;
+        private IConfiguration _config;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
-            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository, IModel model)
+            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository, IModel model,
+            IConfiguration configuration)
         {
             _keyResultRepository = keyResultRepository;
             _contextAccessor = httpContextAccessor;
@@ -31,9 +36,14 @@ namespace OKR.Service.Implementation
             _progressUpdatesRepository = progressUpdatesRepository;
             _objectivesRepository = objectivesRepository;
             _channel = model;
+            _config = configuration;
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(_config["signalr:url"])
+                .Build();
+            _hubConnection.StartAsync().Wait();
         }
 
-        public AppResponse<KeyResultDto> Update(KeyResultDto request)
+        public async Task<AppResponse<KeyResultDto>> Update(KeyResultDto request)
         {
             var result = new AppResponse<KeyResultDto>();
             try
@@ -53,6 +63,7 @@ namespace OKR.Service.Implementation
                 weightUpdate.Note = updateString;
                 weightUpdate.CreateBy = userName;
                 weightUpdate.KeyresultId = request.Id.Value;
+                weightUpdate.ConnectionId = Guid.NewGuid().ToString();
                 var message = JsonSerializer.Serialize(weightUpdate);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -61,7 +72,24 @@ namespace OKR.Service.Implementation
                                       basicProperties: null,
                                       body: body);
 
-                result.BuildResult(request);
+                string respone = "";
+                var signalRTaskCompletionSource = new TaskCompletionSource<string>();
+                _hubConnection.On<string>(SignalRMessage.WeightUpdate + weightUpdate.ConnectionId, (receivedMessage) =>
+                {
+                    respone = receivedMessage;
+                    signalRTaskCompletionSource.SetResult(receivedMessage);
+                });
+                await signalRTaskCompletionSource.Task;
+                if( respone == "OK")
+                {
+                    result.BuildResult(request);
+                }
+                else
+                {
+                    result.BuildError(respone);
+                }
+
+                //result.BuildResult(request);
             }
             catch (Exception ex)
             {

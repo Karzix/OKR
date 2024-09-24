@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using OKR.Models.Entity;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ConsumerWeightUpdate
 {
@@ -16,11 +17,14 @@ namespace ConsumerWeightUpdate
         private readonly IModel _channel;
         private readonly RabbitMQSettings _rabbitMQSettings;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly HubConnection _hubConnection;
+        private IConfiguration _config;
 
-        public RabbitMQConsumer(IOptions<RabbitMQSettings> rabbitMQSettings, IServiceScopeFactory serviceScopeFactory)
+        public RabbitMQConsumer(IOptions<RabbitMQSettings> rabbitMQSettings, IServiceScopeFactory serviceScopeFactory, IConfiguration configuration)
         {
             _rabbitMQSettings = rabbitMQSettings.Value;
             _serviceScopeFactory = serviceScopeFactory;
+            _config = configuration;
 
             var factory = new ConnectionFactory()
             {
@@ -38,12 +42,16 @@ namespace ConsumerWeightUpdate
                                   exclusive: false,
                                   autoDelete: false,
                                   arguments: null);
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(_config["signalr:url"])
+                .Build();
+            _hubConnection.StartAsync().Wait();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, ea) =>
+            consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
@@ -57,7 +65,16 @@ namespace ConsumerWeightUpdate
                     var progressUpdatesRepository = scope.ServiceProvider.GetRequiredService<IProgressUpdatesRepository>();
 
                     // Xử lý message với các repository
-                    SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, weightUpdate);
+                    try
+                    {
+                        SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, weightUpdate);
+                        await _hubConnection.InvokeAsync(SignalRMessage.WeightUpdate, weightUpdate.ConnectionId ,"OK");
+                    }
+                    catch (Exception ex)
+                    {
+                        await _hubConnection.InvokeAsync(SignalRMessage.WeightUpdate, weightUpdate.ConnectionId, ex.Message + " -> " + ex.Message);
+                    }
+                    
                 }
             };
 
