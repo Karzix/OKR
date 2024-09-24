@@ -11,4 +11,5 @@ export class KeyResult {
   // objectId: string | undefined;
   sidequests: Sidequest[] = [];
   note: string = "";
+  addedPoints?: number = 0;
 }

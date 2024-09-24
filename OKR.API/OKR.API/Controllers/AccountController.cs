@@ -17,11 +17,9 @@ namespace OKR.API.Controllers
     public class AccountController : ControllerBase
     {
         private IAuthencationService _authencationService;
-        private readonly IModel _channel;
-        public AccountController(IAuthencationService authencationService, IModel channel)
+        public AccountController(IAuthencationService authencationService)
         {
             _authencationService = authencationService;
-            _channel = channel;
         }
 
         [HttpPost]
@@ -45,13 +43,6 @@ namespace OKR.API.Controllers
         [Route("test")]
         public IActionResult test()
         {
-            var message = JsonSerializer.Serialize("hello");
-            var body = Encoding.UTF8.GetBytes(message);
-
-            _channel.BasicPublish(exchange: "",
-                                  routingKey: RabbitMQQueue.QueueWeightUpdate,
-                                  basicProperties: null,
-                                  body: body);
             return Ok("OK");
         }
 

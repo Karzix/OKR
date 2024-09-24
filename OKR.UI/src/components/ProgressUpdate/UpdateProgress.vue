@@ -2,7 +2,7 @@
   <div class="keyresult-container">
     <div class="input-group">
       <el-input-number
-        v-model="props.keyresults.currentPoint"
+        v-model="props.keyresults.addedPoints"
         class="current-point"
         :min="0"
         :max="props.keyresults.maximunPoint"
@@ -50,9 +50,11 @@ const Save = async () => {
       ElMessage.error(res.data.message);
     } else {
       emit("onSaveUpdateProgress");
+      var crpoint = props.keyresults.currentPoint ?? 0;
+      var addpoint = props.keyresults.addedPoints ?? 0;
       emit(
         "onUpdateProgress",
-        props.keyresults.currentPoint ?? 0,
+        (crpoint + addpoint) ?? 0,
         props.keyresults.id ?? ""
       );
     }

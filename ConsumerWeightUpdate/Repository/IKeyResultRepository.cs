@@ -6,5 +6,6 @@ namespace ConsumerWeightUpdate.Repository
 {
     public interface IKeyResultRepository : IGenericRepository<KeyResults, OKRDBContext, ApplicationUser>
     {
+        int caculatePercentKeyResults(KeyResults input);
     }
 }

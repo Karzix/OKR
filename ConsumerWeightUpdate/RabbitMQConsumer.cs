@@ -5,6 +5,8 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using OKR.Models.Entity;
 
 namespace ConsumerWeightUpdate
 {
@@ -46,7 +48,7 @@ namespace ConsumerWeightUpdate
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine($"Received: {message}");
-
+                var weightUpdate = JsonConvert.DeserializeObject<MessageWeightUpdate>(message);
                 // Tạo một scope mới để sử dụng các scoped services
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
@@ -55,7 +57,7 @@ namespace ConsumerWeightUpdate
                     var progressUpdatesRepository = scope.ServiceProvider.GetRequiredService<IProgressUpdatesRepository>();
 
                     // Xử lý message với các repository
-                    SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, message);
+                    SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, weightUpdate);
                 }
             };
 
@@ -66,14 +68,30 @@ namespace ConsumerWeightUpdate
             return Task.CompletedTask;
         }
 
-        private void SaveWeightUpdate(
+        private async void SaveWeightUpdate(
             IKeyResultRepository _keyResultRepository,
             IObjectivesRepository _objectivesRepository,
             IProgressUpdatesRepository _progressUpdatesRepository,
-            string message)
+            MessageWeightUpdate message)
         {
-            var test = _objectivesRepository.AsQueryable().First();
-            Console.WriteLine(test.ToString());
+            //var test = _objectivesRepository.AsQueryable().First();
+            //Console.WriteLine(test.ToString());
+
+            var keyresult = _keyResultRepository.AsQueryable().Where(x=>x.Id == message.KeyresultId).First();
+            var progressUpdates = new ProgressUpdates();
+            progressUpdates.CreatedBy = message.CreateBy;
+            progressUpdates.CreatedOn = DateTime.UtcNow;
+            progressUpdates.Note = message.Note;
+            progressUpdates.KeyResultId = keyresult.Id;
+            progressUpdates.OldPoint = keyresult.CurrentPoint;
+            progressUpdates.NewPoint = keyresult.CurrentPoint + message.AddedPoints;
+
+            keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + message.AddedPoints);
+            _keyResultRepository.Edit(keyresult);
+            progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
+            Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
+            progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
+            _progressUpdatesRepository.Add(progressUpdates);
         }
     }
 }

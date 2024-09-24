@@ -1,7 +1,7 @@
 import { UserModel } from "@/Models/UserModel";
 import axios from "axios";
 import Cookies from 'js-cookie';
-const baseAPIUrl =  "http://103.209.34.217:8080/";
+const baseAPIUrl =  "https://localhost:7231/";
 export const axiosInstance = axios.create({
     baseURL: baseAPIUrl,
    // timeout: 10000,
