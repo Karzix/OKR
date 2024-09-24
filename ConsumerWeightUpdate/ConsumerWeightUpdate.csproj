@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.8" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+    <ProjectReference Include="..\OKR.API\OKR.Models\OKR.Models.csproj" />
+    <ProjectReference Include="..\OKR.Infrastructure\OKR.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\SharedSettings\SharedSettings.projitems" Label="Shared" />
+
+</Project>

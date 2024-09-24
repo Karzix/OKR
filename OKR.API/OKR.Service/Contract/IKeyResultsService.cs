@@ -10,6 +10,6 @@ namespace OKR.Service.Contract
 {
     public interface IKeyResultsService
     {
-        AppResponse<KeyResultDto> Update(KeyResultDto request);
+        Task<AppResponse<KeyResultDto>> Update(KeyResultDto request);
     }
 }

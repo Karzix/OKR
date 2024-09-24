@@ -1,36 +1,46 @@
 {
-    "EPPlus": {
-        "ExcelPackage": {
-            "LicenseContext": "NonCommercial"
-        }
-    },
-    "Serilog": {
-        "Using": [ "Serilog.Sinks.Seq" ],
-        "MinimumLevel": {
-            "Default": "Information",
-            "Override": {
-                "Microsoft": "Warning",
-                "System": "Warning"
-            }
-        },
-        "WriteTo": [
-            //{
-            //    "Name": "Console"
-            //},
-            {
-                "Name": "Seq",
-                "Args": {
-                    "serverUrl": "http://localhost:8080/"
-                },
-                "compact": true,
-                "restrictedToMinimumLevel": "Information",
-                "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
-            }
-        ]
-        //"Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
-        //"Properties": {
-        //    "Application": "YourAppName"
-        //}
+  "EPPlus": {
+    "ExcelPackage": {
+      "LicenseContext": "NonCommercial"
     }
+  },
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Seq" ],
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      //{
+      //    "Name": "Console"
+      //},
+      {
+        "Name": "Seq",
+        "Args": {
+          "serverUrl": "http://localhost:8080/"
+        },
+        "compact": true,
+        "restrictedToMinimumLevel": "Information",
+        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
+      }
+    ]
+    //"Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+    //"Properties": {
+    //    "Application": "YourAppName"
+    //}
+  },
+  "RabbitMQ": {
+    "HostName": "103.209.34.217",
+    "UserName": "guest",
+    "Password": "guest",
+    "VirtualHost": "/",
+    "Port": 5672
+  },
+  "signalr": {
+    "url": "http://103.209.34.217:8080/weightUpdateNotification"
+  }
 
 }

@@ -1,11 +1,18 @@
 ﻿using AutoMapper;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
+using OKR.Infrastructure;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
+using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
 
 namespace OKR.Service.Implementation
 {
@@ -16,18 +23,27 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private IProgressUpdatesRepository _progressUpdatesRepository;
         private IObjectivesRepository _objectivesRepository;
-
+        private readonly IModel _channel;
+        private readonly HubConnection _hubConnection;
+        private IConfiguration _config;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
-            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository)
+            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository, IModel model,
+            IConfiguration configuration)
         {
             _keyResultRepository = keyResultRepository;
             _contextAccessor = httpContextAccessor;
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
             _objectivesRepository = objectivesRepository;
+            _channel = model;
+            _config = configuration;
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(_config["signalr:url"])
+                .Build();
+            _hubConnection.StartAsync().Wait();
         }
 
-        public AppResponse<KeyResultDto> Update(KeyResultDto request)
+        public async Task<AppResponse<KeyResultDto>> Update(KeyResultDto request)
         {
             var result = new AppResponse<KeyResultDto>();
             try
@@ -40,25 +56,40 @@ namespace OKR.Service.Implementation
                     return result.BuildError("current point is invalid");
                 }
                 var progressUpdates = new ProgressUpdates();
+                var weightUpdate = new MessageWeightUpdate();
                 var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
-                progressUpdates.CreatedBy = userName;
-                progressUpdates.CreatedOn = DateTime.UtcNow;
-                progressUpdates.Note = updateString;
-                progressUpdates.KeyResultId = keyresult.Id;
-                progressUpdates.OldPoint = keyresult.CurrentPoint;
-                progressUpdates.NewPoint = request.CurrentPoint.Value;
-                
+            
+                weightUpdate.AddedPoints = request.AddedPoints;
+                weightUpdate.Note = updateString;
+                weightUpdate.CreateBy = userName;
+                weightUpdate.KeyresultId = request.Id.Value;
+                weightUpdate.ConnectionId = Guid.NewGuid().ToString();
+                var message = JsonSerializer.Serialize(weightUpdate);
+                var body = Encoding.UTF8.GetBytes(message);
 
-                keyresult.MaximunPoint = (int)request.MaximunPoint;
-                keyresult.CurrentPoint = (int)request.CurrentPoint;
-                keyresult.Description = request.Description;
-                _keyResultRepository.Edit(keyresult);
-                progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
-                Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
-                progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
-                _progressUpdatesRepository.Add(progressUpdates);
+                _channel.BasicPublish(exchange: "",
+                                      routingKey: RabbitMQQueue.QueueWeightUpdate,
+                                      basicProperties: null,
+                                      body: body);
 
-                result.BuildResult(request);
+                string respone = "";
+                var signalRTaskCompletionSource = new TaskCompletionSource<string>();
+                _hubConnection.On<string>(SignalRMessage.WeightUpdate + weightUpdate.ConnectionId, (receivedMessage) =>
+                {
+                    respone = receivedMessage;
+                    signalRTaskCompletionSource.SetResult(receivedMessage);
+                });
+                await signalRTaskCompletionSource.Task;
+                if( respone == "OK")
+                {
+                    result.BuildResult(request);
+                }
+                else
+                {
+                    result.BuildError(respone);
+                }
+
+                //result.BuildResult(request);
             }
             catch (Exception ex)
             {
@@ -74,9 +105,9 @@ namespace OKR.Service.Implementation
             {
                 content += "update keyresults name from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
             }
-            if (NewKeyResult.CurrentPoint != CurKeyResults.CurrentPoint)
+            if ((CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints) != CurKeyResults.CurrentPoint)
             {
-                content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + NewKeyResult.CurrentPoint + "; ";
+                content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + (CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints)+ "; ";
             }
             if(NewKeyResult.Deadline != CurKeyResults.Deadline)
             {

@@ -22,15 +22,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}  # Lưu tên đăng nhập trong Secrets của GitHub
           password: ${{ secrets.DOCKER_PASSWORD }}  # Lưu mật khẩu Docker Hub trong Secrets của GitHub
 
-      - name: Build and push API image
+      - name: Set up Docker Compose
         run: |
-          docker build -t karzix/okrapi:latest ./
-          docker push karzix/okrapi:latest
+          sudo apt-get update
+          sudo apt-get install docker-compose
 
-      - name: Build and push Vue image
+      - name: Build and push Docker images using Docker Compose
         run: |
-          docker build -t karzix/okrui:latest ./OKR.UI
-          docker push karzix/okrui:latest
+          docker-compose -f ./docker-compose.yml build
+          docker-compose -f ./docker-compose.yml push
 
       - name: Deploy to remote server via SSH
         uses: appleboy/ssh-action@master
@@ -40,4 +40,15 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}  # Lưu password của server SSH trong Secrets hoặc sử dụng private key
           port: 22  # Cổng SSH (mặc định là 22)
           script: |
-            /bin/bash /home/deploy.sh
+            docker pull karzix/okrapi:latest
+            docker pull karzix/okrui:latest
+            docker pull karzix/consumerweightupdate:latest
+
+            docker stop okr-container okrui-container okr-consumerweightupdate || true
+            docker rm okr-container okrui-container okr-consumerweightupdate || true
+
+            docker run -d --name okr-container --restart unless-stopped -p 8080:8080 karzix/okrapi:latest
+            docker run -d --name okrui-container --restart unless-stopped -p 80:80 karzix/okrui:latest
+            docker run -d --name okr-consumerweightupdate --restart unless-stopped -p 8082:8082 karzix/consumerweightupdate:latest
+
+            docker image prune -a -f

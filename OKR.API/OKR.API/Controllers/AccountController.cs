@@ -3,7 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
+using OKR.Infrastructure;
 using OKR.Service.Contract;
+using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
 
 namespace OKR.API.Controllers
 {
@@ -13,7 +17,6 @@ namespace OKR.API.Controllers
     public class AccountController : ControllerBase
     {
         private IAuthencationService _authencationService;
-
         public AccountController(IAuthencationService authencationService)
         {
             _authencationService = authencationService;

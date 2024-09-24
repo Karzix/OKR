@@ -1,0 +1,6 @@
+@ConsumerWeightUpdate_HostAddress = http://localhost:5120
+
+GET {{ConsumerWeightUpdate_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

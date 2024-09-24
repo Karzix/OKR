@@ -1,26 +1,35 @@
-version: '3.8'
+version: '3'
+networks:
+  mynetwork:
+    driver: bridge
 
 services:
-  api:
-    build:
-      context: ./
-      dockerfile: Dockerfile
+  okrapi:
+    build: 
+      context: .
+      dockerfile: ./OKR.API/Dockerfile
     image: karzix/okrapi:latest
     ports:
       - "8080:8080"
     networks:
-      - app-network
+      - mynetwork
 
-  vue:
-    build:
-      context: ./OKR.UI
-      dockerfile: Dockerfile
+  okrui:
+    build: 
+      context: .
+      dockerfile: ./OKR.UI/Dockerfile
     image: karzix/okrui:latest
     ports:
-      - "3000:80"
+      - "80:80"
     networks:
-      - app-network
+      - mynetwork
 
-networks:
-  app-network:
-    driver: bridge
+  consumerweightupdate:
+    build: 
+      context: .
+      dockerfile: ./ConsumerWeightUpdate/Dockerfile
+    image: karzix/consumerweightupdate:latest
+    ports:
+      - "8082:8082"
+    networks:
+      - mynetwork
