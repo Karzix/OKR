@@ -1,18 +1,26 @@
 <template>
   <div class="keyresult-container">
     <div class="input-group">
-      <el-input-number
-        v-model="props.keyresults.addedPoints"
+      <el-input
+        v-model="caculateCrrentPoint"
         class="current-point"
-        :min="0"
-        :max="props.keyresults.maximunPoint"
         controls-position="right"
+        :disabled="true"
       />
       <p>/</p>
       <el-input
         v-model="props.keyresults.maximunPoint"
         class="max-point"
         :disabled="true"
+      />
+    </div>
+    <div>
+      <el-input-number
+        v-model="props.keyresults.addedPoints"
+        class="current-point"
+        :min="(-1 * (props.keyresults.currentPoint ?? 0))"
+        :max="props.keyresults.maximunPoint"
+        controls-position="right"
       />
     </div>
     <div class="note-container">
@@ -30,6 +38,7 @@
 import { KeyResult } from "@/Models/KeyResult";
 import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage, ElLoading } from "element-plus";
+import { ref, watch } from "vue";
 
 const props = defineProps<{
   keyresults: KeyResult;
@@ -39,6 +48,7 @@ const emit = defineEmits<{
   (e: "onSaveUpdateProgress"): void;
   (e: "onUpdateProgress", point: number, keyresultId: string): void;
 }>();
+const caculateCrrentPoint = ref(0);
 const Save = async () => {
   const loading = ElLoading.service({
     lock: true,
@@ -61,6 +71,11 @@ const Save = async () => {
   });
   loading.close();
 };
+watch(() => props.keyresults.addedPoints , () => {
+  var cur = props.keyresults.currentPoint ?? 0 ;
+  var add = props.keyresults.addedPoints ?? 0;
+  caculateCrrentPoint.value = cur + add;
+},{immediate: true})
 </script>
 <style scoped>
 .keyresult-container {

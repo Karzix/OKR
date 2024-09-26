@@ -74,9 +74,9 @@
       :dialog-visible="createKeyResultDialogVisible"
       v-if="createKeyResultDialogVisible"
       @on-turn-off-dialog="handleClose"
-      @on-edit-item="handleEditKeyResult"
+      @onEditItem="handleEditKeyResult"
     />
-    <el-button plain @click="createKeyResultDialogVisible = true">
+    <el-button plain @click="addKeyresult">
       Add key result
     </el-button>
   </div>
@@ -112,20 +112,7 @@ const emit = defineEmits<{
   (e: "onSearchObjective"): void;
   (e: "onClose"): void;
 }>();
-// const TargetTypes = ref([
-//   {
-//     id: 0,
-//     name: "Individual",
-//   },
-//   {
-//     id: 1,
-//     name: "Branch",
-//   },
-//   {
-//     id: 2,
-//     name: "Team",
-//   },
-// ]);
+
 const targetTypeValues = Object.keys(TargetType)
     .map(key => Number(key))
     .filter(value => !isNaN(value));
@@ -155,11 +142,7 @@ const handleEditKeyResult = (item: KeyResult) => {
   //   objective.value.listKeyResults.splice(index, 1, item);
   // }
 };
-// const GetGeneralData = () => {
-//   axiosInstance.get("TargetType").then((res) => {
-//     TargetTypes.value = res.data.data;
-//   });
-// };
+
 onMounted(() => {
   // GetGeneralData();
   if (props.isEdit) {
