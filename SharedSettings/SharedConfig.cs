@@ -6,13 +6,14 @@ namespace SharedSettings
 {
     public static class SharedConfig
     {
-        public static IConfigurationRoot LoadSharedConfiguration()
+        public static IConfigurationRoot LoadSharedConfiguration(string evn)
         {
-            var builder = new ConfigurationBuilder()
-                //.SetBasePath(basePath)
-                .AddJsonFile("sharedsettings.json", optional: false, reloadOnChange: true);
+            IConfigurationRoot builder = new ConfigurationBuilder()
+                .AddJsonFile("sharedsettings.json")
+                .AddJsonFile($"sharedsettings.{evn}.json", optional: true, reloadOnChange: true)
+                .Build();
 
-            return builder.Build();
+            return builder;
         }
     }
 }

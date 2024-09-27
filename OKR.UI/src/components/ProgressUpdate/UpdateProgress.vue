@@ -52,7 +52,7 @@ const caculateCrrentPoint = ref(0);
 const Save = async () => {
   const loading = ElLoading.service({
     lock: true,
-    text: "Loading",
+    text: "The request is being processed",
     background: "rgba(0, 0, 0, 0.7)",
   });
   await axiosInstance.put("KeyResults", props.keyresults).then((res) => {

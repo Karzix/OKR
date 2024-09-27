@@ -89,6 +89,7 @@
           type="primary"
           @click="
             () => {
+              if(validateKeyResult() == false) return;
               handleAddItem(keyResult);
               handleClose();
             }
@@ -108,6 +109,7 @@ import { Sidequest } from "@/Models/Sidequests";
 import { Close } from "@element-plus/icons-vue";
 import { getUtcOffsetInHours } from "@/Service/formatDate";
 import { deepCopy } from "@/Service/deepCopy";
+import { ElMessage } from "element-plus";
 const sidequestsName = ref("");
 const keyResult = ref<KeyResult>({
   id: undefined,
@@ -131,7 +133,38 @@ const props = defineProps<{
   isEdit: boolean;
   dialogVisible: boolean;
 }>();
+const validateKeyResult = () => {
+  // if (!keyResult.value.description) {
+  //   ElMessage.error("Vui lòng nhập mô tả.");
+  //   return false;
+  // }
+
+  if (!keyResult.value.deadline) {
+    ElMessage.error("Vui lòng chọn ngày hết hạn.");
+    return false;
+  }
+
+  if (keyResult.value.unit === undefined) {
+    ElMessage.error("Vui lòng chọn đơn vị.");
+    return false;
+  }
+
+  if (keyResult.value.unit !== 2 && keyResult.value.currentPoint! < 0) {
+    ElMessage.error("Điểm hiện tại phải lớn hơn hoặc bằng 0.");
+    return false;
+  }
+
+  if (keyResult.value.unit !== 2 && keyResult.value.maximunPoint! < 1) {
+    ElMessage.error("Điểm tối đa phải lớn hơn hoặc bằng 1.");
+    return false;
+  }
+
+  return true; // Tất cả điều kiện đều hợp lệ
+};
 const handleAddItem = (item: KeyResult) => {
+  if (!validateKeyResult()) {
+    return; 
+  }
   if (!props.isEdit) {
     emit("onAddItem", deepCopy(item));
   }

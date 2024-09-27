@@ -27,3 +27,6 @@ export function getRolesFromToken(): string[] | null {
 interface TokenPayload {
   [x: string]: never[];
 }
+export function IdentifyRoles(requiredRoles: string[]){
+  return hasPermission(getRolesFromToken() ?? [], requiredRoles);
+}
