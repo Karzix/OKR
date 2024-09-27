@@ -2,11 +2,9 @@
   <div>
     <div>
       <el-radio-group v-model="objective.targetType" size="large">
-        <el-radio-button
-          v-for="item in targetTypeValues"
-          :label="TargetType[item]"
-          :value="item"
-        />
+        <el-radio-button :label="TargetType[0]" :value="0" />
+        <el-radio-button :label="TargetType[1]" :value="1" :disabled="!( handleRole.IdentifyRoles(['Admin','superadmin']))"/>
+        <el-radio-button :label="TargetType[2]" :value="2" :disabled="!( handleRole.IdentifyRoles(['Teamleader']))"/>
       </el-radio-group>
     </div>
     <div class="form-item">
@@ -74,9 +72,9 @@
       :dialog-visible="createKeyResultDialogVisible"
       v-if="createKeyResultDialogVisible"
       @on-turn-off-dialog="handleClose"
-      @on-edit-item="handleEditKeyResult"
+      @onEditItem="handleEditKeyResult"
     />
-    <el-button plain @click="createKeyResultDialogVisible = true">
+    <el-button plain @click="addKeyresult">
       Add key result
     </el-button>
   </div>
@@ -93,6 +91,8 @@ import { CloseBold } from "@element-plus/icons-vue";
 import { formatDate } from "../../Service/formatDate";
 import { deepCopy } from "../../Service/deepCopy";
 import { TargetType } from "@/Models/Enum/TargetType";
+import * as handleRole from "@/components/maynghien/Common/handleRole";
+import { ElMessage } from "element-plus";
 
 const objective = ref<Objective>({
   id: undefined,
@@ -112,20 +112,7 @@ const emit = defineEmits<{
   (e: "onSearchObjective"): void;
   (e: "onClose"): void;
 }>();
-// const TargetTypes = ref([
-//   {
-//     id: 0,
-//     name: "Individual",
-//   },
-//   {
-//     id: 1,
-//     name: "Branch",
-//   },
-//   {
-//     id: 2,
-//     name: "Team",
-//   },
-// ]);
+
 const targetTypeValues = Object.keys(TargetType)
     .map(key => Number(key))
     .filter(value => !isNaN(value));
@@ -155,11 +142,7 @@ const handleEditKeyResult = (item: KeyResult) => {
   //   objective.value.listKeyResults.splice(index, 1, item);
   // }
 };
-// const GetGeneralData = () => {
-//   axiosInstance.get("TargetType").then((res) => {
-//     TargetTypes.value = res.data.data;
-//   });
-// };
+
 onMounted(() => {
   // GetGeneralData();
   if (props.isEdit) {
@@ -185,7 +168,38 @@ watch(
     }
   }
 );
+function validateObjective() {
+  if (!objective.value.name) {
+    ElMessage.error("Vui lòng nhập tên mục tiêu.");
+    return false;
+  }
+
+  if (!objective.value.startDay) {
+    ElMessage.error("Vui lòng chọn ngày bắt đầu.");
+    return false;
+  }
+
+  if (!objective.value.deadline) {
+    ElMessage.error("Vui lòng chọn ngày kết thúc.");
+    return false;
+  }
+
+  if (objective.value.startDay >= objective.value.deadline) {
+    ElMessage.error("Ngày bắt đầu phải trước ngày kết thúc.");
+    return false;
+  }
+
+  if (objective.value.listKeyResults.length === 0) {
+    ElMessage.error("Vui lòng thêm ít nhất một kết quả then chốt.");
+    return false;
+  }
+
+  return true; // Tất cả điều kiện đều hợp lệ
+}
 const Save = () => {
+  if (!validateObjective()) {
+    return; 
+  }
   if (props.isEdit) {
     axiosInstance
       .put("Objectives", objective.value)
@@ -228,6 +242,8 @@ function addKeyresult() {
 function handleClose() {
   createKeyResultDialogVisible.value = false;
 }
+
+
 </script>
 <style scoped>
 .key-result-item {

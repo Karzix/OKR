@@ -11,7 +11,8 @@ using SharedSettings;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-var sharedConfig = SharedConfig.LoadSharedConfiguration();
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+var sharedConfig = SharedConfig.LoadSharedConfiguration(environment);
 builder.Configuration.AddConfiguration(sharedConfig);
 // Add services to the container.
 builder.Services.AddControllers();

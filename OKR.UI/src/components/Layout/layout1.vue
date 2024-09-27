@@ -19,15 +19,14 @@
                   <span>User</span>
                 </el-menu-item>
                 <el-menu-item index="3" @click="handleAsideClick('Team')">
-                  <!-- <el-icon>
-                    <User />
-                  </el-icon> -->
+                  <el-icon>
+                    <UserFilled />
+                    <UserFilled />
+                  </el-icon>
                   <span>Team</span>
                 </el-menu-item>
                 <el-menu-item index="4" @click="handleAsideClick('Branch')">
-                  <!-- <el-icon>
-                    <User />
-                  </el-icon> -->
+                  <el-icon><OfficeBuilding /></el-icon>
                   <span>Branch</span>
                 </el-menu-item>
               </el-menu>
@@ -83,7 +82,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import router from "@/router";
 import Cookies from "js-cookie";
-import { Close, Expand, User } from "@element-plus/icons-vue";
+import { Close, Expand, User,OfficeBuilding,UserFilled  } from "@element-plus/icons-vue";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
@@ -99,6 +98,7 @@ const handleAsideClick = (action: string) => {
       break;
     default:
       router.push("/" + action)
+
       break;
   }
 };

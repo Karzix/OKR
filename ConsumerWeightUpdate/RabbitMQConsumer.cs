@@ -68,11 +68,11 @@ namespace ConsumerWeightUpdate
                     try
                     {
                         SaveWeightUpdate(keyResultRepository, objectivesRepository, progressUpdatesRepository, weightUpdate);
-                        await _hubConnection.InvokeAsync(SignalRMessage.WeightUpdate, weightUpdate.ConnectionId ,"OK");
+                        await _hubConnection.InvokeAsync("ReceiveMessageWeightUpdate", weightUpdate.ConnectionId ,"OK");
                     }
                     catch (Exception ex)
                     {
-                        await _hubConnection.InvokeAsync(SignalRMessage.WeightUpdate, weightUpdate.ConnectionId, ex.Message + " -> " + ex.Message);
+                        await _hubConnection.InvokeAsync("ReceiveMessageWeightUpdate", weightUpdate.ConnectionId, ex.Message + " -> " + ex.Message);
                     }
                     
                 }
