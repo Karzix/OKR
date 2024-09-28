@@ -4,7 +4,7 @@
       {{ Cookies.get("userName")?.toString() }}
     </div>
     <el-container>
-      <el-header class="layout2_header">
+      <el-header class="layout2_header" v-if="!isMobile">
         <el-row :gutter="20" class="w-100 layout2-row-header">
           <el-col :span="6" class="item-menu" @click="handleAsideClick('User')">
             <el-icon>
@@ -49,14 +49,52 @@
           </el-col>
         </el-row>
       </el-header>
+      <el-header class="mobile-header" v-if="isMobile">
+        <div class="mobile-header-content">
+          <el-button
+            class="toggle-button"
+            type="primary"
+            :icon="Expand"
+            circle
+            @click="toggleAside"
+          />
+          <span class="mobile-header-title">Menu</span>
+        </div>
+      </el-header>
       <el-main class="layout2-main"><router-view /></el-main>
     </el-container>
   </div>
+
+  <el-drawer v-model="drawerMenuMobile" width="100%" direction="ltr">
+    <el-row class="tac">
+      <el-col>
+        <el-menu default-active="1" class="el-menu-vertical-demo">
+          <el-menu-item index="2" @click="handleAsideClick('User')">
+            <el-icon>
+              <User />
+            </el-icon>
+            <span>User</span>
+          </el-menu-item>
+          <el-menu-item index="3" @click="handleAsideClick('Team')">
+            <el-icon>
+              <UserFilled />
+              <UserFilled />
+            </el-icon>
+            <span>Team</span>
+          </el-menu-item>
+          <el-menu-item index="4" @click="handleAsideClick('Branch')">
+            <el-icon><OfficeBuilding /></el-icon>
+            <span>Branch</span>
+          </el-menu-item>
+        </el-menu>
+      </el-col>
+    </el-row>
+  </el-drawer>
 </template>
+
 <script setup lang="ts">
 import router from "@/router";
 import {
-  Close,
   Expand,
   User,
   OfficeBuilding,
@@ -111,7 +149,6 @@ const handleResize = () => {
   if (!isMobile.value) {
     isAsideVisible.value = true;
   }
-  console.log(isAsideVisible.value);
 };
 
 onMounted(() => {
@@ -135,6 +172,7 @@ function logout() {
   window.location.reload();
 }
 </script>
+
 <style>
 .item-menu {
   background-color: #ddfff6;
@@ -152,6 +190,8 @@ function logout() {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  min-height: 100vh; /* Chiều cao tối thiểu luôn bằng chiều cao của màn hình */
+  width: 100vw; /* Đảm bảo chiều rộng luôn bằng chiều rộng của màn hình */
 }
 .layout2-row-header {
   display: flex !important;
@@ -167,15 +207,28 @@ function logout() {
   background-color: #00ffff99;
   display: flex !important;
   align-items: center;
-  align-content: center;
   justify-content: center;
   margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
   width: 80%;
   border-radius: 15px;
-  height: 100% !important;
   min-height: 60px !important;
+}
+.mobile-header {
+  background-color: #00ffff99;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 0;
+}
+.mobile-header-content {
+  display: flex;
+  align-items: center;
+}
+.mobile-header-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-left: 10px;
 }
 .el-col:hover {
   cursor: pointer;
@@ -190,16 +243,15 @@ function logout() {
 }
 .layout2-main {
   background-color: #ffffff00 !important;
-}
-.layout2-search {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  min-width: 190px !important;
-  max-width: 200px !important;
+
 }
 .layout2-search > i {
-    padding: 5px;
-    font-size: 24px;
+  padding: 5px;
+  font-size: 24px;
+}
+.layout2-search{
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 }
 </style>
