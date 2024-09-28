@@ -12,13 +12,15 @@ import TeamVue from '@/views/Department/Team.vue'
 import { LoginResult } from '@/Models/LoginResult';
 import UserInfor from '@/views/OKR/UserInfor.vue'
 import SeeObjectives from '@/views/OKR/SeeObjectives.vue';
+import layout2 from '@/components/Layout/layout2.vue';
+import Layout2 from '@/components/Layout/layout2.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
-      component: layout1,
+      component: Layout2,
       meta: { requiresAuth: true },
       children: [
         {
@@ -63,8 +65,10 @@ const router = createRouter({
           path: "Objectives=:EntityObjectiveId&:targetTpye",
           component: SeeObjectives,
         },
+      
       ],
     },
+    
   ]
 })
 
