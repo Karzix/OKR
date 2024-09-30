@@ -37,12 +37,13 @@
               style="width: 190px"
               filterable
               remote
+              :remote-method="seachUser"
             >
               <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="item in listUser"
+                :key="item.userName"
+                :label="item.userName"
+                :value="item.userName"
               />
             </el-select>
             <el-icon><Search /></el-icon>
@@ -103,6 +104,8 @@ import {
 } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted } from "vue";
 import Cookies from "js-cookie";
+import type { UserModel } from "@/Models/UserModel";
+import { axiosInstance } from "@/Service/axiosConfig";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
@@ -122,20 +125,7 @@ const handleAsideClick = (action: string) => {
   }
 };
 const searchUsername = ref("");
-const options = [
-  {
-    value: "Option1",
-    label: "Option1",
-  },
-  {
-    value: "Option2",
-    label: "Option2",
-  },
-  {
-    value: "Option3",
-    label: "Option3",
-  },
-];
+const listUser = ref<UserModel[]>([]);
 const toggleAside = () => {
   if (isMobile.value) {
     drawerMenuMobile.value = !drawerMenuMobile.value;
@@ -171,6 +161,14 @@ function logout() {
   }
   window.location.reload();
 }
+
+const seachUser = async (query: string) => {
+  const url = "User/list-by-keyworld/"+query
+  await axiosInstance.get(url).then((res) => {
+    listUser.value = res.data.data
+  })
+}
+
 </script>
 
 <style>

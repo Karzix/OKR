@@ -58,5 +58,13 @@ namespace OKR.API.Controllers
             var result = await _userService.Get(userName);
             return Ok(result);
         }
+        [HttpGet]
+        [Route("list-by-keyworld/{username}")]
+        [AllowAnonymous]
+        public IActionResult GetListByKeyworld(string username)
+        {
+            var result = _userService.GetListByKeyworld(username);
+            return Ok(result);
+        }
     }
 }

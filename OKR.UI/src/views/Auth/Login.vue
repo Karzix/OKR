@@ -101,4 +101,5 @@ const login = async () => {
 .login-input{
   min-width: 300px !important;
 }
+
 </style>

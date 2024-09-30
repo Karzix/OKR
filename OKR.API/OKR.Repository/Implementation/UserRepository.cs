@@ -33,5 +33,10 @@ namespace OKR.Repository.Implementation
             return _context.Users.Where(predicate).AsQueryable();
         }
 
+        public IQueryable<ApplicationUser> AsQueryable()
+        {
+            var query = _context.Users.AsQueryable();
+            return query;
+        }
     }
 }

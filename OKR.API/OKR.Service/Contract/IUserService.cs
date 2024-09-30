@@ -17,5 +17,6 @@ namespace OKR.Service.Contract
         Task<AppResponse<SearchResponse<UserDto>>> Search(SearchRequest request);
         AppResponse<List<UserDto>> GetAll();
         Task<AppResponse<UserDto>> Get(string iduserName);
+        AppResponse<List<UserDto>> GetListByKeyworld(string userName);
     }
 }
