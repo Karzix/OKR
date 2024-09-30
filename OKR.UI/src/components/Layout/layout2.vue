@@ -102,7 +102,7 @@ import {
   UserFilled,
   Search,
 } from "@element-plus/icons-vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, watch } from "vue";
 import Cookies from "js-cookie";
 import type { UserModel } from "@/Models/UserModel";
 import { axiosInstance } from "@/Service/axiosConfig";
@@ -163,12 +163,17 @@ function logout() {
 }
 
 const seachUser = async (query: string) => {
-  const url = "User/list-by-keyworld/"+query
+  const url = "User/list-by-keyworld/" + query;
   await axiosInstance.get(url).then((res) => {
     listUser.value = res.data.data
   })
 }
-
+const loadpage = () => {
+  router.push("/UserName=" + searchUsername.value);
+}
+watch(() => searchUsername.value, () => {
+  loadpage();
+})
 </script>
 
 <style>
