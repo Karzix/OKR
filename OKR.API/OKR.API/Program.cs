@@ -64,6 +64,8 @@ builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
 });
 builder.Services.AddSingleton<RabbitMQ.Client.IConnection>(sp => sp.GetRequiredService<IConnectionFactory>().CreateConnection());
 builder.Services.AddSingleton<RabbitMQ.Client.IModel>(sp => sp.GetRequiredService<RabbitMQ.Client.IConnection>().CreateModel());
+//MemoryCache 
+builder.Services.AddMemoryCache();
 var app = builder.Build();
 app.UseRouting();
 app.MapControllers();

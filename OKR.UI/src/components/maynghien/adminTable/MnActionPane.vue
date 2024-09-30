@@ -18,8 +18,8 @@
                                     :label="item[filter.dropdownData.displayMember]"
                                     :value="item[filter.dropdownData.keyMember]" />
                             </el-select>
-                            <div class="block"  v-if="filter.Type == 'date'">
-                                <span class="demonstration">{{filter.DisplayName}}</span>
+                            <div class="block"  v-if="filter.Type == 'date'" style="display: flex; align-items: center;justify-content: center; gap:5px">
+                                <span class="demonstration">{{filter.DisplayName}} <el-icon style="font-size: 30px;"><Calendar /></el-icon></span>
                                 <el-date-picker
                                     v-model="filter.Value"
                                     type="daterange"
@@ -33,7 +33,7 @@
                               </div>
                         </div>
                         <el-button v-if="filters != undefined && filters.length > 0" :icon="Search"
-                            @click="handlebtnSearchClicked"> search</el-button>
+                            @click="handlebtnSearchClicked"> </el-button>
 
                     </el-row>
 
@@ -65,6 +65,7 @@ import {
     Search,
     Star,
     Plus,
+    Calendar
 } from '@element-plus/icons-vue';
 
 // @ts-ignore

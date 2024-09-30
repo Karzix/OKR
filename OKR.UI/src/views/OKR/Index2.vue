@@ -11,6 +11,20 @@
           :openDialog="() => {}"
         />
       </div>
+    </template>
+
+    <div class="sidebar"></div>
+    <div class="content-container">
+      <!-- <div class="filter-search">
+        <MnActionPane
+          :allowAdd="false"
+          :tableColumns="tableColumns"
+          :isEdit="false"
+          @onBtnSearchClicked="AddFilterAndSearch"
+          :CustomActions="[]"
+          :openDialog="() => {}"
+        /> 
+      </div> -->
 
       <div class="card-header">
         <div class="progress-container">
@@ -30,31 +44,26 @@
             class="new-objective-btn"
             >New Objective</el-button
           >
+          <el-button-group class="mb-2 button-group">
+            <el-button
+              type="primary"
+              plain
+              @click="page = 0"
+              :class="page == 0 ? 'page-select' : ''"
+              >Objectives</el-button
+            >
+            <el-button
+              type="primary"
+              plain
+              @click="page = 1"
+              :class="page == 1 ? 'page-select' : ''"
+              >Progress</el-button
+            >
+          </el-button-group>
         </div>
       </div>
-    </template>
-
-    <div class="sidebar">
-      <el-button-group class="mb-2 button-group">
-        <el-button
-          type="primary"
-          plain
-          @click="page = 0"
-          :class="page == 0 ? 'page-select' : ''"
-          >Objectives</el-button
-        >
-        <el-button
-          type="primary"
-          plain
-          @click="page = 1"
-          :class="page == 1 ? 'page-select' : ''"
-          >Progress</el-button
-        >
-      </el-button-group>
-    </div>
-    <div class="content-container">
       <div class="tabs-container">
-        <el-tabs v-model="targetType" tab-position="left" class="custom-tabs">
+        <el-tabs v-model="targetType" class="custom-tabs">
           <el-tab-pane
             v-for="item in targetTypeValues"
             :key="item"
@@ -150,7 +159,7 @@ const editItem = ref<Objective>({
 const tableColumns = ref<TableColumn[]>([
   {
     key: "createOn",
-    label: "Date",
+    label: "",
     width: 1000,
     sortable: true,
     enableEdit: true,
@@ -267,7 +276,7 @@ watch(
 <style>
 @media screen and (max-width: 600px) {
   .OKR-Index2-dialogOKR {
-  width: 100% !important;
+    width: 100% !important;
   }
 }
 </style>
@@ -276,7 +285,7 @@ watch(
 .profile-card {
   max-width: 9000px;
   margin: auto;
-  background-color: #f8f9fa;
+  background-color: #f8f9faa6;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -383,7 +392,6 @@ watch(
   .tabs-container {
     width: 100%;
   }
-  
 }
 .page-select {
   background-color: #007bff;
@@ -394,5 +402,7 @@ watch(
 .OKR-Index2-dialogOKR {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+.profile-card {
 }
 </style>

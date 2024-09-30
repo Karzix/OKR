@@ -4,6 +4,7 @@ using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
@@ -22,10 +23,12 @@ namespace OKR.Service.Implementation
         private IHttpContextAccessor _httpContextAccessor;
         private IDepartmentRepository _departmentRepository;
         private IMapper _mappper;
+        private readonly IMemoryCache _memoryCache;
+        private readonly string cacheUserKey = "user_list";
 
         public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor, IDepartmentRepository departmentRepository
-            , IMapper mapper)
+            , IMapper mapper, IMemoryCache memoryCache)
         {
             _userRepository = userRepository;
             _userManager = userManager;
@@ -33,6 +36,7 @@ namespace OKR.Service.Implementation
             _httpContextAccessor = httpContextAccessor;
             _departmentRepository = departmentRepository;
             _mappper = mapper;
+            _memoryCache = memoryCache;
         }
 
         public async Task<AppResponse<UserDto>> Create(UserDto request)
@@ -281,6 +285,54 @@ namespace OKR.Service.Implementation
             catch(Exception ex)
             {
                 result.BuildError(ex.Message + ex.StackTrace);
+            }
+            return result;
+        }
+
+        public AppResponse<List<UserDto>> GetListByKeyworld(string userName)
+        {
+            var result = new AppResponse<List<UserDto>>();
+            try
+            {
+                if (!_memoryCache.TryGetValue(cacheUserKey, out List<UserDto> users))
+                {
+                    int page = 0;
+                    users = new List<UserDto>();
+                    while (true)
+                    {
+                        var list = _userRepository.AsQueryable().Skip(page*500).Take(500).Select(x=> new UserDto
+                        {
+                            DepartmentId = x.DepartmentId,
+                            Email = x.Email,
+                            Id = Guid.Parse(x.Id),
+                            UserName = x.UserName,
+                        }).ToList();
+                        if(list.Count() == 0)
+                        {
+                            break;
+                        }
+                        users.AddRange(list);
+                        list.Clear();
+                        page++;
+                    }
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions
+                    {
+                        Priority = CacheItemPriority.NeverRemove
+                    };
+
+                    // Lưu vào bộ nhớ cache
+                    _memoryCache.Set(cacheUserKey, users, cacheEntryOptions);
+                    result.BuildResult(users.Where(x=>x.UserName.Contains(userName)).Take(10).ToList());
+                }
+                else
+                {
+                    result.BuildResult(users.Where(x => x.UserName.Contains(userName)).Take(10).ToList());
+                }
+            }
+            catch(Exception ex)
+            {
+                result.BuildError(ex.Message + " -> " + ex.StackTrace);
             }
             return result;
         }
