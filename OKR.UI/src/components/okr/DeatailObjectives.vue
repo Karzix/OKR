@@ -147,16 +147,21 @@ onMounted(() => {
 });
 
 const copyLink = () => {
-  const text = `${urlUI}Objectives=${props.entityObjectivesId}&${props.targetType}`;
+  try{
+    const text = `${urlUI}Objectives=${props.entityObjectivesId}&${props.targetType}`;
+ 
+    var textField = document.createElement('textarea');
+    textField.innerText = text;
+    document.body.appendChild(textField);
+    textField.select();
+    document.execCommand('copy');
+    document.body.removeChild(textField);
+    ElMessage.success("Đã sao chép liên kết");
+  }
+  catch(err){
+    ElMessage.error("Không thể sao chép liên kết: " + err);
+  }
 
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      ElMessage.success("Đã sao chép liên kết");
-    })
-    .catch((err) => {
-      ElMessage.error("Không thể sao chép liên kết: " + err);
-    });
 };
 </script>
 
