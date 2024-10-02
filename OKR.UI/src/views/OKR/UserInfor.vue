@@ -79,6 +79,7 @@ import * as handleSearch  from "@/components/maynghien/Common/handleSearchFilter
 import SeeObjectives from "./SeeObjectives.vue"
 import { useRoute } from "vue-router";
 import router from "@/router";
+import { deepCopy } from "@/Service/deepCopy";
 
 const route = useRoute();
 const percentage = ref(50);
@@ -122,24 +123,25 @@ onMounted(async () => {
   searchRequest.PageIndex = 1;
   searchRequest.PageSize = 5;
   searchRequest.filters = [];
-  var filter = new Filter();
+  var filtercreateBy = new Filter();
 
-  filter.FieldName = "createBy";
-  filter.Value = route.params.UserName.toString();
-  addFilter(searchRequest.filters, filter);
+  filtercreateBy.FieldName = "createBy";
+  filtercreateBy.Value = route.params.UserName.toString();
+  addFilter(searchRequest.filters, deepCopy(filtercreateBy));
 
-  filter.FieldName = "targetType";
-  filter.Value = "0";
+  var filtertargetType = new Filter();
+  filtertargetType.FieldName = "targetType";
+  filtertargetType.Value = "0";
 
-  addFilter(searchRequest.filters, filter);
+  addFilter(searchRequest.filters, deepCopy(filtertargetType)); 
   Individual.value = await Search(searchRequest,"EntityObjectives/search");
   searchRequest.filters = [];
-  filter.Value = "1";
-  addFilter(searchRequest.filters, filter);
+  filtertargetType.Value = "1";
+  addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Branch.value = await Search(searchRequest,"EntityObjectives/search");
   searchRequest.filters = [];
-  filter.Value = "2";
-  addFilter(searchRequest.filters, filter);
+  filtertargetType.Value = "2";
+  addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Team.value = await Search(searchRequest,"EntityObjectives/search");
 });
 

@@ -238,6 +238,7 @@ namespace OKR.Service.Implementation
                         Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0,
                         StartDay = x.Objectives.StartDay,
                         TargetType = x.Objectives.TargetType,
+                        CreateBy = x.Objectives.CreatedBy,
                     }).First();
                     return result.BuildResult(dto);
                 }
@@ -275,6 +276,7 @@ namespace OKR.Service.Implementation
                         Point = objectId_point.ContainsKey(x.ObjectivesId) ? objectId_point[x.ObjectivesId] : 0,
                         StartDay = x.Objectives.StartDay,
                         TargetType = x.Objectives.TargetType,
+                        CreateBy = x.Objectives.CreatedBy,
                     }).First();
                     return result.BuildResult(dto);
                 }
