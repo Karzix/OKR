@@ -62,7 +62,7 @@ namespace OKR.API.Controllers
         [Route("list-by-keyworld/{username}")]
         [AllowAnonymous]
         public IActionResult GetListByKeyworld(string username)
-        {
+         {
             var result = _userService.GetListByKeyworld(username);
             return Ok(result);
         }
