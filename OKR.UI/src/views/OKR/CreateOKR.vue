@@ -206,6 +206,7 @@ const Save = () => {
       .then((res) => {
         console.log(res);
         if (res.data.isSuccess) {
+          ElMessage.success("Update OK");
           emit("onSearchObjective");
           emit("onClose");
         }
@@ -218,7 +219,9 @@ const Save = () => {
       .post("Objectives", objective.value)
       .then((res) => {
         if (res.data.isSuccess) {
+          ElMessage.success("Create OK");
           emit("onSearchObjective");
+          emit("onClose");
         }
       })
       .catch((error) => {

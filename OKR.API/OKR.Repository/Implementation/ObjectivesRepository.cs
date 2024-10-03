@@ -147,21 +147,22 @@ namespace OKR.Repository.Implementation
                     }
 
                     _context.Objectives.Update(obj);
-
+                    _context.SaveChanges();
                     var existingKeyResults = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).ToList();
 
                     var listKeyResultsEdit = keyResults.Where(x => existingKeyResults.Any(kr => kr.Id == x.Id)).ToList();
                     _context.KeyResults.UpdateRange(listKeyResultsEdit);
-
+                    _context.SaveChanges();
                     var listNewKeyResults = keyResults.Where(x => existingKeyResults.All(kr => kr.Id != x.Id)).ToList();
                     _context.KeyResults.AddRange(listNewKeyResults);
-
+                    _context.SaveChanges();
                     var ListIdKeyresults = listKeyResultsEdit.Select(x => x.Id).ToList();
 
-                    var listSidequestsEdit = sidequests.Where(x => ListIdKeyresults.Contains(x.Id)).ToList();
+                    var editSidequestsID = _context.Sidequests.Where(x => ListIdKeyresults.Contains(x.KeyResultsId)).Select(x=>x.Id).ToList();
+                    var listSidequestsEdit = sidequests.Where(x => editSidequestsID.Contains(x.Id)).ToList();
                     _context.Sidequests.UpdateRange(listSidequestsEdit);
-
-                    var listNewSidequests = sidequests.Where(x => !ListIdKeyresults.Contains(x.Id)).ToList();
+                    _context.SaveChanges();
+                    var listNewSidequests = sidequests.Where(x => !editSidequestsID.Contains(x.Id)).ToList();
                     _context.Sidequests.AddRange(listNewSidequests);
 
                     _context.SaveChanges();
