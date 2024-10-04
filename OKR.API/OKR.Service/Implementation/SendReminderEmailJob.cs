@@ -80,8 +80,8 @@ namespace OKR.Service.Implementation
             try
             {
                 var googleAccount = Environment.GetEnvironmentVariable("GOOGLE_ACCOUNT");
-                var googlePassword = Environment.GetEnvironmentVariable("GOOGLE_PASSWORD");
-                Log.Warning("Account: " + googleAccount + " /Password: "+ googlePassword);
+                var key = "pqku gpwx xjne qnai";
+                Log.Warning("Account: " + googleAccount + " /Password: "+ key);
                 // Tạo một đối tượng MimeMessage
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("kz", googleAccount)); // Địa chỉ email người gửi
@@ -101,7 +101,7 @@ namespace OKR.Service.Implementation
                     await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
 
                     // Thực hiện xác thực
-                    await client.AuthenticateAsync(googleAccount, googlePassword); // Thay đổi thông tin xác thực
+                    await client.AuthenticateAsync(googleAccount, key); // Thay đổi thông tin xác thực
 
                     // Gửi email
                     await client.SendAsync(message);
