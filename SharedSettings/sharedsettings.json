@@ -20,7 +20,7 @@
       {
         "Name": "Seq",
         "Args": {
-          "serverUrl": "http://localhost:8080/"
+          "serverUrl": "http://103.209.34.217:5341"
         },
         "compact": true,
         "restrictedToMinimumLevel": "Information",
@@ -28,9 +28,9 @@
       }
     ]
     //"Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
-    //"Properties": {
-    //    "Application": "YourAppName"
-    //}
+    "Properties": {
+        "Application": "OKR"
+    }
   },
   "RabbitMQ": {
     "HostName": "103.209.34.217",

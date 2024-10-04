@@ -8,6 +8,7 @@ using System.Net.Mail;
 using MailKit.Net.Smtp;
 using MimeKit;
 using OKR.Infrastructure.Enum;
+using Serilog;
 
 namespace OKR.Service.Implementation
 {
@@ -80,6 +81,7 @@ namespace OKR.Service.Implementation
             {
                 var googleAccount = Environment.GetEnvironmentVariable("GOOGLE_ACCOUNT");
                 var googlePassword = Environment.GetEnvironmentVariable("GOOGLE_PASSWORD");
+                Log.Warning("Account: " + googleAccount + " /Password: "+ googlePassword);
                 // Tạo một đối tượng MimeMessage
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("kz", googleAccount)); // Địa chỉ email người gửi
