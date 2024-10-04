@@ -19,7 +19,8 @@ COPY ["OKR.Infrastructure/OKR.Infrastructure.csproj", "OKR.Infrastructure/"]
 COPY ["OKR.API/OKR.Repository/OKR.Repository.csproj", "OKR.API/OKR.Repository/"]
 COPY ["OKR.API/OKR.DTO/OKR.DTO.csproj", "OKR.API/OKR.DTO/"]
 COPY ["OKR.API/OKR.Service/OKR.Service.csproj", "OKR.API/OKR.Service/"]
-COPY ["OKR.API/OKR.Service/Template/Email.html", "/"]
+COPY ["OKR.API/OKR.Service/Template/Email.html", "/app/Email.html"]
+
 RUN dotnet restore "./OKR.API/OKR.API/OKR.API.csproj"
 COPY . .
 WORKDIR "/src/OKR.API/OKR.API"
