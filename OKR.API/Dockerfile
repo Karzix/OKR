@@ -12,6 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
 COPY ["OKR.API/OKR.API/OKR.API.csproj", "OKR.API/OKR.API/"]
 COPY ["OKR.API/OKR.Models/OKR.Models.csproj", "OKR.API/OKR.Models/"]
 COPY ["Maynghien.Infrastructure/Maynghien.Infrastructure.csproj", "Maynghien.Infrastructure/"]
@@ -19,10 +20,11 @@ COPY ["OKR.Infrastructure/OKR.Infrastructure.csproj", "OKR.Infrastructure/"]
 COPY ["OKR.API/OKR.Repository/OKR.Repository.csproj", "OKR.API/OKR.Repository/"]
 COPY ["OKR.API/OKR.DTO/OKR.DTO.csproj", "OKR.API/OKR.DTO/"]
 COPY ["OKR.API/OKR.Service/OKR.Service.csproj", "OKR.API/OKR.Service/"]
-COPY ["OKR.API/OKR.Service/Template/Email.html", "/app/Email.html"]
+
 
 RUN dotnet restore "./OKR.API/OKR.API/OKR.API.csproj"
 COPY . .
+
 WORKDIR "/src/OKR.API/OKR.API"
 RUN dotnet build "./OKR.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
@@ -35,4 +37,5 @@ RUN dotnet publish "./OKR.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY ["OKR.API/OKR.Service/Template/Email.html", "/app/Email.html"]
 ENTRYPOINT ["dotnet", "OKR.API.dll"]
