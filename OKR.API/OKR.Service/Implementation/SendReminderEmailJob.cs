@@ -7,6 +7,7 @@ using Quartz;
 using System.Net.Mail;
 using MailKit.Net.Smtp;
 using MimeKit;
+using OKR.Infrastructure.Enum;
 
 namespace OKR.Service.Implementation
 {
@@ -33,6 +34,38 @@ namespace OKR.Service.Implementation
                 _sidequestsRepository = scope.ServiceProvider.GetRequiredService<ISidequestsRepository>();
                 //var objectives = _objectivesRepository.AsQueryable().ToList();
                 var objectives = _objectivesRepository.FindByPredicate(x => x.Deadline <= thresholdDate && x.Deadline > currentDate)
+                    .Select(x=> new ObjectiveDto
+                    {
+                        CreatedBy = x.CreatedBy,
+                        Deadline = x.Deadline,
+                        Id = x.Id,
+                        Name = x.Name,
+                        Point = 0,
+                        StartDay = x.StartDay,
+                        TargetType = x.TargetType,
+                        ListKeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id).Select(k=> new KeyResultDto
+                        {
+                            Active = k.Active,
+                            AddedPoints = 0,
+                            CurrentPoint = k.CurrentPoint,
+                            Deadline = k.Deadline,
+                            Description = k.Description,
+                            Id = k.Id,
+                            MaximunPoint = k.MaximunPoint,
+                            Note = "",
+                            Unit = k.Unit,
+                            Sidequests = _sidequestsRepository.AsQueryable().Where(s=>s.KeyResultsId == k.Id)
+                            .Select(s=> new SidequestsDto
+                            {
+                                Id = s.Id,
+                                KeyResultsId = s.Id,
+                                Name = s.Name,
+                                Status = s.Status,
+                             }
+                             )
+                            .ToList(),
+                        }).ToList(),
+                    })
                     .ToList();
                 foreach (var objective in objectives)
                 {
@@ -47,7 +80,7 @@ namespace OKR.Service.Implementation
             {
                 // Tạo một đối tượng MimeMessage
                 var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("kz", "GOOGLE_ACCOUNT")); // Địa chỉ email người gửi
+                message.From.Add(new MailboxAddress("kz", "{{ GOOGLE_ACCOUNT }}")); // Địa chỉ email người gửi
                 message.To.Add(new MailboxAddress("", recipientEmail)); // Địa chỉ email người nhận
                 message.Subject = subject; // Tiêu đề email
 
@@ -64,7 +97,7 @@ namespace OKR.Service.Implementation
                     await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
 
                     // Thực hiện xác thực
-                    await client.AuthenticateAsync("GOOGLE_ACCOUNT", "GOOGLE_PASSWORD"); // Thay đổi thông tin xác thực
+                    await client.AuthenticateAsync("{{ GOOGLE_ACCOUNT }}", "{{ GOOGLE_PASSWORD }}"); // Thay đổi thông tin xác thực
 
                     // Gửi email
                     await client.SendAsync(message);
@@ -80,7 +113,7 @@ namespace OKR.Service.Implementation
             }
         }
 
-        private async Task<string> buildEmailAsync(Objectives objectives)
+        private async Task<string> buildEmailAsync(ObjectiveDto objectives)
         {
             try
             {
@@ -90,10 +123,10 @@ namespace OKR.Service.Implementation
 
 
                 mailText = mailText.Replace("{{ObjectiveName}}", objectives.Name);
-                mailText = mailText.Replace("{{Dealine}}", objectives.Deadline.ToShortDateString());
+                mailText = mailText.Replace("{{Dealine}}", objectives.Deadline.Value.ToShortDateString());
 
-                var listKeyresuls = _keyResultRepository.AsQueryable().Where(x => x.ObjectivesId == objectives.Id).ToList();
-                var keyresults = BuildKeyresult(listKeyresuls);
+                //var listKeyresuls = _keyResultRepository.AsQueryable().Where(x => x.ObjectivesId == objectives.Id).ToList();
+                var keyresults = BuildKeyresult(objectives.ListKeyResults);
                 mailText = mailText.Replace("{{ListKeyresult}}", keyresults);
                 return mailText;
             }
@@ -104,16 +137,19 @@ namespace OKR.Service.Implementation
             }
         }
 
-        private string BuildKeyresult(List<KeyResults> keyResultDto)
+        private string BuildKeyresult(List<KeyResultDto> keyResultDto)
         {
             string content = "";
             foreach (var keyResult in keyResultDto)
             {
                 content += "<tr>" +
-                              $"<td style=\"border: 1px solid #dddddd; padding: 10px;\">{keyResult.Description}</td>" +
-                              $"<td style=\"border: 1px solid #dddddd; padding: 10px; text-align: center;\">{keyResult.CurrentPoint}/{keyResult.MaximunPoint}</td>" +
+                              $"<td style=\"border: 1px solid #dddddd; padding: 10px;\">{keyResult.Description}</td>" +(
+                              keyResult.Unit != TypeUnitKeyResult.Checked ?
+                              $"<td style=\"border: 1px solid #dddddd; padding: 10px; text-align: center;\">{keyResult.CurrentPoint}/{keyResult.MaximunPoint}</td>" 
+                              : $"<td style=\"border: 1px solid #dddddd; padding: 10px; text-align: center;\">{keyResult.Sidequests.Where(x=>x.Status == true).Count()}/{keyResult.Sidequests.Count}</td>"
+                              ) +
                               "<td style=\"border: 1px solid #dddddd; padding: 10px;\">" +
-                                  //BuildSidequests(keyResult.Sidequests) +
+                                  BuildSidequests(keyResult.Sidequests) +
                               "</td>" +
                           "</tr>";
             }
