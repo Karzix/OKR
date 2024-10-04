@@ -122,7 +122,7 @@ namespace OKR.Service.Implementation
             try
             {
                 //string content = "";
-                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..\\OKR.Service\\Template", "Email.html");
+                var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "OKR.Service", "Template", "Email.html");
                 var mailText = await File.ReadAllTextAsync(templatePath);
 
 
