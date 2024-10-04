@@ -1,4 +1,5 @@
-﻿using OKR.Repository.Contract;
+﻿using OKR.Models.Context;
+using OKR.Repository.Contract;
 using OKR.Repository.Implementation;
 using OKR.Service.Contract;
 using OKR.Service.Implementation;
@@ -31,6 +32,13 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<ISidequestsService, SidequestsService>();
             builder.Services.AddScoped<IEvaluateTargetService, EvaluateTargetService>();
             builder.Services.AddScoped<IEntityObjectivesService, EntityObjectivesService>();
+
+
+            //builder.Services.AddScoped<ObjectivesRepository>();
+            //builder.Services.AddScoped<KeyResultRepository>();
+            //builder.Services.AddScoped<SidequestsRepository>();
+            //builder.Services.AddScoped<SendReminderEmailJob>();
+            //builder.Services.AddScoped<SendReminderEmailJob>();
         }
     }
 }
