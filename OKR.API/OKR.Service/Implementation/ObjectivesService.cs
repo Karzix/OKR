@@ -296,8 +296,13 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
+
                 //edit
                 var objectives = _objectiveRepository.Get(request.Id.Value);
+                if(objectives.CreatedBy != userName)
+                {
+                    return result.BuildError("you are not the owner");
+                }
                 var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
                 var listkrID = listKeyResults.Select(x=>x.Id).ToList();
                 var listSidequests = _questsRepository.AsQueryable().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
@@ -370,6 +375,7 @@ namespace OKR.Service.Implementation
                 listSidequests.AddRange(ListNewSidequests);
 
                 _objectiveRepository.Edit(objectives, listKeyResults, listSidequests);
+                result.BuildResult(request);
 
             }
             catch (Exception ex)
