@@ -52,9 +52,10 @@ import { ElMessage } from "element-plus";
 import Cookies from "js-cookie";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 import LineChart from "@/components/okr/LineChart.vue";
+import type { EntityObjectives } from "@/Models/EntityObjectives";
 
 const props = defineProps<{
-   objective: Objective,
+   objective: EntityObjectives,
    isGuest? : boolean
   }>();
 const emit = defineEmits<{

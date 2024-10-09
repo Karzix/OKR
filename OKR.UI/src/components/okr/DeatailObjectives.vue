@@ -1,7 +1,11 @@
 <template>
   <div class="deatail-objectives">
     <div class="objective-header">
-      <h1>{{ props.objective.name }}</h1>
+      <div class="objective-title">
+        <h1>{{ props.objective.name }}</h1>
+       <div v-if="!isGuest" @click="statusChange"><el-tag>{{ props.objective.status == 0 ? "Working" : "End" }}</el-tag></div>
+      </div>
+      
       <div>
         <el-icon @click="copyLink()"><Share /></el-icon>
       </div>
@@ -82,9 +86,12 @@ import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
 import { Share } from "@element-plus/icons-vue";
 import { axiosInstance, urlUI } from "@/Service/axiosConfig";
 import { ElMessage } from "element-plus";
+import { EntityObjectives } from "@/Models/EntityObjectives";
+import { deepCopy } from "@/Service/deepCopy";
+import { el } from "element-plus/es/locales.mjs";
 
 const props = defineProps<{
-  objective: Objective;
+  objective: EntityObjectives;
   isGuest?: boolean;
   targetType: string;
   entityObjectivesId: string;
@@ -112,7 +119,7 @@ const searchRequest = ref<SearchRequest>({
   filters: [
     {
       FieldName: "objectivesId",
-      Value: props.objective.id,
+      Value: props.objective.objectivesId,
       Operation: "eq",
       dropdownData: undefined,
       DisplayName: undefined,
@@ -139,11 +146,11 @@ onMounted(() => {
   }
   var filter = new Filter();
   filter.FieldName = "objectivesId";
-  filter.Value = props.objective.id;
-  addFilter(searchRequest.value.filters as [], filter);
+  filter.Value = props.objective.objectivesId;
+  addFilter(searchRequest.value.filters as [],deepCopy(filter));
   filter.FieldName = "entityObjectivesId";
   filter.Value = props.entityObjectivesId;
-  addFilter(searchRequest.value.filters as [], filter);
+  addFilter(searchRequest.value.filters as [], deepCopy(filter));
 });
 
 const copyLink = () => {
@@ -163,6 +170,23 @@ const copyLink = () => {
   }
 
 };
+const statusChange = () => {
+  var entity  = new EntityObjectives();
+  entity.id = props.entityObjectivesId;
+  entity.name = props.objective.name;
+  // entity.status = props.objective.status;
+  entity.status = props.objective.status == 0 ? 1 : 0;
+  axiosInstance.put("EntityObjectives/status-change", entity).then((res) => {
+    var respone = res.data;
+    if(respone.isSuccess){
+      props.objective.status = entity.status;
+      ElMessage.success("status change OK");
+    }
+    else {
+      ElMessage.error(respone.message);
+    }
+  })
+}
 </script>
 
 <style scoped>
@@ -236,4 +260,9 @@ const copyLink = () => {
   padding: 20px;
   border-radius: 15px;
 }
+.objective-title{
+  display: flex;
+  gap: 10px;
+}
+
 </style>

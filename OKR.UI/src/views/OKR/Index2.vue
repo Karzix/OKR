@@ -15,16 +15,6 @@
 
     <div class="sidebar"></div>
     <div class="content-container">
-      <!-- <div class="filter-search">
-        <MnActionPane
-          :allowAdd="false"
-          :tableColumns="tableColumns"
-          :isEdit="false"
-          @onBtnSearchClicked="AddFilterAndSearch"
-          :CustomActions="[]"
-          :openDialog="() => {}"
-        /> 
-      </div> -->
 
       <div class="card-header">
         <div class="progress-container">
@@ -145,7 +135,7 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 });
 
-const editItem = ref<Objective>({
+const editItem = ref<EntityObjectives>({
   id: undefined,
   name: "",
   startDay: undefined,
@@ -154,6 +144,8 @@ const editItem = ref<Objective>({
   targetType: undefined,
   targetTypeName: "",
   point: 0,
+  objectivesId: undefined,
+  status: 0,
 });
 
 const tableColumns = ref<TableColumn[]>([
@@ -205,16 +197,7 @@ const Search = async () => {
 
 const editObjective = (entityObjectives: EntityObjectives) => {
   entityObjectivesId.value = entityObjectives.id ?? "";
-  var objective = new Objective();
-  objective.id = entityObjectives.objectivesId;
-  objective.name = entityObjectives.name;
-  objective.point = entityObjectives.point;
-  objective.startDay = entityObjectives.startDay;
-  objective.deadline = entityObjectives.deadline;
-  objective.listKeyResults = entityObjectives.listKeyResults;
-  objective.targetType = entityObjectives.targetType;
-  objective.targetTypeName = entityObjectives.targetTypeName;
-  editItem.value = objective;
+  editItem.value = entityObjectives;
   EditDialog.value = true;
   createDialog.value = true;
 };
@@ -226,16 +209,7 @@ const CreateObjectives = () => {
 
 const handleDeatail = (entityObjectives: EntityObjectives) => {
   entityObjectivesId.value = entityObjectives.id ?? "";
-  var objective = new Objective();
-  objective.id = entityObjectives.objectivesId;
-  objective.name = entityObjectives.name;
-  objective.point = entityObjectives.point;
-  objective.startDay = entityObjectives.startDay;
-  objective.deadline = entityObjectives.deadline;
-  objective.listKeyResults = entityObjectives.listKeyResults;
-  objective.targetType = entityObjectives.targetType;
-  objective.targetTypeName = entityObjectives.targetTypeName;
-  editItem.value = objective;
+  editItem.value = entityObjectives;
   DeatailDialog.value = true;
 };
 
@@ -404,6 +378,6 @@ watch(
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
-.profile-card {
-}
+/* .profile-card {
+} */
 </style>
