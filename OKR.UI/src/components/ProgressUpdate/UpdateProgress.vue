@@ -64,7 +64,7 @@ const Save = async () => {
       var addpoint = props.keyresults.addedPoints ?? 0;
       emit(
         "onUpdateProgress",
-        (crpoint + addpoint) ?? 0,
+        (crpoint + addpoint),
         props.keyresults.id ?? ""
       );
     }

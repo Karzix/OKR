@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MayNghien.Infrastructure.Models.Entity;
+using OKR.Infrastructure.Enum;
 
 namespace OKR.Models.Entity
 {
     public class UserObjectives : BaseEntity
     {
+        public StatusObjectives status {  get; set; }
+
         [ForeignKey("Objectives")]
         public Guid ObjectivesId { get; set; }
         [ForeignKey("ObjectivesId")]

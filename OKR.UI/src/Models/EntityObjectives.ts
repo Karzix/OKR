@@ -12,6 +12,10 @@ export class EntityObjectives {
     createBy?: string | undefined;
     createOn?: Date | undefined;
     objectivesId?: string | undefined;
-
+    status: StatusObjectives | undefined;
     // constructor() {}
+}
+export enum StatusObjectives {
+    working,
+    end,
 }

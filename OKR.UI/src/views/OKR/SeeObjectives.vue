@@ -15,7 +15,7 @@ const isLoading = ref(true);
 // const props = defineProps<{
 //   objective: Objective
 // }>();
-const objectives = ref<Objective>({
+const objectives = ref<EntityObjectives>({
   id: undefined,
   name: "",
   startDay: undefined,
@@ -24,6 +24,8 @@ const objectives = ref<Objective>({
   targetType: undefined,
   targetTypeName: "",
   point: 0,
+  objectivesId: undefined,
+  status: 0,
 });
 const targetType = ref<string>("");
 const search = async () => {
@@ -32,16 +34,7 @@ const search = async () => {
   await axiosInstance.get(`EntityObjectives/${id}`).then((res) => {
     if (res.data.isSuccess) {
       entityObjectives = res.data.data;
-      objectives.value.id = entityObjectives.objectivesId;
-      objectives.value.name = entityObjectives.name;
-      objectives.value.point = entityObjectives.point;
-      objectives.value.startDay = entityObjectives.startDay;
-      objectives.value.deadline = entityObjectives.deadline;
-      objectives.value.listKeyResults = entityObjectives.listKeyResults;
-      objectives.value.targetType = entityObjectives.targetType;
-      objectives.value.targetTypeName = entityObjectives.targetTypeName;
-      objectives.value.createBy = entityObjectives.createBy;
-      objectives.value.createOn = entityObjectives.createOn;
+      objectives.value = entityObjectives;
     } else {
       console.log(res.data.message);
     }

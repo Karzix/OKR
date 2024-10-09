@@ -13,5 +13,6 @@ namespace OKR.Service.Contract
     {
         AppResponse<SearchResponse<EntityObjectivesDto>> Search(SearchRequest request);
         AppResponse<EntityObjectivesDto> Get(Guid id);
+        AppResponse<string> StatusChange(EntityObjectivesDto dto);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OKR.DTO;
 using OKR.Service.Contract;
 
 namespace OKR.API.Controllers
@@ -29,6 +30,13 @@ namespace OKR.API.Controllers
         public IActionResult Get(Guid id)
         {
             var result = _userObjectivesService.Get(id);
+            return Ok(result);
+        }
+        [HttpPut]
+        [Route("status-change")]
+        public IActionResult StatusChange(EntityObjectivesDto request)
+        {
+            var result = _userObjectivesService.StatusChange(request);
             return Ok(result);
         }
     }

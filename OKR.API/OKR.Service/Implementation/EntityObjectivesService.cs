@@ -91,7 +91,9 @@ namespace OKR.Service.Implementation
                             
                         }).ToList(),
                         Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0,
-                        ObjectivesId = x.ObjectivesId
+                        ObjectivesId = x.ObjectivesId,
+                        Status = x.status,
+                        CreateBy = x.CreatedBy
                     })
                     .ToList();
 
@@ -282,6 +284,39 @@ namespace OKR.Service.Implementation
                 }
             }
             catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
+        }
+
+        public AppResponse<string> StatusChange(EntityObjectivesDto dto)
+        {
+            var result = new AppResponse<string>();
+            try
+            {
+                var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                var userObjectives = _userObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
+                var departmentObjectives = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
+                if (userObjectives == null && departmentObjectives == null)
+                {
+                    return result.BuildError("cannot find objectives");
+                }
+                if (userObjectives != null)
+                {
+                    
+                    userObjectives.status = dto.Status.Value;
+                    _userObjectivesRepository.Edit(userObjectives);
+                }
+                else
+                {
+                    departmentObjectives.status = dto.Status.Value;
+                    _departmentObjectivesRepository.Edit(departmentObjectives);
+                }
+                result.BuildResult("OK");
+                
+            }
+            catch(Exception ex)
             {
                 result.BuildError(ex.Message);
             }
