@@ -236,7 +236,8 @@ onMounted(() => {
     handleSearch.addFilter(searchRequest.value.filters as [], fil);
   } else {
   }
-  Search();
+  AddFilterTargetType(targetType.value);
+  // Search();
 });
 watch(
   () => targetType.value,

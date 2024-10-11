@@ -44,6 +44,7 @@ import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter"
 import { ElMessage } from "element-plus";
 import {EntityObjectives} from "@/Models/EntityObjectives";
 import { Edit } from "@element-plus/icons-vue";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const props = defineProps<{
   searchRequest: SearchRequest;
