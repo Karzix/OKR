@@ -6,5 +6,6 @@ namespace OKR.Repository.Contract
 {
     public interface IDepartmentObjectivesRepository : IGenericRepository<DepartmentObjectives, OKRDBContext, ApplicationUser>
     {
+        Dictionary<Guid, int> caculatePercentObjectives(IQueryable<DepartmentObjectives> input);
     }
 }

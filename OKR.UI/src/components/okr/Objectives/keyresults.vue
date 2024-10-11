@@ -8,7 +8,7 @@
           <el-tag>{{ item.unit == 0 ? "Percent" : item.unit == 1 ? "Value" : "Checked" }}</el-tag>
         </div>
         <div class="header-extra" v-if="!isGuest">
-          <el-button v-if="isLogin" type="primary" class="ml-2" @click="handleProgressUpdate(item)">
+          <el-button v-if="isLogin && item.unit != 2" type="primary" class="ml-2" @click="handleProgressUpdate(item)">
             <el-icon><EditIcon /></el-icon>
           </el-button>
         </div>

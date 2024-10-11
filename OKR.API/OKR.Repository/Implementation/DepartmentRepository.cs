@@ -1,5 +1,6 @@
 ﻿using Maynghien.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
