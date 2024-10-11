@@ -8,6 +8,7 @@ using System.Net.Mail;
 using MailKit.Net.Smtp;
 using MimeKit;
 using OKR.Infrastructure.Enum;
+using Serilog;
 
 namespace OKR.Service.Implementation
 {
@@ -17,6 +18,8 @@ namespace OKR.Service.Implementation
         private IKeyResultRepository _keyResultRepository;
         private IObjectivesRepository _objectivesRepository;
         private ISidequestsRepository _sidequestsRepository;
+        private IUserObjectivesRepository _userObjectivesRepository;
+        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         public SendReminderEmailJob(IServiceScopeFactory serviceScopeFactory)
         {
             //_context = oKRDBContext;
@@ -32,6 +35,8 @@ namespace OKR.Service.Implementation
                 _keyResultRepository = scope.ServiceProvider.GetRequiredService<IKeyResultRepository>();
                 _objectivesRepository = scope.ServiceProvider.GetRequiredService<IObjectivesRepository>();
                 _sidequestsRepository = scope.ServiceProvider.GetRequiredService<ISidequestsRepository>();
+                _userObjectivesRepository = scope.ServiceProvider.GetRequiredService<IUserObjectivesRepository>();
+                _departmentObjectivesRepository = scope.ServiceProvider.GetRequiredService<IDepartmentObjectivesRepository>();
                 //var objectives = _objectivesRepository.AsQueryable().ToList();
                 var objectives = _objectivesRepository.FindByPredicate(x => x.Deadline <= thresholdDate && x.Deadline > currentDate)
                     .Select(x=> new ObjectiveDto
@@ -67,10 +72,19 @@ namespace OKR.Service.Implementation
                         }).ToList(),
                     })
                     .ToList();
+                var dateNow = DateTime.UtcNow;
                 foreach (var objective in objectives)
                 {
-                    var body = await buildEmailAsync(objective);
-                    await SendEmailAsync(objective.CreatedBy, "Reminder: Objective is nearing deadline", body);
+                    if(objective.Deadline.Value.Date !=  dateNow.Date)
+                    {
+                        var body = await buildEmailAsync(objective);
+                        await SendEmailAsync(objective.CreatedBy, "Reminder: Objective is nearing deadline", body);
+                    }
+                    else
+                    {
+                        StatusChange(objective.Id.Value);
+                    }
+                    
                 }
             }
         }
@@ -177,6 +191,40 @@ namespace OKR.Service.Implementation
             }
             content += "</ul>";
             return content;
+        }
+        private void StatusChange( Guid ObjectivesID)
+        {
+            try
+            {
+                var userObjectivesL = _userObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
+                var departmentObjectivesL = _departmentObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
+                if (userObjectivesL.Count() == 0 && departmentObjectivesL.Count == 0)
+                {
+                    return;
+                }
+                if (userObjectivesL.Count() != 0)
+                {
+                    userObjectivesL.ForEach(userObjectives =>
+                    {
+                        userObjectives.status = StatusObjectives.end;
+                        _userObjectivesRepository.Edit(userObjectives);
+                    });
+                    
+                }
+                else
+                {
+                    departmentObjectivesL.ForEach(departmentObjectives =>
+                    {
+                        departmentObjectives.status = StatusObjectives.end;
+                        _departmentObjectivesRepository.Edit(departmentObjectives);
+                    });
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("entity objectives: " + ObjectivesID + " error when the system automatically updates the status: " + ex.Message + " " + ex.StackTrace);
+            }
         }
     }
 }

@@ -296,6 +296,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                var now = DateTime.UtcNow;
                 var userObjectives = _userObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
                 var departmentObjectives = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
                 if (userObjectives == null && departmentObjectives == null)
@@ -304,12 +305,21 @@ namespace OKR.Service.Implementation
                 }
                 if (userObjectives != null)
                 {
-                    
+                    var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == userObjectives.ObjectivesId).First();
+                    if(objectives.Deadline.Date >= now)
+                    {
+                        return result.BuildError("cannot be changed because the deadline has passed");
+                    }
                     userObjectives.status = dto.Status.Value;
                     _userObjectivesRepository.Edit(userObjectives);
                 }
-                else
+                else if (departmentObjectives != null) 
                 {
+                    var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == departmentObjectives.ObjectivesId).First();
+                    if (objectives.Deadline.Date >= now)
+                    {
+                        return result.BuildError("cannot be changed because the deadline has passed");
+                    }
                     departmentObjectives.status = dto.Status.Value;
                     _departmentObjectivesRepository.Edit(departmentObjectives);
                 }
