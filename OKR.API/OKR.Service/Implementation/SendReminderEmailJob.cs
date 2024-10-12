@@ -28,7 +28,7 @@ namespace OKR.Service.Implementation
 
         public async Task Execute(IJobExecutionContext context)
         {
-            DateTime currentDate = DateTime.Now;
+            DateTime currentDate = DateTime.UtcNow;
             DateTime thresholdDate = currentDate.AddDays(3);
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -38,7 +38,7 @@ namespace OKR.Service.Implementation
                 _userObjectivesRepository = scope.ServiceProvider.GetRequiredService<IUserObjectivesRepository>();
                 _departmentObjectivesRepository = scope.ServiceProvider.GetRequiredService<IDepartmentObjectivesRepository>();
                 //var objectives = _objectivesRepository.AsQueryable().ToList();
-                var objectives = _objectivesRepository.FindByPredicate(x => x.Deadline <= thresholdDate && x.Deadline > currentDate)
+                var objectives = _objectivesRepository.FindByPredicate(x => x.Deadline.Date <= thresholdDate.Date && x.Deadline.Date >= currentDate.Date)
                     .Select(x=> new ObjectiveDto
                     {
                         CreatedBy = x.CreatedBy,
@@ -137,7 +137,7 @@ namespace OKR.Service.Implementation
 
 
                 mailText = mailText.Replace("{{ObjectiveName}}", objectives.Name);
-                mailText = mailText.Replace("{{Dealine}}", objectives.Deadline.Value.ToShortDateString());
+                mailText = mailText.Replace("{{Dealine}}", objectives.Deadline.Value.AddHours(7).ToShortDateString());
 
                 //var listKeyresuls = _keyResultRepository.AsQueryable().Where(x => x.ObjectivesId == objectives.Id).ToList();
                 var keyresults = BuildKeyresult(objectives.ListKeyResults);

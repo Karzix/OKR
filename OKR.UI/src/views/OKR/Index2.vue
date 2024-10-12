@@ -228,7 +228,7 @@ const AddFilterTargetType = (emunTarget: string) => {
   handleSearch.addFilter(searchRequest.value.filters ?? [], filterTargetType);
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (route.params.UserName != undefined) {
     var fil = new Filter();
     fil.FieldName = "createBy";
@@ -238,6 +238,11 @@ onMounted(() => {
   }
   AddFilterTargetType(targetType.value);
   // Search();
+  var responeOverallProgress = await axiosInstance.post(
+    "Objectives/overal-progress",
+    searchRequest.value
+  );
+  overalProgress.value = responeOverallProgress.data.data;
 });
 watch(
   () => targetType.value,

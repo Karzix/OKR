@@ -331,7 +331,7 @@ namespace OKR.Service.Implementation
                 if (userObjectives != null)
                 {
                     var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == userObjectives.ObjectivesId).First();
-                    if (objectives.Deadline.Date >= now)
+                    if (objectives.Deadline.Date <= now)
                     {
                         return result.BuildError("cannot be changed because the deadline has passed");
                     }
@@ -341,7 +341,7 @@ namespace OKR.Service.Implementation
                 else if (departmentObjectives != null)
                 {
                     var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == departmentObjectives.ObjectivesId).First();
-                    if (objectives.Deadline.Date >= now)
+                    if (objectives.Deadline.Date <= now)
                     {
                         return result.BuildError("cannot be changed because the deadline has passed");
                     }
