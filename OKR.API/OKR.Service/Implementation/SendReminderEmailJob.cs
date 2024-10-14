@@ -75,7 +75,7 @@ namespace OKR.Service.Implementation
                 var dateNow = DateTime.UtcNow;
                 foreach (var objective in objectives)
                 {
-                    if(objective.Deadline.Value.Date !=  dateNow.Date)
+                    if(objective.Deadline.Value !=  dateNow)
                     {
                         var body = await buildEmailAsync(objective);
                         await SendEmailAsync(objective.CreatedBy, "Reminder: Objective is nearing deadline", body);
