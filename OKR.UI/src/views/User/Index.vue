@@ -121,6 +121,10 @@ const tableColumns: TableColumn[] = [
           role: "Teamleader",
           roleName: "Teamleader",
         },
+        {
+          role: "BranchManagement ",
+          roleName: "Branch Management ",
+        },
       ],
     },
   },
