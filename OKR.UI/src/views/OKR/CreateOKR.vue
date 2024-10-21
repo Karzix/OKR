@@ -3,7 +3,7 @@
     <div>
       <el-radio-group v-model="objective.targetType" size="large">
         <el-radio-button :label="TargetType[0]" :value="0" />
-        <el-radio-button :label="TargetType[1]" :value="1" :disabled="!( handleRole.IdentifyRoles(['Admin','superadmin', 'BranchManagement ']))"/>
+        <el-radio-button :label="TargetType[1]" :value="1" :disabled="!( handleRole.IdentifyRoles(['Admin','superadmin', 'BranchManagement']))"/>
         <el-radio-button :label="TargetType[2]" :value="2" :disabled="!( handleRole.IdentifyRoles(['Teamleader']))"/>
       </el-radio-group>
     </div>

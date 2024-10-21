@@ -14,5 +14,6 @@ namespace OKR.DTO
         public int AddedPoints = 0;
         public DateTime? CreatedOn { get; set; }
         public string? CreatedBy { get; set; }
+        public bool IsApproved { get; set; }
     }
 }

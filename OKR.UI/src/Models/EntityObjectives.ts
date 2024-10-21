@@ -13,6 +13,7 @@ export class EntityObjectives {
     createOn?: Date | undefined;
     objectivesId?: string | undefined;
     status: StatusObjectives | undefined;
+    numberOfPendingUpdates: number = 0
     // constructor() {}
 }
 export enum StatusObjectives {

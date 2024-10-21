@@ -26,18 +26,22 @@ const router = createRouter({
         {
           path: "",
           component: HomePageView,
+          meta: { requiresAuth: true},
         },
         {
           path: "User",
           component: UserVue,
+          meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
         {
           path: "Branch",
           component: BranchVue,
+          meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
         {
           path: "Team",
           component: TeamVue,
+          meta: { requiresAuth: true, roles: ["BranchManagement"]},
         },
       ],
     },
@@ -60,10 +64,12 @@ const router = createRouter({
         {
           path: "UserName=:UserName",
           component: UserInfor,
+          meta: { requiresAuth: true},
         },
         {
           path: "Objectives=:EntityObjectiveId&:targetTpye",
           component: SeeObjectives,
+          meta: { requiresAuth: true},
         },
       
       ],

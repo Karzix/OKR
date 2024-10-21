@@ -1,6 +1,7 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OKR.DTO;
 using OKR.Service.Contract;
 
 namespace OKR.API.Controllers
@@ -20,6 +21,13 @@ namespace OKR.API.Controllers
         public IActionResult search(SearchRequest request)
         {
             var result = _service.Search(request);
+            return Ok(result);
+        }
+        [HttpPut]
+        [Route("confirm")]
+        public IActionResult Confirm(DepartmentProgressApprovalDto dto)
+        {
+            var result = _service.Confirm(dto);
             return Ok(result);
         }
     }

@@ -39,9 +39,11 @@ import { KeyResult } from "@/Models/KeyResult";
 import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage, ElLoading } from "element-plus";
 import { ref, watch } from "vue";
+import Cookies from "js-cookie";
 
 const props = defineProps<{
   keyresults: KeyResult;
+  UserCreateObjectives: string
 }>();
 const emit = defineEmits<{
   (e: "close"): void;
@@ -55,18 +57,25 @@ const Save = async () => {
     text: "The request is being processed",
     background: "rgba(0, 0, 0, 0.7)",
   });
+  console.log(props.UserCreateObjectives);
   await axiosInstance.put("KeyResults", props.keyresults).then((res) => {
     if (!res.data.isSuccess) {
       ElMessage.error(res.data.message);
     } else {
-      emit("onSaveUpdateProgress");
-      var crpoint = props.keyresults.currentPoint ?? 0;
-      var addpoint = props.keyresults.addedPoints ?? 0;
-      emit(
-        "onUpdateProgress",
-        (crpoint + addpoint),
-        props.keyresults.id ?? ""
-      );
+      if(!isTheCreator()){
+        ElMessage.success("Your request will be processed when the owner accepts it.");
+      }
+      else{
+        emit("onSaveUpdateProgress");
+        var crpoint = props.keyresults.currentPoint ?? 0;
+        var addpoint = props.keyresults.addedPoints ?? 0;
+        emit(
+          "onUpdateProgress",
+          (crpoint + addpoint),
+          props.keyresults.id ?? ""
+        );
+      }
+      
     }
   });
   loading.close();
@@ -76,6 +85,11 @@ watch(() => props.keyresults.addedPoints , () => {
   var add = props.keyresults.addedPoints ?? 0;
   caculateCrrentPoint.value = cur + add;
 },{immediate: true})
+
+const isTheCreator = () : boolean => {
+  var userLogin = Cookies.get("userName")?.toString();
+  return userLogin == props.UserCreateObjectives;
+}
 </script>
 <style scoped>
 .keyresult-container {

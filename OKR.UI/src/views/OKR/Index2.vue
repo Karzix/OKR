@@ -146,6 +146,7 @@ const editItem = ref<EntityObjectives>({
   point: 0,
   objectivesId: undefined,
   status: 0,
+  numberOfPendingUpdates: 0
 });
 
 const tableColumns = ref<TableColumn[]>([

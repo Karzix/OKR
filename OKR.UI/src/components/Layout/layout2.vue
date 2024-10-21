@@ -6,13 +6,13 @@
     <el-container>
       <el-header class="layout2_header" v-if="!isMobile">
         <el-row :gutter="20" class="w-100 layout2-row-header">
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('User')">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin'])">
             <el-icon>
               <User />
             </el-icon>
             <span>User</span>
           </el-col>
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['BranchManagement'])">
             <el-icon>
               <UserFilled />
               <UserFilled />
@@ -20,6 +20,7 @@
             <span>Team</span>
           </el-col>
           <el-col
+            v-if="hasPermission(userRoles as string[], ['Admin'])"
             :span="6"
             class="item-menu"
             @click="handleAsideClick('Branch')"
@@ -70,20 +71,20 @@
     <el-row class="tac">
       <el-col>
         <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="2" @click="handleAsideClick('User')">
+          <el-menu-item index="2" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin'])">
             <el-icon>
               <User />
             </el-icon>
             <span>User</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="handleAsideClick('Team')">
+          <el-menu-item index="3" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['BranchManagement'])">
             <el-icon>
               <UserFilled />
               <UserFilled />
             </el-icon>
             <span>Team</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="handleAsideClick('Branch')">
+          <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin'])">
             <el-icon><OfficeBuilding /></el-icon>
             <span>Branch</span>
           </el-menu-item>
@@ -106,11 +107,12 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 import Cookies from "js-cookie";
 import type { UserModel } from "@/Models/UserModel";
 import { axiosInstance } from "@/Service/axiosConfig";
+import { hasPermission } from "@/components/maynghien/Common/handleRole";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
 const drawerMenuMobile = ref(false);
-
+const userRoles = ref<string[]>();
 const handleAsideClick = (action: string) => {
   switch (action) {
     case "logout":
@@ -126,6 +128,13 @@ const handleAsideClick = (action: string) => {
 };
 const searchUsername = ref("");
 const listUser = ref<UserModel[]>([]);
+const getRole = () => {
+  var jsonString = Cookies.get('Roles')?.toString() ?? '';
+  var jsonObject = JSON.parse(jsonString);
+  var arrayFromString = Object.values(jsonObject);
+  userRoles.value = arrayFromString as string[];
+}
+getRole();
 const toggleAside = () => {
   if (isMobile.value) {
     drawerMenuMobile.value = !drawerMenuMobile.value;

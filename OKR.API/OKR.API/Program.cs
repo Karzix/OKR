@@ -106,5 +106,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();
-app.MapHub<WeightUpdateNotification>("/weightUpdateNotification");
+//app.MapHub<WeightUpdateNotification>("/weightUpdateNotification");
 app.Run();

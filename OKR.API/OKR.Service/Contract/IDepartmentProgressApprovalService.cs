@@ -12,5 +12,6 @@ namespace OKR.Service.Contract
     public interface IDepartmentProgressApprovalService
     {
         AppResponse<SearchResponse<DepartmentProgressApprovalDto>> Search(SearchRequest request);
+        AppResponse<DepartmentProgressApprovalDto> Confirm(DepartmentProgressApprovalDto dept);
     }
 }

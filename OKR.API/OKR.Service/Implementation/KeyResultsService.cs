@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -12,6 +13,7 @@ using OKR.Repository.Implementation;
 using OKR.Service.Contract;
 using RabbitMQ.Client;
 using System.Data.Entity;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
@@ -26,12 +28,14 @@ namespace OKR.Service.Implementation
         private IProgressUpdatesRepository _progressUpdatesRepository;
         private IObjectivesRepository _objectivesRepository;
         private readonly IModel _channel;
-        //private readonly HubConnection _hubConnection;
-        //private IConfiguration _config;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IDepartmentRepository _departmentRepository;
+
         private IDepartmentProgressApprovalRepository _progressApprovalRepository;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
             IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository, IModel model,
-            IConfiguration configuration, IDepartmentProgressApprovalRepository departmentProgressApprovalRepository)
+            IConfiguration configuration, IDepartmentProgressApprovalRepository departmentProgressApprovalRepository,
+            UserManager<ApplicationUser> userManager, IDepartmentRepository departmentRepository)
         {
             _keyResultRepository = keyResultRepository;
             _contextAccessor = httpContextAccessor;
@@ -45,6 +49,8 @@ namespace OKR.Service.Implementation
             //    .Build();
             //_hubConnection.StartAsync().Wait();
             _progressApprovalRepository = departmentProgressApprovalRepository;
+            _userManager = userManager;
+            _departmentRepository = departmentRepository;
         }
 
         public async Task<AppResponse<KeyResultDto>> Update(KeyResultDto request)
@@ -54,6 +60,7 @@ namespace OKR.Service.Implementation
             {   
                 
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
                 if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
                 {
@@ -61,27 +68,20 @@ namespace OKR.Service.Implementation
                 }
                 var objectives = _objectivesRepository.AsQueryable()
                     .Where(x=>x.Id == keyresult.ObjectivesId)
-                    .Include(x=>x.UserObjectives).First();
+                    .Include(x=>x.UserObjectives).Include(x=>x.DepartmentObjectives).First();
                 var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
-                if(objectives.UserObjectives != null && objectives.UserObjectives.Any())
+                
+                if(objectives.CreatedBy == userName)
                 {
-                    var progressUpdates = new ProgressUpdates();
-                    progressUpdates.CreatedBy = userName;
-                    progressUpdates.CreatedOn = DateTime.UtcNow;
-                    progressUpdates.Note = updateString;
-                    progressUpdates.KeyResultId = keyresult.Id;
-                    progressUpdates.OldPoint = keyresult.CurrentPoint;
-                    progressUpdates.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
-
-                    keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + request.AddedPoints);
-                    _keyResultRepository.Edit(keyresult);
-                    progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
-                    Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
-                    progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
-                    _progressUpdatesRepository.Add(progressUpdates);
+                    Update_Save(keyresult, request);
                 }
                 else
                 {
+                    //if (objectives.CreatedBy == userName)
+                    //{
+                    //    Update_Save(keyresult, request);
+                    //    goto exit;
+                    //}
                     var departmentProgressApproval = new DepartmentProgressApproval
                     {
                         Id = Guid.NewGuid(),
@@ -92,6 +92,7 @@ namespace OKR.Service.Implementation
                         AddedPoints = (int)request.AddedPoints
                     };
                     _progressApprovalRepository.Add(departmentProgressApproval);
+                    exit:;
                 }
 
                 result.BuildResult(request);
@@ -120,5 +121,45 @@ namespace OKR.Service.Implementation
             }
             return content;
         }
+
+        private void Update_Save(KeyResults keyresult, KeyResultDto request)
+        {
+            var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
+            var userName = _contextAccessor.HttpContext.User.Identity.Name;
+            var progressUpdates = new ProgressUpdates();
+            progressUpdates.CreatedBy = userName;
+            progressUpdates.CreatedOn = DateTime.UtcNow;
+            progressUpdates.Note = updateString;
+            progressUpdates.KeyResultId = keyresult.Id;
+            progressUpdates.OldPoint = keyresult.CurrentPoint;
+            progressUpdates.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
+
+            keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + request.AddedPoints);
+            _keyResultRepository.Edit(keyresult);
+            progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
+            Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
+            progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
+            _progressUpdatesRepository.Add(progressUpdates);
+        }
+        private string GetCurrentUserRole()
+        {
+            var user = _contextAccessor.HttpContext.User;
+
+            // Kiểm tra nếu người dùng đã đăng nhập
+            if (user.Identity != null && user.Identity.IsAuthenticated)
+            {
+                // Lấy tất cả các vai trò của người dùng
+                var roles = user.Claims
+                    .Where(c => c.Type == ClaimTypes.Role)
+                    .Select(c => c.Value)
+                    .ToList();
+
+                // Trả về vai trò đầu tiên (có thể điều chỉnh nếu người dùng có nhiều vai trò)
+                return roles.First();
+            }
+
+            return "";
+        }
+
     }
 }

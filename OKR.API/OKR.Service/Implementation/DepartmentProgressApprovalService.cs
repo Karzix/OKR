@@ -21,9 +21,14 @@ namespace OKR.Service.Implementation
         private IDepartmentRepository _departmentRepository;
         private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         private IUserRepository _userRepository;
+        private IKeyResultRepository _keyResultRepository;
+        private IProgressUpdatesRepository _progressUpdatesRepository;
+        private IObjectivesRepository _objectivesRepository;
+
         public DepartmentProgressApprovalService(IDepartmentProgressApprovalRepository departmentProgressApprovalRepository,
             IMapper mapper, IHttpContextAccessor httpContextAccessor, IDepartmentRepository departmentRepository,
-            IDepartmentObjectivesRepository departmentObjectivesRepository, IUserRepository userRepository)
+            IDepartmentObjectivesRepository departmentObjectivesRepository, IUserRepository userRepository,
+            IKeyResultRepository keyResultRepository, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository)
         {
             _departmentProgressApprovalRepository = departmentProgressApprovalRepository;
             _mapper = mapper;
@@ -31,6 +36,9 @@ namespace OKR.Service.Implementation
             _departmentRepository = departmentRepository;
             _departmentObjectivesRepository = departmentObjectivesRepository;
             _userRepository = userRepository;
+            _keyResultRepository = keyResultRepository;
+            _progressUpdatesRepository = progressUpdatesRepository;
+            _objectivesRepository = objectivesRepository;
         }
         public AppResponse<SearchResponse<DepartmentProgressApprovalDto>> Search(SearchRequest request)
         {
@@ -126,7 +134,7 @@ namespace OKR.Service.Implementation
         {
             var userRole = GetCurrentUserRole();
             var managerId = GetCurrentUserId();
-            if (userRole == "TeamLead" || userRole == "BranchManagement ")
+            if (userRole == "TeamLead" || userRole == "BranchManagement")
             {
                 var managedDepartments = _userRepository.AsQueryable()
                     .Where(user => user.Id == managerId.ToString()) 
@@ -169,5 +177,44 @@ namespace OKR.Service.Implementation
             }
             return Guid.Empty;
         }
+
+        public AppResponse<DepartmentProgressApprovalDto> Confirm(DepartmentProgressApprovalDto dept)
+        {
+            var result = new AppResponse<DepartmentProgressApprovalDto>();
+            try
+            {
+                var departmentProgressApproval = _departmentProgressApprovalRepository.Get(dept.Id.Value);
+                var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                if (dept.IsApproved)
+                {
+                    var keyresult = _keyResultRepository.Get(departmentProgressApproval.KeyResultsId);
+                    var progressUpdates = new ProgressUpdates();
+                    progressUpdates.CreatedBy = userName;
+                    progressUpdates.CreatedOn = DateTime.UtcNow;
+                    progressUpdates.Note = departmentProgressApproval.Note;
+                    progressUpdates.KeyResultId = departmentProgressApproval.KeyResultsId;
+                    progressUpdates.OldPoint = keyresult.CurrentPoint;
+                    progressUpdates.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
+
+                    keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + departmentProgressApproval.AddedPoints);
+                    _keyResultRepository.Edit(keyresult);
+                    progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
+                    Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
+                    progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
+                    _progressUpdatesRepository.Add(progressUpdates);
+                }
+                departmentProgressApproval.IsDeleted = true;
+                _departmentProgressApprovalRepository.Edit(departmentProgressApproval);
+                result.BuildResult(dept);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
+        }
+
+
+
     }
 }
