@@ -21,5 +21,6 @@ namespace OKR.DTO
         public Guid? ObjectivesId { get; set; }
         public string? CreateBy { get; set; }
         public StatusObjectives? Status { get; set; }
+        public int? NumberOfPendingUpdates { get; set; }
     }
 }

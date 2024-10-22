@@ -26,11 +26,13 @@ namespace OKR.Service.Implementation
         private IDepartmentRepository _departmentRepository;
         private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         private IUserObjectivesRepository _userObjectivesRepository;
+        private IDepartmentProgressApprovalRepository _departmentProgressApprovalRepository;
 
         public EntityObjectivesService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository,
             IMapper mapper, IKeyResultRepository keyResultRepository, ISidequestsRepository questsRepository,
             UserManager<ApplicationUser> userManager, IDepartmentRepository departmentRepository,
-            IDepartmentObjectivesRepository departmentObjectivesRepository, IUserObjectivesRepository userObjectivesRepository)
+            IDepartmentObjectivesRepository departmentObjectivesRepository, IUserObjectivesRepository userObjectivesRepository,
+            IDepartmentProgressApprovalRepository departmentProgressApprovalRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
@@ -41,6 +43,7 @@ namespace OKR.Service.Implementation
             _departmentRepository = departmentRepository;
             _departmentObjectivesRepository = departmentObjectivesRepository;
             _userObjectivesRepository = userObjectivesRepository;
+            _departmentProgressApprovalRepository = departmentProgressApprovalRepository;
         }
 
         public AppResponse<SearchResponse<EntityObjectivesDto>> Search(SearchRequest request)
@@ -82,7 +85,7 @@ namespace OKR.Service.Implementation
             }
             catch (Exception ex)
             {
-                result.BuildError(ex.Message + " " + ex.StackTrace);
+                result.BuildError(ex.Message );
             }
             return result;
         }
@@ -399,7 +402,8 @@ namespace OKR.Service.Implementation
                     Point = objectIdPoint.ContainsKey(x.Id) ? objectIdPoint[x.Id] : 0,
                     ObjectivesId = x.ObjectivesId,
                     Status = x.status,
-                    CreateBy = x.CreatedBy
+                    CreateBy = x.CreatedBy,
+                    NumberOfPendingUpdates = 0
                 })
                 .ToList();
 
@@ -447,7 +451,9 @@ namespace OKR.Service.Implementation
                     Point = objectIdPoint.ContainsKey(x.Id) ? objectIdPoint[x.Id] : 0,
                     ObjectivesId = x.ObjectivesId,
                     Status = x.status,
-                    CreateBy = x.CreatedBy
+                    CreateBy = x.CreatedBy,
+                    NumberOfPendingUpdates = _departmentProgressApprovalRepository.AsQueryable()
+                                                .Where(dpa => dpa.KeyResults.ObjectivesId == x.ObjectivesId && !dpa.IsDeleted).Count(),
                 })
                 .ToList();
 

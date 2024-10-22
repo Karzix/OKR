@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OKR.Models.Context;
 
@@ -11,9 +12,11 @@ using OKR.Models.Context;
 namespace OKR.Models.Migrations
 {
     [DbContext(typeof(OKRDBContext))]
-    partial class OKRDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241017170432_addtableDepartmentProgressApproval")]
+    partial class addtableDepartmentProgressApproval
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -305,9 +308,6 @@ namespace OKR.Models.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
-
-                    b.Property<int>("AddedPoints")
-                        .HasColumnType("int");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");

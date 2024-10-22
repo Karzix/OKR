@@ -21,7 +21,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IDepartmentObjectivesRepository, DepartmentObjectivesRepository>();
             builder.Services.AddScoped<IEvaluateTargetRepository, EvaluateTargetRepository>();
             builder.Services.AddScoped<IUserObjectivesRepository, UserObjectivesRepository>();
-
+            builder.Services.AddScoped<IDepartmentProgressApprovalRepository, DepartmentProgressApprovalRepository>();
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -32,6 +32,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<ISidequestsService, SidequestsService>();
             builder.Services.AddScoped<IEvaluateTargetService, EvaluateTargetService>();
             builder.Services.AddScoped<IEntityObjectivesService, EntityObjectivesService>();
+            builder.Services.AddScoped<IDepartmentProgressApprovalService, DepartmentProgressApprovalService>();
 
             builder.Services.AddScoped<SendReminderEmailJob>();
         }

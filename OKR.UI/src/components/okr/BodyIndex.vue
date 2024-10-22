@@ -22,6 +22,24 @@
                 "
                 ><Edit
               /></el-icon>
+              <el-popover 
+                placement="top"
+                trigger="click"
+                width="100%"
+                
+              >
+                <template #reference>
+                  <el-badge class="item" 
+                  @click.stop="showDialogDepartmentProgressQueue"
+                    :value="item.numberOfPendingUpdates" 
+                    v-if="item.numberOfPendingUpdates != 0 && (Cookies.get('userName') == item.createBy )" 
+                  >
+                    <el-icon class="icon-Notification"><BellFilled /></el-icon>
+                  </el-badge>
+                </template>
+                <DepartmentProgressQueue :EntotyOfjectivesId="item.id ?? ''" @close="DialogDepartmentProgressQueueVisible = false"/>
+              </el-popover>
+              
             </h3>
             <el-progress :percentage="item.point" :color="customColorMethod" />
           </div>
@@ -31,6 +49,8 @@
     </ul>
   </div>
   <p v-if="noMore">noMore</p>
+
+  
 </template>
 <script setup lang="ts">
 import { Objective } from "@/Models/Objective";
@@ -43,8 +63,10 @@ import { RecalculateTheDate } from "@/Service/formatDate";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import { ElMessage } from "element-plus";
 import {EntityObjectives} from "@/Models/EntityObjectives";
-import { Edit } from "@element-plus/icons-vue";
+import { Edit, BellFilled } from "@element-plus/icons-vue";
 import { TargetType } from "@/Models/Enum/TargetType";
+//@ts-ignore
+import DepartmentProgressQueue from "../DepartmentProgressApproval/DepartmentProgressQueue.vue";
 
 const props = defineProps<{
   searchRequest: SearchRequest;
@@ -88,28 +110,11 @@ const searchRequest = ref<SearchRequest>({
   filters: props.searchRequest.filters ?? [],
   SortBy: undefined,
 });
+const DialogDepartmentProgressQueueVisible = ref(false);
 const editObjective = (entityObjectives: EntityObjectives) => {
-  // var objective = new Objective();
-  // objective.id = entityObjectives.objectivesId;
-  // objective.name = entityObjectives.name;
-  // objective.point = entityObjectives.point;
-  // objective.startDay = entityObjectives.startDay;
-  // objective.deadline = entityObjectives.deadline;
-  // objective.listKeyResults = entityObjectives.listKeyResults;
-  // objective.targetType = entityObjectives.targetType;
-  // objective.targetTypeName = entityObjectives.targetTypeName;
   emit("onEditObjective", entityObjectives);
 };
 const handleDeatail = (entityObjectives: EntityObjectives) => {
-  // var objective = new Objective();
-  // objective.id = entityObjectives.objectivesId;
-  // objective.name = entityObjectives.name;
-  // objective.point = entityObjectives.point;
-  // objective.startDay = entityObjectives.startDay;
-  // objective.deadline = entityObjectives.deadline;
-  // objective.listKeyResults = entityObjectives.listKeyResults;
-  // objective.targetType = entityObjectives.targetType;
-  // objective.targetTypeName = entityObjectives.targetTypeName;
   emit("onDeatail", entityObjectives);
 };
 const buildTree = (objective: EntityObjectives): Tree[] => {
@@ -141,6 +146,7 @@ onMounted(() => {
   }
 });
 const Search = async () => {
+  console.log("search_bodyIndex", searchRequest.value);
   if (loading.value && noMore.value) return; 
   loading.value = true;
   try {
@@ -174,23 +180,16 @@ const Search = async () => {
         }
       }
     });
-    // searchResponseObjectives.value = responeSeach.data.data;
-    // if (!searchResponseObjectives.value) {
-    //   searchResponseObjectives.value = new SearchResponse();
-    //   searchResponseObjectives.value.data = [];
-    // }
-    // searchResponseObjectives.value.data?.forEach((item) => {
-    //   item.deadline = RecalculateTheDate(item.deadline);
-    //   item.startDay = RecalculateTheDate(item.startDay);
-    //   item.listKeyResults?.forEach((keyResult) => {
-    //     keyResult.deadline = RecalculateTheDate(keyResult.deadline);
-    //   });
-    // });
   } catch (e) {}
 };
 onMounted(() => {
   Search();
 });
+const showDialogDepartmentProgressQueue = () => {
+  DialogDepartmentProgressQueueVisible.value = true;
+  console.log("showDialogDepartmentProgressQueue");
+}
+
 </script>
 <style scoped>
 .infinite-list-wrapper {
@@ -207,5 +206,11 @@ onMounted(() => {
 
 .list-item {
   margin-bottom: 20px;
+}
+</style>
+<style>
+.icon-Notification{
+  font-size: 22px;
+  color: #00cbff;
 }
 </style>

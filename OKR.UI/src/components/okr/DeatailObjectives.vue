@@ -187,6 +187,16 @@ const statusChange = () => {
     }
   })
 }
+// const test = () => {
+//   var filter = new Filter();
+//   filter.FieldName = "user";
+//   filter.Value = "";
+//   addFilter(searchRequest.value.filters as [], deepCopy(filter));
+//   axiosInstance.post("DepartmentProgressApproval/search", searchRequest.value).then((res) => {
+    
+//   })
+// }
+// test()
 </script>
 
 <style scoped>

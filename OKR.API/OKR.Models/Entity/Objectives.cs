@@ -15,5 +15,8 @@ namespace OKR.Models.Entity
         public DateTime StartDay { get; set; }
         public DateTime Deadline { get; set; }
         public TargetType TargetType { get; set; } = 0;
+
+        public ICollection<UserObjectives>? UserObjectives { get; set; }
+        public ICollection<DepartmentObjectives>? DepartmentObjectives { get; set; }
     }
 }

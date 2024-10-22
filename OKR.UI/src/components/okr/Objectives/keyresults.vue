@@ -34,6 +34,7 @@
       :keyresults="tempKeyResults"
       @onSaveUpdateProgress="() => { emit('onSearchObjective'); visibleDialogProgressUpdate = false; }"
       @onUpdateProgress="changePoint"
+      :UserCreateObjectives="props.objective.createBy ?? 'Unknow'"
     />
   </el-dialog>
 </template>
