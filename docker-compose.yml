@@ -24,12 +24,12 @@ services:
     networks:
       - mynetwork
 
-  consumerweightupdate:
-    build: 
-      context: .
-      dockerfile: ./ConsumerWeightUpdate/Dockerfile
-    image: karzix/consumerweightupdate:latest
-    ports:
-      - "8082:8082"
-    networks:
-      - mynetwork
+  # consumerweightupdate:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./ConsumerWeightUpdate/Dockerfile
+  #   image: karzix/consumerweightupdate:latest
+  #   ports:
+  #     - "8082:8082"
+  #   networks:
+  #     - mynetwork

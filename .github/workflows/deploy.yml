@@ -45,10 +45,9 @@ jobs:
 
             docker pull karzix/okrapi:latest
             docker pull karzix/okrui:latest
-            docker pull karzix/consumerweightupdate:latest
 
-            docker stop okr-container okrui-container okr-consumerweightupdate || true
-            docker rm okr-container okrui-container okr-consumerweightupdate || true
+            docker stop okr-container okrui-container || true
+            docker rm okr-container okrui-container || true
 
             docker run -d --name okr-container --restart unless-stopped -p 8080:8080 \
             -e GOOGLE_ACCOUNT=$GOOGLE_ACCOUNT \
@@ -56,6 +55,5 @@ jobs:
             karzix/okrapi:latest
 
             docker run -d --name okrui-container --restart unless-stopped -p 80:80 karzix/okrui:latest
-            docker run -d --name okr-consumerweightupdate --restart unless-stopped -p 8082:8082 karzix/consumerweightupdate:latest
 
             docker image prune -a -f
