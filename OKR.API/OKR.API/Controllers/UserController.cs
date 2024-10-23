@@ -9,7 +9,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles ="superadmin")]
+    [Authorize(Roles ="superadmin, Admin")]
     public class UserController : Controller
     {
         private IUserService _userService;
@@ -53,6 +53,7 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("{userName}")]
+        [Authorize]
         public async Task<IActionResult> Get(string userName)
         {
             var result = await _userService.Get(userName);
@@ -60,7 +61,7 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("list-by-keyworld/{username}")]
-        [AllowAnonymous]
+        [Authorize]
         public IActionResult GetListByKeyworld(string username)
          {
             var result = _userService.GetListByKeyworld(username);
