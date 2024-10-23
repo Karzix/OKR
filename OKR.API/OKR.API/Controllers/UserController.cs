@@ -9,7 +9,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin, superadmin")]
     public class UserController : Controller
     {
         private IUserService _userService;
@@ -20,14 +20,12 @@ namespace OKR.API.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles ="superadmin, Admin")]
         public async Task<IActionResult> Create(UserDto request)
         {
             var result =await _userService.Create(request);
             return Ok(result);
         }
         [HttpPut]
-        [Authorize(Roles = "superadmin, Admin")]
         public async Task<IActionResult> Update(UserDto request)
         {
             var result =await _userService.Update(request);
@@ -35,7 +33,6 @@ namespace OKR.API.Controllers
         }
         [HttpPut]
         [Route("lock")]
-        [Authorize(Roles = "superadmin, Admin")]
         public async Task<IActionResult> Lock(UserDto request)
         {
             var result = await _userService.LockAsync(request);
@@ -43,14 +40,12 @@ namespace OKR.API.Controllers
         }
         [HttpPost]
         [Route("search")]
-        [Authorize(Roles = "superadmin, Admin")]
         public async Task<IActionResult> Search(SearchRequest request)
         {
             var result =await _userService.Search(request);
             return Ok(result);
         }
         [HttpGet]
-        [Authorize(Roles = "superadmin, Admin")]
         public IActionResult GetAll()
         {
             var result =_userService.GetAll();
@@ -58,6 +53,7 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("{userName}")]
+        [Authorize]
         public async Task<IActionResult> Get(string userName)
         {
             var result = await _userService.Get(userName);
@@ -65,6 +61,7 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("list-by-keyworld/{username}")]
+        [Authorize]
         public IActionResult GetListByKeyworld(string username)
          {
             var result = _userService.GetListByKeyworld(username);
