@@ -7,4 +7,5 @@ export class UserModel {
     token: string | undefined;
     refreshToken: string | undefined;
     id: string | undefined;
+    departmentName: string = "";
 }

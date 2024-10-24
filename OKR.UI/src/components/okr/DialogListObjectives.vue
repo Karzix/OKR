@@ -2,7 +2,7 @@
   <!-- <el-dialog v-model="showDialog"> -->
     <el-tabs v-model="taps" class="demo-tabs">
       <el-tab-pane label="objectives" name="objectives">
-        <Objectives :searchRequest="searchRequest"></Objectives>
+        <Objectives :searchRequest="searchRequest" @onDeatail="handleDetail"></Objectives>
       </el-tab-pane>
       <el-tab-pane label="progress" name="progress">
         <ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate>
@@ -21,11 +21,13 @@ import type { Objective } from "@/Models/Objective";
 import * as handleSearch from '@/components/maynghien/Common/handleSearchFilter'
 import { axiosInstance } from "@/Service/axiosConfig";
 import { TargetType } from "@/Models/Enum/TargetType";
+import type { EntityObjectives } from "@/Models/EntityObjectives";
+import router from "@/router";
 
 const props = defineProps<{
   filters?: Filter[];
   showDialog: boolean;
-  title: TargetType;
+  title: string;
 }>();
 const taps = ref<string>("objectives");
 
@@ -59,6 +61,9 @@ onMounted(async () => {
   handleSearch.addFilter(searchRequest.value.filters as [], targetType);
   await search()
 });
+const handleDetail = (entityObjectives: EntityObjectives)=> {
+  router.push('objectives=' + entityObjectives.id+ '&'+entityObjectives.targetType);
+}
 </script>
 <style scoped>
 </style>

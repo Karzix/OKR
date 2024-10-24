@@ -82,19 +82,26 @@
     </div>
   </el-card>
 
-  <el-dialog v-model="createDialog" class="OKR-Index2-dialogOKR">
-    <CreateObjective
-      :objective="editItem"
-      :is-edit="EditDialog"
-      @onSearchObjective="Search()"
-      @onClose="
+  <el-dialog
+    v-model="createDialog"
+    class="OKR-Index2-dialogOKR"
+    :close-on-click-modal="false"
+  >
+    <div class="dialog-content">
+      <CreateObjective
+        :objective="editItem"
+        :is-edit="EditDialog"
+        @onSearchObjective="Search()"
+        @onClose="
         () => {
           createDialog = false;
           EditDialog = false;
         }
       "
-    />
+      />
+    </div>
   </el-dialog>
+
   <el-dialog v-model="DeatailDialog" class="OKR-Index2-dialogOKR">
     <Deatail
       :objective="editItem"
@@ -263,6 +270,17 @@ watch(
 </style>
 
 <style scoped>
+.OKR-Index2-dialogOKR {
+  max-width: 800px; /* Set a max width for the dialog */
+  margin: 0 auto; /* Center the dialog */
+}
+
+.dialog-content {
+  padding: 20px;
+  /* background-color: #ffffff; */
+  border-radius: 8px;
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
+}
 .profile-card {
   /* max-width: 9000px; */
   margin: auto;
@@ -381,10 +399,5 @@ watch(
 }
 </style>
 <style>
-.OKR-Index2-dialogOKR {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-/* .profile-card {
-} */
+
 </style>

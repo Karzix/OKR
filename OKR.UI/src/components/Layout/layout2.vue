@@ -6,13 +6,13 @@
     <el-container>
       <el-header class="layout2_header" v-if="!isMobile">
         <el-row :gutter="20" class="w-100 layout2-row-header">
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin'])">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
               <User />
             </el-icon>
             <span>User</span>
           </el-col>
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['BranchManagement'])">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
             <el-icon>
               <UserFilled />
               <UserFilled />
@@ -20,7 +20,7 @@
             <span>Team</span>
           </el-col>
           <el-col
-            v-if="hasPermission(userRoles as string[], ['Admin'])"
+            v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])"
             :span="6"
             class="item-menu"
             @click="handleAsideClick('Branch')"
@@ -253,6 +253,7 @@ watch(() => searchUsername.value, () => {
   color: white;
   padding: 12px;
   border-radius: 0 0 0 10px;
+  z-index: 999;
 }
 .layout2-main {
   background-color: #ffffff00 !important;
