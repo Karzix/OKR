@@ -63,17 +63,17 @@ builder.Services.AddIdentityCore<ApplicationUser>()
 builder.Services.AddSignalR();
 
 // RabbitMQ
-var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
-builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
-{
-    HostName = rabbitMQConfig["HostName"],
-    UserName = rabbitMQConfig["UserName"],
-    Password = rabbitMQConfig["Password"],
-    VirtualHost = rabbitMQConfig["VirtualHost"],
-    Port = int.Parse(rabbitMQConfig["Port"])
-});
-builder.Services.AddSingleton<RabbitMQ.Client.IConnection>(sp => sp.GetRequiredService<IConnectionFactory>().CreateConnection());
-builder.Services.AddSingleton<RabbitMQ.Client.IModel>(sp => sp.GetRequiredService<RabbitMQ.Client.IConnection>().CreateModel());
+//var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
+//builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
+//{
+//    HostName = rabbitMQConfig["HostName"],
+//    UserName = rabbitMQConfig["UserName"],
+//    Password = rabbitMQConfig["Password"],
+//    VirtualHost = rabbitMQConfig["VirtualHost"],
+//    Port = int.Parse(rabbitMQConfig["Port"])
+//});
+//builder.Services.AddSingleton<RabbitMQ.Client.IConnection>(sp => sp.GetRequiredService<IConnectionFactory>().CreateConnection());
+//builder.Services.AddSingleton<RabbitMQ.Client.IModel>(sp => sp.GetRequiredService<RabbitMQ.Client.IConnection>().CreateModel());
 
 //  Cache
 builder.Services.AddMemoryCache();

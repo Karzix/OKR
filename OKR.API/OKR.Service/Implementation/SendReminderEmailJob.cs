@@ -82,10 +82,11 @@ namespace OKR.Service.Implementation
                     }
                     else
                     {
-                        StatusChange(objective.Id.Value);
+                        ChangeStatusFromWorkingToEnd(objective.Id.Value);
                     }
                     
                 }
+                ChangeStatusFromNotStartedToWorking();
             }
         }
         private async Task SendEmailAsync(string recipientEmail, string subject, string body)
@@ -192,7 +193,7 @@ namespace OKR.Service.Implementation
             content += "</ul>";
             return content;
         }
-        private void StatusChange( Guid ObjectivesID)
+        private void ChangeStatusFromWorkingToEnd( Guid ObjectivesID)
         {
             try
             {
@@ -225,6 +226,40 @@ namespace OKR.Service.Implementation
             {
                 Log.Error("entity objectives: " + ObjectivesID + " error when the system automatically updates the status: " + ex.Message + " " + ex.StackTrace);
             }
+        }
+
+        private void ChangeStatusFromNotStartedToWorking()
+        {
+            var now = DateTime.UtcNow;
+            var list =  _objectivesRepository.AsQueryable()
+                .Include(x => x.DepartmentObjectives)
+                .Include(x => x.UserObjectives)
+                .Where(x => x.StartDay >= now && (
+                    x.DepartmentObjectives.Where(dO => dO.ObjectivesId == x.Id && dO.status == StatusObjectives.notStarted).Count() > 0
+                    || x.UserObjectives.Where(uo => uo.ObjectivesId == x.Id && uo.status == StatusObjectives.notStarted).Count() > 0
+                )).ToList();
+            foreach (var item in list)
+            {
+                var dO = item.DepartmentObjectives;
+                var uo = item.UserObjectives;
+                if(dO != null && dO.Count != 0)
+                {
+                    foreach(var item2 in dO)
+                    {
+                        item2.status = StatusObjectives.working;
+                        _departmentObjectivesRepository.Edit(item2);
+                    }
+                }
+                if (uo != null && uo.Count != 0)
+                {
+                    foreach (var item2 in uo)
+                    {
+                        item2.status = StatusObjectives.working;
+                        _userObjectivesRepository.Edit(item2);
+                    }
+                }
+            }
+
         }
     }
 }

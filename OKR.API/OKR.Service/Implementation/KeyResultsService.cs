@@ -60,15 +60,21 @@ namespace OKR.Service.Implementation
             {   
                 
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                
+                var now = DateTime.UtcNow;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
                 if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
                 {
                     return result.BuildError("current point is invalid");
                 }
+                //var objectives = _objectivesRepository.Get(keyresult.ObjectivesId);
+
                 var objectives = _objectivesRepository.AsQueryable()
                     .Where(x=>x.Id == keyresult.ObjectivesId)
                     .Include(x=>x.UserObjectives).Include(x=>x.DepartmentObjectives).First();
+                if (now > objectives.Deadline)
+                {
+                    return result.BuildError("objectives has expired!");
+                }
                 var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
                 
                 if(objectives.CreatedBy == userName)
