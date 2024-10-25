@@ -11,17 +11,17 @@ namespace OKR.API.Controllers
     public class EntityObjectivesController : Controller
     {
 
-        private IEntityObjectivesService _userObjectivesService;
-        public EntityObjectivesController(IEntityObjectivesService userObjectivesService)
+        private IEntityObjectivesService _entityObjectivesService;
+        public EntityObjectivesController(IEntityObjectivesService entityObjectivesService)
         {
-            _userObjectivesService = userObjectivesService;
+            _entityObjectivesService = entityObjectivesService;
         }
 
         [HttpPost]
         [Route("search")]
         public IActionResult Search(SearchRequest request)
         {
-            var result  = _userObjectivesService.Search(request);
+            var result  = _entityObjectivesService.Search(request);
             return Ok(result);
         }
 
@@ -29,14 +29,21 @@ namespace OKR.API.Controllers
         [Route("{id}")]
         public IActionResult Get(Guid id)
         {
-            var result = _userObjectivesService.Get(id);
+            var result = _entityObjectivesService.Get(id);
             return Ok(result);
         }
         [HttpPut]
         [Route("status-change")]
         public IActionResult StatusChange(EntityObjectivesDto request)
         {
-            var result = _userObjectivesService.StatusChange(request);
+            var result = _entityObjectivesService.StatusChange(request);
+            return Ok(result);
+        }
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var result = _entityObjectivesService.DeleteEntityObjectives(id);
             return Ok(result);
         }
     }

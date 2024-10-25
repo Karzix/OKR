@@ -157,14 +157,17 @@ onMounted(async () => {
 
   addFilter(searchRequest.filters, deepCopy(filtertargetType)); 
   Individual.value = await Search(searchRequest,"EntityObjectives/search");
+  progressIndividual.value = await getProgress(searchRequest);
   // searchRequest.filters = [];
   filtertargetType.Value = "1";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Branch.value = await Search(searchRequest,"EntityObjectives/search");
+  progressBranch.value = await getProgress(searchRequest);
   // searchRequest.filters = [];
   filtertargetType.Value = "2";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Team.value = await Search(searchRequest,"EntityObjectives/search");
+  progressTeam.value = await getProgress(searchRequest);
 });
 
 const handleShowDialog = (TargetType: string) => {
@@ -188,6 +191,14 @@ const getUser = async () => {
   })
 }
 getUser();
+
+const getProgress = async (searchRequest: SearchRequest) =>{
+  var responeOverallProgress = await axiosInstance.post(
+    "Objectives/overal-progress",
+    searchRequest
+  );
+  return responeOverallProgress.data.data;
+}
 </script>
 <style scoped>
 .container {

@@ -535,5 +535,37 @@ namespace OKR.Service.Implementation
 
             return (data, numOfRecords);
         }
+
+        public AppResponse<string> DeleteEntityObjectives(Guid Id)
+        {
+            var result = new AppResponse<string>();
+            try
+            {
+                var dpo = _departmentObjectivesRepository.AsQueryable().Where(x=>x.Id == Id).FirstOrDefault();
+                if (dpo != null)
+                {
+                    dpo.IsDeleted = true;
+                    _departmentObjectivesRepository.Edit(dpo);
+                }
+                else
+                {
+                    var uo = _userObjectivesRepository.AsQueryable().Where(x => x.Id == Id).FirstOrDefault();
+                    if (uo != null)
+                    {
+                        uo.IsDeleted = true;
+                        _userObjectivesRepository.Edit(uo);
+                    }
+                }
+                //var objectives = _objectiveRepository.Get(dpo.ObjectivesId);
+                //objectives.IsDeleted = true;
+                //_objectiveRepository.Edit(objectives);
+                result.BuildResult("delete OK");
+            }
+            catch(Exception ex)
+            {
+                result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
+        }
     }
 }
