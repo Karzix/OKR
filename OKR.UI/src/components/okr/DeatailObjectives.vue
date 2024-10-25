@@ -37,8 +37,9 @@
       <el-tab-pane label="Objectives" name="Objectives">
         <keyresultsOfObjectives
           :objective="props.objective"
-          @on-search-objective="
+          @onSearchObjective="
             () => {
+              console.log('onSearchObjective_deatailObjectives');
               keyChart++;
               emit('onSearchObjective');
             }
