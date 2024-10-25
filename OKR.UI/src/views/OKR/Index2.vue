@@ -250,6 +250,19 @@ const editObjective = (entityObjectives: EntityObjectives) => {
 };
 
 const CreateObjectives = () => {
+  editItem.value = {
+    id: undefined,
+    name: "",
+    startDay: undefined,
+    deadline: undefined,
+    listKeyResults: [],
+    targetType: undefined,
+    targetTypeName: "",
+    point: 0,
+    objectivesId: undefined,
+    status: 0,
+    numberOfPendingUpdates: 0
+  };
   EditDialog.value = false;
   createDialog.value = true;
 };
