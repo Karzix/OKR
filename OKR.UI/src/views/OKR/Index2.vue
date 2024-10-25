@@ -109,6 +109,7 @@
       :target-type="targetType"
       :entity-objectives-id="entityObjectivesId"
       v-if="DeatailDialog"
+      @close="() => {DeatailDialog = false; }"
     />
   </el-dialog>
 </template>

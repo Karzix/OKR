@@ -281,9 +281,22 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<int>();
             try
             {
+                var filter = request.Filters.Where(x=>x.FieldName == "targetType").First();
+                TargetType targetType = (TargetType)int.Parse(filter.Value);
                 var query = BuildFilterExpression(request.Filters);
                 var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
-                var model = _objectiveRepository.FindByPredicate(query);
+                var model = _objectiveRepository.FindByPredicate(query)
+                    .Include(x => x.UserObjectives)
+                    .Include(x => x.DepartmentObjectives);
+                if(targetType == TargetType.individual)
+                {
+                    model = model.Where(x => x.UserObjectives.Where(uo => uo.IsDeleted != true).Count() != 0);
+                }
+                else
+                {
+                    model = model.Where(x => x.DepartmentObjectives.Where(dpo => dpo.IsDeleted != true).Count() != 0);
+                }
+                var test = model.ToList();
                 var point = _objectiveRepository.caculateOveralProgress(model);
                 result.BuildResult(point);
             }
