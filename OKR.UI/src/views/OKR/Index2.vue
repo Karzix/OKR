@@ -66,7 +66,7 @@
                   :search-request="searchRequest"
                   @onEditObjective="editObjective"
                   @onDeatail="handleDeatail"
-                  :key="bodyIndexKey"
+                  
                 />
               </div>
               <div v-if="page == 1">
