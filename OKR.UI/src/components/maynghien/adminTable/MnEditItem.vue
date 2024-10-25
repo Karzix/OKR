@@ -175,3 +175,88 @@ watch(() => props.editItem, () => {
     }
 }
 </style>
+<style scoped>
+/* Dialog styling */
+.form-dialog {
+    border-radius: 8px; /* Rounded corners for the dialog */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Header styling */
+.form-dialog .el-dialog__header {
+    background-color: #f5f5f5; /* Light background for header */
+    color: #333; /* Dark text color for contrast */
+    padding: 15px; /* Padding for the header */
+    border-bottom: 1px solid #e0e0e0; /* Subtle bottom border */
+}
+
+/* Input field styling */
+.editform {
+    padding: 15px; /* Padding inside the form */
+}
+
+/* Label styling */
+.editform label {
+    display: block; /* Make label block for better spacing */
+    margin-bottom: 5px; /* Space between label and input */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #555; /* Darker color for readability */
+}
+
+/* Input and select styling */
+.el-input,
+.el-select {
+    width: 100%; /* Full width for inputs */
+    margin-bottom: 15px; /* Space below each input */
+    border-radius: 4px; /* Rounded corners for inputs */
+    border: 1px solid #ccc; /* Light border color */
+    transition: border-color 0.2s; /* Smooth transition for border color */
+}
+
+/* Focus effect for inputs */
+.el-input:focus,
+.el-select:focus {
+    border-color: #3498db; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); /* Add shadow on focus */
+}
+
+/* Tree view styling */
+.tree-view {
+    margin-top: 10px; /* Space above the tree view */
+}
+
+/* Dialog footer styling */
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    padding: 10px; /* Padding for the footer */
+    background-color: #f9f9f9; /* Light background for footer */
+    border-top: 1px solid #e0e0e0; /* Subtle top border */
+}
+
+/* Button styling */
+.el-button {
+    margin-left: 10px; /* Space between buttons */
+    border-radius: 4px; /* Rounded corners */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Adjust dialog width on small screens */
+    .form-dialog {
+        width: 90vw; /* Use viewport width for small screens */
+    }
+
+    /* Adjust padding and font size for inputs */
+    .el-input,
+    .el-select {
+        font-size: 14px; /* Smaller font for mobile */
+        padding: 10px; /* Less padding for inputs */
+    }
+
+    /* Adjust button size */
+    .el-button {
+        font-size: 14px; /* Smaller button text */
+    }
+}
+</style>

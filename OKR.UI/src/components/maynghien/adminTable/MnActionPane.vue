@@ -3,13 +3,13 @@
         <el-col :span="24">
             <el-row class="ep-bg-purple-dark el-col-24">
                 <el-col :span="24">
-                    <el-row>
+                    <el-row class="list-actions">
                         <div v-for="filter in filters">
 
                             <el-input v-model="filter.Value" :placeholder="filter.DisplayName"
                                 v-if="filter.Type == undefined || filter.Type == 'text'" class="action-input">
                             </el-input>
-                            <el-select v-model="filter.Value" :placeholder="filter.DisplayName" class="action-input"
+                            <el-select v-model="filter.Value" :placeholder="filter.DisplayName" class="action-input" style="min-width: 100px;"
                                 v-if="filter.Type == 'dropdown'"  filterable>
                                 <el-option label="" value="" />
 
@@ -173,5 +173,18 @@ watch(() => props.tableColumns, async () => {
 
 .action-pane .action-input {
     padding-right: 5px;
+}
+.demonstration{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+}
+.list-actions{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+
 }
 </style>

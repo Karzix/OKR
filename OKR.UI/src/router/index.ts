@@ -41,7 +41,7 @@ const router = createRouter({
         {
           path: "Team",
           component: TeamVue,
-          meta: { requiresAuth: true, roles: ["BranchManagement"]},
+          meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
       ],
     },

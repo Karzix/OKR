@@ -26,6 +26,16 @@ namespace OKR.Repository.Implementation
             {
                 try
                 {
+                    var now = DateTime.UtcNow;
+                    //StatusObjectives status;
+                    if(now < obj.StartDay)
+                    {
+                        obj.status = StatusObjectives.notStarted;
+                    }
+                    else
+                    {
+                        obj.status = StatusObjectives.working;
+                    }
                     obj.CreatedOn = DateTime.UtcNow;
                     _context.Add(obj);
 
@@ -52,6 +62,7 @@ namespace OKR.Repository.Implementation
                             Id = Guid.NewGuid(),
                             ObjectivesId = obj.Id,
                             CreatedOn = DateTime.UtcNow,
+                            //status = status
                         };
                         _context.UserObjectives.Add(newUserObj);
                     }
@@ -64,6 +75,7 @@ namespace OKR.Repository.Implementation
                             CreatedOn = DateTime.UtcNow,
                             ObjectivesId = obj.Id,
                             Id = Guid.NewGuid(),
+                            //status = status
                         };
                         _context.DepartmentObjectives.Add(newDepartmentObj);
                     }

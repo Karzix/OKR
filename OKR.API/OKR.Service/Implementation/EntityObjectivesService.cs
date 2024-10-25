@@ -4,9 +4,11 @@ using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
+using OKR.Models.Migrations;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
 using System.Data.Entity;
@@ -109,12 +111,57 @@ namespace OKR.Service.Implementation
                                 }
                             case "createOn":
                                 {
-                                    predicate = predicate.And(x => x.CreatedBy == filter.Value);
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.CreatedOn.Value.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.CreatedOn.Value.Date <= dayEnd);
+                                    }
                                     break;
                                 }
                             case "targetType":
                                 {
                                     //predicate = BuildFilterTargetType(predicate, Filters);
+                                    break;
+                                }
+                            case "startDay":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.Objectives.StartDay.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.Objectives.StartDay.Date <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "deadline":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.Objectives.Deadline.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.Objectives.Deadline.Date <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "status":
+                                {
+                                    if (filter.Value.IsNullOrEmpty())
+                                    {
+                                        break;
+                                    }
+                                    var enumN = int.Parse(filter.Value);
+                                    StatusObjectives statusObjectives = (StatusObjectives)enumN;
+                                    predicate = predicate.And(x => x.Objectives.status == statusObjectives);
                                     break;
                                 }
                             default:
@@ -161,12 +208,57 @@ namespace OKR.Service.Implementation
                                 }
                             case "createOn":
                                 {
-                                    predicate = predicate.And(x => x.CreatedBy == filter.Value);
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.CreatedOn.Value.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.CreatedOn.Value.Date <= dayEnd);
+                                    }
                                     break;
                                 }
                             case "targetType":
                                 {
                                     predicate = BuildFilterTargetType(predicate, Filters);
+                                    break;
+                                }
+                            case "startDay":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.Objectives.StartDay.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.Objectives.StartDay.Date <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "deadline":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.Objectives.Deadline.Date >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.Objectives.Deadline.Date <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "status":
+                                {
+                                    if (filter.Value.IsNullOrEmpty())
+                                    {
+                                        break;
+                                    }
+                                    var enumN = int.Parse(filter.Value);
+                                    StatusObjectives statusObjectives = (StatusObjectives)enumN;
+                                    predicate = predicate.And(x => x.Objectives.status == statusObjectives);
                                     break;
                                 }
                             default:
@@ -325,32 +417,16 @@ namespace OKR.Service.Implementation
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var now = DateTime.UtcNow;
-                var userObjectives = _userObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
-                var departmentObjectives = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
-                if (userObjectives == null && departmentObjectives == null)
+                //var userObjectives = _userObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
+                //var departmentObjectives = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
+
+                var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == dto.ObjectivesId).First();
+                if (objectives.Deadline <= now)
                 {
-                    return result.BuildError("cannot find objectives");
+                    return result.BuildError("cannot be changed because the deadline has passed");
                 }
-                if (userObjectives != null)
-                {
-                    var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == userObjectives.ObjectivesId).First();
-                    if (objectives.Deadline <= now)
-                    {
-                        return result.BuildError("cannot be changed because the deadline has passed");
-                    }
-                    userObjectives.status = dto.Status.Value;
-                    _userObjectivesRepository.Edit(userObjectives);
-                }
-                else if (departmentObjectives != null)
-                {
-                    var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == departmentObjectives.ObjectivesId).First();
-                    if (objectives.Deadline <= now)
-                    {
-                        return result.BuildError("cannot be changed because the deadline has passed");
-                    }
-                    departmentObjectives.status = dto.Status.Value;
-                    _departmentObjectivesRepository.Edit(departmentObjectives);
-                }
+                objectives.status = dto.Status.Value;
+                _objectiveRepository.Edit(objectives);
                 result.BuildResult("OK");
 
             }
@@ -367,7 +443,7 @@ namespace OKR.Service.Implementation
             var queryUserObjectives = BuildFilterUserObjectives(filterList);
             var model = _userObjectivesRepository.FindByPredicate(queryUserObjectives);
             int numOfRecords = _userObjectivesRepository.CountRecordsByPredicate(queryUserObjectives);
-            model = model.Skip(startIndex).Take(pageSize);
+            model = model.OrderByDescending(x=>x.CreatedOn).Skip(startIndex).Take(pageSize);
             var objectIdPoint = _userObjectivesRepository.caculatePercentObjectives(model);
 
             var data = model.Include(x => x.Objectives)
@@ -401,7 +477,7 @@ namespace OKR.Service.Implementation
                     }).ToList(),
                     Point = objectIdPoint.ContainsKey(x.Id) ? objectIdPoint[x.Id] : 0,
                     ObjectivesId = x.ObjectivesId,
-                    Status = x.status,
+                    Status = x.Objectives.status,
                     CreateBy = x.CreatedBy,
                     NumberOfPendingUpdates = 0
                 })
@@ -416,7 +492,7 @@ namespace OKR.Service.Implementation
             var queryDepartmentObjectives = BuildFilterDepartmentObjectives(filterList);
             var model = _departmentObjectivesRepository.FindByPredicate(queryDepartmentObjectives);
             int numOfRecords = _departmentObjectivesRepository.CountRecordsByPredicate(queryDepartmentObjectives);
-            model = model.Skip(startIndex).Take(pageSize);
+            model = model.OrderByDescending(x => x.CreatedOn).Skip(startIndex).Take(pageSize);
             var objectIdPoint = _departmentObjectivesRepository.caculatePercentObjectives(model);
 
             var data = model.Include(x => x.Objectives)
@@ -450,7 +526,7 @@ namespace OKR.Service.Implementation
                     }).ToList(),
                     Point = objectIdPoint.ContainsKey(x.Id) ? objectIdPoint[x.Id] : 0,
                     ObjectivesId = x.ObjectivesId,
-                    Status = x.status,
+                    Status = x.Objectives.status,
                     CreateBy = x.CreatedBy,
                     NumberOfPendingUpdates = _departmentProgressApprovalRepository.AsQueryable()
                                                 .Where(dpa => dpa.KeyResults.ObjectivesId == x.ObjectivesId && !dpa.IsDeleted).Count(),

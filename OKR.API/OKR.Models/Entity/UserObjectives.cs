@@ -11,7 +11,6 @@ namespace OKR.Models.Entity
 {
     public class UserObjectives : BaseEntity
     {
-        public StatusObjectives status {  get; set; }
 
         [ForeignKey("Objectives")]
         public Guid ObjectivesId { get; set; }

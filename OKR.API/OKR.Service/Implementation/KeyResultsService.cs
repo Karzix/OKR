@@ -27,13 +27,13 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private IProgressUpdatesRepository _progressUpdatesRepository;
         private IObjectivesRepository _objectivesRepository;
-        private readonly IModel _channel;
+        //private readonly IModel _channel;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDepartmentRepository _departmentRepository;
 
         private IDepartmentProgressApprovalRepository _progressApprovalRepository;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
-            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository, IModel model,
+            IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository,
             IConfiguration configuration, IDepartmentProgressApprovalRepository departmentProgressApprovalRepository,
             UserManager<ApplicationUser> userManager, IDepartmentRepository departmentRepository)
         {
@@ -42,7 +42,7 @@ namespace OKR.Service.Implementation
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
             _objectivesRepository = objectivesRepository;
-            _channel = model;
+            //_channel = model;
             //_config = configuration;
             //_hubConnection = new HubConnectionBuilder()
             //    .WithUrl(_config["signalr:url"])
@@ -60,15 +60,21 @@ namespace OKR.Service.Implementation
             {   
                 
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                
+                var now = DateTime.UtcNow;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
                 if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
                 {
                     return result.BuildError("current point is invalid");
                 }
+                //var objectives = _objectivesRepository.Get(keyresult.ObjectivesId);
+
                 var objectives = _objectivesRepository.AsQueryable()
                     .Where(x=>x.Id == keyresult.ObjectivesId)
                     .Include(x=>x.UserObjectives).Include(x=>x.DepartmentObjectives).First();
+                if (now > objectives.Deadline || objectives.status == Infrastructure.Enum.StatusObjectives.end || objectives.status == Infrastructure.Enum.StatusObjectives.notStarted)
+                {
+                    return result.BuildError("objectives has expired!");
+                }
                 var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
                 
                 if(objectives.CreatedBy == userName)

@@ -19,4 +19,5 @@ export class EntityObjectives {
 export enum StatusObjectives {
     working,
     end,
+    notStarted
 }

@@ -47,6 +47,7 @@ namespace OKR.Service.Implementation
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var user = _userManager.Users.Where(x=>x.UserName == userName).FirstOrDefault();
+                var now = DateTime.UtcNow;
                 if(request.ListKeyResults == null || request.ListKeyResults.Count == 0)
                 {
                     return result.BuildError("requires at least one keyResult");
@@ -72,10 +73,14 @@ namespace OKR.Service.Implementation
                         }
                     }
                 }
-
+                if(now > request.Deadline)
+                {
+                    return result.BuildError("The deadline must be greater than the current date");
+                }
                 var objective =_mapper.Map<Objectives>(request);
                 objective.Id = Guid.NewGuid();
                 objective.CreatedBy = userName;
+
                 var keyResults = new List<KeyResults>();
                 var ListKeyResultsDtoTemp = new List<KeyResultDto>();
                 foreach(var k in request.ListKeyResults)

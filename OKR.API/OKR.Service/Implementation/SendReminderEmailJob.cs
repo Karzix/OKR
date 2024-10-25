@@ -82,10 +82,11 @@ namespace OKR.Service.Implementation
                     }
                     else
                     {
-                        StatusChange(objective.Id.Value);
+                        ChangeStatusFromWorkingToEnd(objective.Id.Value);
                     }
                     
                 }
+                ChangeStatusFromNotStartedToWorking();
             }
         }
         private async Task SendEmailAsync(string recipientEmail, string subject, string body, string objectivesName= "")
@@ -197,39 +198,31 @@ namespace OKR.Service.Implementation
             content += "</ul>";
             return content;
         }
-        private void StatusChange( Guid ObjectivesID)
+        private void ChangeStatusFromWorkingToEnd( Guid ObjectivesID)
         {
             try
             {
-                var userObjectivesL = _userObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
-                var departmentObjectivesL = _departmentObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
-                if (userObjectivesL.Count() == 0 && departmentObjectivesL.Count == 0)
-                {
-                    return;
-                }
-                if (userObjectivesL.Count() != 0)
-                {
-                    userObjectivesL.ForEach(userObjectives =>
-                    {
-                        userObjectives.status = StatusObjectives.end;
-                        _userObjectivesRepository.Edit(userObjectives);
-                    });
-                    
-                }
-                else
-                {
-                    departmentObjectivesL.ForEach(departmentObjectives =>
-                    {
-                        departmentObjectives.status = StatusObjectives.end;
-                        _departmentObjectivesRepository.Edit(departmentObjectives);
-                    });
-                    
-                }
+                var objectives = _objectivesRepository.Get(ObjectivesID);
+                objectives.status = StatusObjectives.end;
+                _objectivesRepository.Edit(objectives);
             }
             catch (Exception ex)
             {
                 Log.Error("entity objectives: " + ObjectivesID + " error when the system automatically updates the status: " + ex.Message + " " + ex.StackTrace);
             }
+        }
+
+        private void ChangeStatusFromNotStartedToWorking()
+        {
+            var now = DateTime.UtcNow;
+            var list =  _objectivesRepository.AsQueryable()
+                .Where(x => x.StartDay >= now && x.status == StatusObjectives.notStarted).ToList();
+            foreach (var item in list)
+            {
+                item.status = StatusObjectives.working;
+            }
+
+            _objectivesRepository.EditRange(list);
         }
     }
 }

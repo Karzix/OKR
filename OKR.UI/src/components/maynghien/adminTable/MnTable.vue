@@ -249,3 +249,95 @@ function getDropdownDisplayValue(dropdownData: { data: any[], keyMember: string,
     max-height: 0;
 }
 </style>
+<style scoped>
+/* Basic reset for the table */
+.admin-table,
+.scroll {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for table headers */
+.admin-table th,
+.scroll th {
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Styling for table cells */
+.admin-table td,
+.scroll td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Alternate row color for better readability */
+.admin-table tr:nth-child(even),
+.scroll tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Hover effect for rows */
+.admin-table tr:hover,
+.scroll tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Fixed column styling */
+.admin-table th.fixed,
+.scroll th.fixed,
+.admin-table td.fixed,
+.scroll td.fixed {
+    position: sticky;
+    left: 0;
+    background-color: white;
+    z-index: 2;
+}
+
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+    .admin-table,
+    .scroll {
+        font-size: 14px; /* Smaller text on mobile */
+    }
+
+    .admin-table th,
+    .scroll th,
+    .admin-table td,
+    .scroll td {
+        padding: 10px; /* Less padding on mobile */
+    }
+
+    .admin-table {
+        display: block; /* Make the table block to allow for scrolling */
+        overflow-x: auto; /* Allow horizontal scrolling */
+    }
+
+    .element-lv2 {
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        padding: 10px;
+    }
+}
+
+/* Button styling */
+.el-button {
+    margin: 0 5px; /* Spacing between buttons */
+    border-radius: 4px; /* Rounded corners */
+}
+
+/* Link styling */
+.el-link {
+    color: #3498db; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.el-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+</style>

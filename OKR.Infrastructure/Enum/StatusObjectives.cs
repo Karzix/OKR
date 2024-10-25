@@ -10,6 +10,6 @@ namespace OKR.Infrastructure.Enum
     {
         working,
         end,
-
+        notStarted
     }
 }
