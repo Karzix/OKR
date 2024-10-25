@@ -197,30 +197,9 @@ namespace OKR.Service.Implementation
         {
             try
             {
-                var userObjectivesL = _userObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
-                var departmentObjectivesL = _departmentObjectivesRepository.AsQueryable().Where(x => x.ObjectivesId == ObjectivesID).ToList();
-                if (userObjectivesL.Count() == 0 && departmentObjectivesL.Count == 0)
-                {
-                    return;
-                }
-                if (userObjectivesL.Count() != 0)
-                {
-                    userObjectivesL.ForEach(userObjectives =>
-                    {
-                        userObjectives.status = StatusObjectives.end;
-                        _userObjectivesRepository.Edit(userObjectives);
-                    });
-                    
-                }
-                else
-                {
-                    departmentObjectivesL.ForEach(departmentObjectives =>
-                    {
-                        departmentObjectives.status = StatusObjectives.end;
-                        _departmentObjectivesRepository.Edit(departmentObjectives);
-                    });
-                    
-                }
+                var objectives = _objectivesRepository.Get(ObjectivesID);
+                objectives.status = StatusObjectives.end;
+                _objectivesRepository.Edit(objectives);
             }
             catch (Exception ex)
             {
@@ -232,34 +211,13 @@ namespace OKR.Service.Implementation
         {
             var now = DateTime.UtcNow;
             var list =  _objectivesRepository.AsQueryable()
-                .Include(x => x.DepartmentObjectives)
-                .Include(x => x.UserObjectives)
-                .Where(x => x.StartDay >= now && (
-                    x.DepartmentObjectives.Where(dO => dO.ObjectivesId == x.Id && dO.status == StatusObjectives.notStarted).Count() > 0
-                    || x.UserObjectives.Where(uo => uo.ObjectivesId == x.Id && uo.status == StatusObjectives.notStarted).Count() > 0
-                )).ToList();
+                .Where(x => x.StartDay >= now && x.status == StatusObjectives.notStarted).ToList();
             foreach (var item in list)
             {
-                var dO = item.DepartmentObjectives;
-                var uo = item.UserObjectives;
-                if(dO != null && dO.Count != 0)
-                {
-                    foreach(var item2 in dO)
-                    {
-                        item2.status = StatusObjectives.working;
-                        _departmentObjectivesRepository.Edit(item2);
-                    }
-                }
-                if (uo != null && uo.Count != 0)
-                {
-                    foreach (var item2 in uo)
-                    {
-                        item2.status = StatusObjectives.working;
-                        _userObjectivesRepository.Edit(item2);
-                    }
-                }
+                item.status = StatusObjectives.working;
             }
 
+            _objectivesRepository.EditRange(list);
         }
     }
 }

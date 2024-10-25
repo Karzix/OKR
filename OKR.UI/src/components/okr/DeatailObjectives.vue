@@ -3,7 +3,11 @@
     <div class="objective-header">
       <div class="objective-title">
         <h1>{{ props.objective.name }}</h1>
-       <div v-if="!isGuest" @click="statusChange"><el-tag>{{ props.objective.status == 0 ? "Working" : "End" }}</el-tag></div>
+        <div v-if="!isGuest" @click="statusChange">
+          <el-tag :type="getTagType(props.objective.status ?? -1)">
+            {{ getStatusText(props.objective.status ?? -1) }}
+          </el-tag>
+        </div>
       </div>
       
       <div>
@@ -166,9 +170,13 @@ const copyLink = () => {
     });
 };
 const statusChange = () => {
+  if (props.isGuest) {
+    return
+  }
   var entity  = new EntityObjectives();
   entity.id = props.entityObjectivesId;
   entity.name = props.objective.name;
+  entity.objectivesId = props.objective.objectivesId;
   // entity.status = props.objective.status;
   entity.status = props.objective.status == 0 ? 1 : 0;
   axiosInstance.put("EntityObjectives/status-change", entity).then((res) => {
@@ -192,6 +200,31 @@ const statusChange = () => {
 //   })
 // }
 // test()
+const getStatusText = (status : number) => {
+  switch (status) {
+    case 0:
+      return "Working";
+    case 1:
+      return "End";
+    case 2:
+      return "Not Started";
+    default:
+      return "Unknown";
+  }
+}
+
+const getTagType = (status : number) => {
+  switch (status) {
+    case 0:
+      return "success";
+    case 1:
+      return "danger";
+    case 2:
+      return "warning";
+    default:
+      return "";
+  }
+}
 </script>
 
 <style scoped>

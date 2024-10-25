@@ -158,8 +158,8 @@ const editItem = ref<EntityObjectives>({
 
 const tableColumns = ref<TableColumn[]>([
   {
-    key: "createOn",
-    label: "",
+    key: "startDay",
+    label: "Start Day",
     width: 1000,
     sortable: true,
     enableEdit: true,
@@ -169,6 +169,45 @@ const tableColumns = ref<TableColumn[]>([
     showSearch: true,
     inputType: "date",
     dropdownData: null,
+  },
+  {
+    key: "deadline",
+    label: "Dealine",
+    width: 1000,
+    sortable: true,
+    enableEdit: true,
+    enableCreate: true,
+    required: false,
+    hidden: false,
+    showSearch: true,
+    inputType: "date",
+    dropdownData: null,
+  },
+  {
+    key: "status",
+    label: "Status",
+    width: 1000,
+    sortable: true,
+    enableEdit: true,
+    enableCreate: true,
+    required: false,
+    hidden: false,
+    showSearch: true,
+    inputType: "dropdown",
+    dropdownData: {
+      displayMember: "name",
+      keyMember: "value",
+      data: [{
+        value: "0",
+        name: "working",
+      },{
+        value: "1",
+        name: "end",
+      },{
+        value: "2",
+        name: "notStarted",
+      }],
+    },
   },
 ]);
 const page = ref<number>(0);
@@ -222,6 +261,7 @@ const handleDeatail = (entityObjectives: EntityObjectives) => {
 };
 
 const AddFilterAndSearch = (filters: Filter[]) => {
+  searchRequest.value.filters = [];
   filters.forEach((filter) => {
     handleSearch.addFilter(searchRequest.value.filters as [], filter);
   });

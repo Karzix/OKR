@@ -26,6 +26,7 @@ const objectives = ref<EntityObjectives>({
   point: 0,
   objectivesId: undefined,
   status: 0,
+  numberOfPendingUpdates: 0
 });
 const targetType = ref<string>("");
 const search = async () => {
