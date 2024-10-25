@@ -1,6 +1,6 @@
 <template>
   <!-- <el-dialog v-model="showDialog"> -->
-    <el-tabs v-model="taps" class="demo-tabs">
+    <el-tabs v-model="taps" class="demo-tabs" v-if="!load">
       <el-tab-pane label="objectives" name="objectives">
         <Objectives :searchRequest="searchRequest" @onDeatail="handleDetail"></Objectives>
       </el-tab-pane>
@@ -23,6 +23,7 @@ import { axiosInstance } from "@/Service/axiosConfig";
 import { TargetType } from "@/Models/Enum/TargetType";
 import type { EntityObjectives } from "@/Models/EntityObjectives";
 import router from "@/router";
+import { useRoute } from "vue-router";
 
 const props = defineProps<{
   filters?: Filter[];
@@ -30,28 +31,29 @@ const props = defineProps<{
   title: string;
 }>();
 const taps = ref<string>("objectives");
-
+const route = useRoute();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
-  filters: props.filters,
+  filters: [],
   SortBy: undefined,
 });
-const searchResponseObjectives = ref<SearchResponse<Objective[]>>({
-  data: [] as Objective[],
-  totalRows: 0,
-  totalPages: 0,
-  currentPage: 1,
-  rowsPerPage: 0,
-});
-const search = async () => {
-  await axiosInstance.post("Objectives/search", searchRequest.value).then(
-    (res) => {
-      searchResponseObjectives.value = res.data;
-    }
-  )
-}
-onMounted(async () => {
+const load = ref<boolean>(true);
+// const searchResponseObjectives = ref<SearchResponse<Objective[]>>({
+//   data: [] as Objective[],
+//   totalRows: 0,
+//   totalPages: 0,
+//   currentPage: 1,
+//   rowsPerPage: 0,
+// });
+// const search = async () => {
+//   await axiosInstance.post("Objectives/search", searchRequest.value).then(
+//     (res) => {
+//       searchResponseObjectives.value = res.data;
+//     }
+//   )
+// }
+onMounted( () => {
   var targetType = new Filter();
   targetType.FieldName = "targetType";
   targetType.Value = props.title.toString();
@@ -59,7 +61,17 @@ onMounted(async () => {
     searchRequest.value.filters = [];
   }
   handleSearch.addFilter(searchRequest.value.filters as [], targetType);
-  await search()
+  var filtercreateBy = new Filter();
+  // if(targetType.Value == "0"){
+    filtercreateBy.FieldName = "createBy";
+  // }
+  // else{
+  //   filtercreateBy.FieldName = "userName";
+  // }
+  filtercreateBy.Value = route.params.UserName.toString();
+  handleSearch.addFilter(searchRequest.value.filters as [], filtercreateBy);
+//  search()
+  load.value = false
 });
 const handleDetail = (entityObjectives: EntityObjectives)=> {
   router.push('objectives=' + entityObjectives.id+ '&'+entityObjectives.targetType);

@@ -11,7 +11,7 @@
         <template #header>
           <div class="card-header">
             <span>Individual</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="progressIndividual" :color="customColors" />
           </div>
         </template>
         <div v-for="item in Individual" :key="item.id" class="objective-card" @click="DetailObjectives(item)">
@@ -26,7 +26,7 @@
         <template #header>
           <div class="card-header">
             <span>Branch</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="progressBranch" :color="customColors" />
           </div>
         </template>
         <div v-for="item in Branch" :key="item.id" class="objective-card">
@@ -41,7 +41,7 @@
         <template #header>
           <div class="card-header">
             <span>Team</span>
-            <el-progress :percentage="percentage" :color="customColors" />
+            <el-progress :percentage="progressTeam" :color="customColors" />
           </div>
         </template>
         <div v-for="item in Team" :key="item.id" class="objective-card">
@@ -101,6 +101,9 @@ const defaultProps = {
 const Individual = ref<Objective[]>([]);
 const Branch = ref<Objective[]>([]);
 const Team = ref<Objective[]>([]);
+const progressIndividual = ref<number>(0);
+const progressBranch = ref<number>(0);
+const progressTeam = ref<number>(0);
 const User = ref<UserModel>({
   userName: "",
   password: "",
@@ -147,14 +150,18 @@ onMounted(async () => {
   var filtertargetType = new Filter();
   filtertargetType.FieldName = "targetType";
   filtertargetType.Value = "0";
+  var filtercreateBy = new Filter();
+  filtercreateBy.FieldName = "createBy";
+  filtercreateBy.Value = route.params.UserName.toString();
+  handleSearch.addFilter(searchRequest.filters as [], filtercreateBy);
 
   addFilter(searchRequest.filters, deepCopy(filtertargetType)); 
   Individual.value = await Search(searchRequest,"EntityObjectives/search");
-  searchRequest.filters = [];
+  // searchRequest.filters = [];
   filtertargetType.Value = "1";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Branch.value = await Search(searchRequest,"EntityObjectives/search");
-  searchRequest.filters = [];
+  // searchRequest.filters = [];
   filtertargetType.Value = "2";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Team.value = await Search(searchRequest,"EntityObjectives/search");
