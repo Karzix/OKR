@@ -9,7 +9,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "TeamLeader,BranchManagement")]
+    [Authorize(Roles = "Teamleader, BranchManagement")]
     public class DepartmentProgressApprovalController : Controller
     {
         private IDepartmentProgressApprovalService _service;
