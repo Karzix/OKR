@@ -10,7 +10,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,superadmin")]
+    [Authorize(Roles = "Admin, superadmin")]
     public class DepartmentController : Controller
     {
         private IDepartmentService _departmentService;
