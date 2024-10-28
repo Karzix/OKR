@@ -4,6 +4,7 @@ using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
@@ -245,13 +246,58 @@ namespace OKR.Service.Implementation
                                 }
                             case "createOn":
                                 {
-                                    predicate = predicate.And(x => x.CreatedBy == filter.Value);
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.CreatedOn.Value >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.CreatedOn.Value <= dayEnd);
+                                    }
                                     break;
                                 }
                             case "targetType":
                                 {
                                    predicate = BuildFilterTargetType(predicate, Filters);
 
+                                    break;
+                                }
+                            case "startDay":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.StartDay >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.StartDay <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "deadline":
+                                {
+                                    string[] dateStrings = filter.Value.Split(',');
+                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                    //if (filter.Value != "")
+                                    predicate = predicate.And(m => m.Deadline >= dayStart);
+                                    if (dateStrings[1] != null)
+                                    {
+                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                                        predicate = predicate.And(m => m.Deadline <= dayEnd);
+                                    }
+                                    break;
+                                }
+                            case "status":
+                                {
+                                    if (filter.Value.IsNullOrEmpty())
+                                    {
+                                        break;
+                                    }
+                                    var enumN = int.Parse(filter.Value);
+                                    StatusObjectives statusObjectives = (StatusObjectives)enumN;
+                                    predicate = predicate.And(x => x.status == statusObjectives);
                                     break;
                                 }
                             default:

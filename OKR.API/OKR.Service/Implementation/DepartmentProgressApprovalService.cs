@@ -59,7 +59,7 @@ namespace OKR.Service.Implementation
                     AddedPoints = x.AddedPoints,
                     CreatedBy = x.CreatedBy,
                     CreatedOn = x.CreatedOn,
-                    KeuresultID = x.KeyResultsId,
+                    KeyresultID = x.KeyResultsId,
                     Note = x.Note,
                 }).ToList();
                 var searchResult = new SearchResponse<DepartmentProgressApprovalDto>

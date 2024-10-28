@@ -66,7 +66,9 @@
                   :search-request="searchRequest"
                   @onEditObjective="editObjective"
                   @onDeatail="handleDeatail"
+                  @onSearch = "() => {Search()}"
                   :key="bodyIndexKey"
+
                 />
               </div>
               <div v-if="page == 1">
@@ -91,7 +93,7 @@
       <CreateObjective
         :objective="editItem"
         :is-edit="EditDialog"
-        @onSearchObjective="Search()"
+        @onSearchObjective="() => {bodyIndexKey ++; Search()}"
         @onClose="
         () => {
           createDialog = false;
@@ -281,7 +283,15 @@ const AddFilterAndSearch = (filters: Filter[]) => {
     handleSearch.addFilter(searchRequest.value.filters as [], filter);
   });
   // searchRequest.value.filters?.push(...filters);
+  var filter = new Filter();
+  filter.FieldName = "targetType";
+  filter.Value = targetType.value;
+  handleSearch.addFilter(searchRequest.value.filters as [], filter);
   Search();
+  
+  
+  bodyIndexKey.value++;
+
 };
 
 const AddFilterTargetType = (emunTarget: string) => {
