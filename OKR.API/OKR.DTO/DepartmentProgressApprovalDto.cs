@@ -9,9 +9,9 @@ namespace OKR.DTO
 {
     public class DepartmentProgressApprovalDto : BaseDto
     {
-        public Guid KeuresultID { get; set; }
+        public Guid KeyresultID { get; set; }
         public string Note { get; set; } = "";
-        public int AddedPoints = 0;
+        public int AddedPoints { get; set; } = 0;
         public DateTime? CreatedOn { get; set; }
         public string? CreatedBy { get; set; }
         public bool IsApproved { get; set; }
