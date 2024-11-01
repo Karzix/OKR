@@ -5,12 +5,24 @@
       class="list"
       :infinite-scroll-disabled="disabled"
     >
-      <div class="comment" v-for="item in listEvaluateTarget" :key="item.id">
+      <div class="comment" v-for="(item, index)  in listEvaluateTarget" :key="item.id">
         <p class="comment-header">
           <strong>{{ item.createBy }}</strong> -
           <span class="timestamp">{{ formatDate(item.createOn) }}</span>
         </p>
-        <p class="comment-body">{{ item.content }}</p>
+        <p class="comment-body" v-if="!isEdit">{{ item.content }}</p>
+        <div class="comment-body-edit" v-else>
+          <el-input v-model="item.content" type="textarea"></el-input>
+          <el-button type="primary" @click="Edit(item)"><el-icon><Promotion /></el-icon></el-button>
+        </div>
+        
+        <div class="comment-btn" v-if="Cookies.get('userName') == item.createBy">
+          <el-button-group class="ml-4">
+            <el-button @click="Delete(item.id ?? '')" :icon="CloseBold" type="danger" plain/>
+            <el-button @click="isEdit = !isEdit" :icon="EditPen" type="primary" plain></el-button>
+          </el-button-group>
+          
+        </div>
       </div>
       <p v-if="loading" class="loading-av"><el-icon class="spinning-icon"><Loading /></el-icon></p>
       <p v-if="noMore">nomore</p>
@@ -34,6 +46,8 @@ import { EvaluateTarget } from "@/Models/EvaluateTarget";
 import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import { formatDate, RecalculateTheDate } from "@/Service/formatDate";
 import { Loading } from "@element-plus/icons-vue";
+import { CloseBold, EditPen, Promotion } from "@element-plus/icons-vue";
+import Cookies from "js-cookie";
 
 const route = useRoute();
 const loading = ref(false);
@@ -58,6 +72,8 @@ const searchRequest = ref<SearchRequest>({
 });
 const listEvaluateTarget = ref<EvaluateTarget[]>([]);
 const content = ref("");
+const editContent = ref("");
+const isEdit = ref(false);
 const search = async () => {
   if (loading.value && noMore.value) return;
   loading.value = true;
@@ -165,6 +181,71 @@ const AddEvaluateTarget = async () => {
 
   console.log(props.searchRequest);
 };
+
+const Delete = (id: string) => {
+  ElMessageBox.confirm(
+    'Are you sure you want to delete?',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      axiosInstance
+      .delete("EvaLuateTarget/" + id)
+      .then((res) => {
+        if (res.data.isSuccess) {
+          ElMessage({
+            message: "Delete success",
+            type: "success",
+            plain: true,
+          });
+          listEvaluateTarget.value = listEvaluateTarget.value.filter(
+            (x) => x.id != id
+          );
+        } else {
+          ElMessage({
+            message: res.data.message,
+            type: "error",
+            plain: true,
+          });
+        }
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
+  
+}
+const Edit = (item: EvaluateTarget) => {
+  console.log(item);
+  axiosInstance
+    .put("EvaLuateTarget", item)
+    .then((res) => {
+      if (res.data.isSuccess) {
+        ElMessage({
+          message: "Edit success",
+          type: "success",
+          plain: true,
+        });
+        isEdit.value = false  ;
+      }
+      else {
+        ElMessage({
+          message: res.data.message,
+          type: "error",
+          plain: true,
+        }); 
+      }
+    }
+      
+    )
+}
 </script>
 <style scoped>
 .infinite-list-wrapper {
@@ -181,6 +262,7 @@ const AddEvaluateTarget = async () => {
   margin-bottom: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease-in-out;
+  position: relative;
 }
 
 .comment:hover {
@@ -219,5 +301,14 @@ p.loading-av {
   100% {
     transform: rotate(360deg);
   }
+}
+.comment-btn {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.comment-body-edit{
+  display: flex;
 }
 </style>

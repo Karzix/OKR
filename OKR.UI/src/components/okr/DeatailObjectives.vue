@@ -283,6 +283,7 @@ const DeleteEntityObjectives = () => {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
 .objective-details {

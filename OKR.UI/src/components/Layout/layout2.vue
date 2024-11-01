@@ -71,25 +71,45 @@
     <el-row class="tac">
       <el-col>
         <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="2" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin'])">
+          <el-menu-item index="2" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
               <User />
             </el-icon>
             <span>User</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['BranchManagement'])">
+          <el-menu-item index="3" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
               <UserFilled />
               <UserFilled />
             </el-icon>
             <span>Team</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin'])">
+          <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon><OfficeBuilding /></el-icon>
             <span>Branch</span>
           </el-menu-item>
+          <el-menu-item index="5" >
+            <el-select
+              v-model="searchUsername"
+              clearable
+              placeholder="User Name"
+              style="width: 190px"
+              filterable
+              remote
+              :remote-method="seachUser"
+            >
+              <el-option
+                v-for="item in listUser"
+                :key="item.userName"
+                :label="item.userName"
+                :value="item.userName"
+              />
+            </el-select>
+            <el-icon><Search /></el-icon>
+          </el-menu-item>
         </el-menu>
       </el-col>
+
     </el-row>
   </el-drawer>
 </template>
@@ -178,7 +198,8 @@ const seachUser = async (query: string) => {
   })
 }
 const loadpage = () => {
-  router.push("/UserName=" + searchUsername.value);
+  const url = "/UserName=" + searchUsername.value;
+  window.open(url, "_blank"); // Mở cửa sổ mới với URL
 }
 watch(() => searchUsername.value, () => {
   loadpage();
@@ -267,5 +288,8 @@ watch(() => searchUsername.value, () => {
     display: flex !important;
     align-items: center;
     justify-content: center;
+}
+.layout2-search-mobile{
+
 }
 </style>
