@@ -203,7 +203,7 @@ namespace OKR.Service.Implementation
                         {
                             case "createBy":
                                 {
-                                    predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
+                                    //predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
                                     break;
                                 }
                             case "createOn":
