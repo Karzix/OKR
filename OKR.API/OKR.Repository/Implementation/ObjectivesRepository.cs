@@ -1,16 +1,10 @@
 ﻿using Maynghien.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.IO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static OKR.Infrastructure.Enum.helperQuarter;
 
 namespace OKR.Repository.Implementation
 {
@@ -28,7 +22,7 @@ namespace OKR.Repository.Implementation
                 {
                     var now = DateTime.UtcNow;
                     //StatusObjectives status;
-                    if(now < obj.StartDay)
+                    if(obj.Year < now.Year || (obj.Year == now.Year && obj.Quarter != GetCurrentQuarter()))
                     {
                         obj.status = StatusObjectives.notStarted;
                     }

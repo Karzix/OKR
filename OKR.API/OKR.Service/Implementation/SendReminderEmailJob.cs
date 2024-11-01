@@ -28,8 +28,38 @@ namespace OKR.Service.Implementation
 
         public async Task Execute(IJobExecutionContext context)
         {
-            DateTime currentDate = DateTime.UtcNow;
-            DateTime thresholdDate = currentDate.AddDays(3);
+            DateTime targetDate = DateTime.Now.AddDays(3);
+
+            // Xác định quý hiện tại và năm của ngày targetDate
+            int month = targetDate.Month;
+            int currentQuarter = (month - 1) / 3 + 1;
+            int currentYear = targetDate.Year;
+
+            // Xác định quý trước và năm tương ứng
+            Quarter previousQuarter;
+            int previousYear;
+
+            switch (currentQuarter)
+            {
+                case 1:
+                    previousQuarter = Quarter.Quarter4;
+                    previousYear = currentYear - 1;
+                    break;
+                case 2:
+                    previousQuarter = Quarter.Quarter1;
+                    previousYear = currentYear;
+                    break;
+                case 3:
+                    previousQuarter = Quarter.Quarter2;
+                    previousYear = currentYear;
+                    break;
+                case 4:
+                    previousQuarter = Quarter.Quarter3;
+                    previousYear = currentYear;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 _keyResultRepository = scope.ServiceProvider.GetRequiredService<IKeyResultRepository>();
@@ -38,15 +68,13 @@ namespace OKR.Service.Implementation
                 _userObjectivesRepository = scope.ServiceProvider.GetRequiredService<IUserObjectivesRepository>();
                 _departmentObjectivesRepository = scope.ServiceProvider.GetRequiredService<IDepartmentObjectivesRepository>();
                 //var objectives = _objectivesRepository.AsQueryable().ToList();
-                var objectives = _objectivesRepository.FindByPredicate(x => x.Deadline.Date <= thresholdDate.Date && x.Deadline.Date >= currentDate.Date)
+                var objectives = _objectivesRepository.AsQueryable().Where(obj => obj.Quarter == previousQuarter && obj.Year == previousYear)
                     .Select(x=> new ObjectiveDto
                     {
                         CreatedBy = x.CreatedBy,
-                        Deadline = x.Deadline,
                         Id = x.Id,
                         Name = x.Name,
                         Point = 0,
-                        StartDay = x.StartDay,
                         TargetType = x.TargetType,
                         ListKeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id).Select(k=> new KeyResultDto
                         {
@@ -214,15 +242,19 @@ namespace OKR.Service.Implementation
 
         private void ChangeStatusFromNotStartedToWorking()
         {
-            var now = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow;
+
+            int month = now.Month;
+            Quarter quarter = (Quarter)((month - 1) / 3 + 1);
+            int year = now.Year;
             var list =  _objectivesRepository.AsQueryable()
-                .Where(x => x.StartDay >= now && x.status == StatusObjectives.notStarted).ToList();
+                .Where(x => x.Quarter == quarter && x.Year == year && x.status == StatusObjectives.notStarted).ToList();
             foreach (var item in list)
             {
                 item.status = StatusObjectives.working;
             }
-
-            _objectivesRepository.EditRange(list);
+            if (list.Count > 0) 
+                _objectivesRepository.EditRange(list);
         }
     }
 }

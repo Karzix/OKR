@@ -185,8 +185,6 @@ namespace OKR.Service.Implementation
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Deadline = x.Deadline,
-                        StartDay = x.StartDay,
                         TargetType = x.TargetType,
                         TargetTypeName = getTargetTypeName(x.TargetType),
                         ListKeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id)
@@ -263,32 +261,32 @@ namespace OKR.Service.Implementation
 
                                     break;
                                 }
-                            case "startDay":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.StartDay >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.StartDay <= dayEnd);
-                                    }
-                                    break;
-                                }
-                            case "deadline":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Deadline >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Deadline <= dayEnd);
-                                    }
-                                    break;
-                                }
+                            //case "startDay":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.StartDay >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.StartDay <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
+                            //case "deadline":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.Deadline >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.Deadline <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
@@ -371,8 +369,8 @@ namespace OKR.Service.Implementation
                 var listkrID = listKeyResults.Select(x=>x.Id).ToList();
                 var listSidequests = _questsRepository.AsQueryable().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
 
-                objectives.StartDay = request.StartDay.Value;
-                objectives.Deadline = request.Deadline.Value;
+                //objectives.StartDay = request.StartDay.Value;
+                //objectives.Deadline = request.Deadline.Value;
                 objectives.Name = request.Name;
                 objectives.TargetType = (TargetType)request.TargetType;
 

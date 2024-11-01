@@ -2,21 +2,15 @@
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
-using OKR.Infrastructure;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
-using OKR.Repository.Implementation;
 using OKR.Service.Contract;
-using RabbitMQ.Client;
 using System.Data.Entity;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Channels;
+using static OKR.Infrastructure.Enum.helperQuarter;
 
 namespace OKR.Service.Implementation
 {
@@ -71,7 +65,7 @@ namespace OKR.Service.Implementation
                 var objectives = _objectivesRepository.AsQueryable()
                     .Where(x=>x.Id == keyresult.ObjectivesId)
                     .Include(x=>x.UserObjectives).Include(x=>x.DepartmentObjectives).First();
-                if (now > objectives.Deadline || objectives.status == Infrastructure.Enum.StatusObjectives.end || objectives.status == Infrastructure.Enum.StatusObjectives.notStarted)
+                if (now.Year != objectives.Year || objectives.Quarter != GetCurrentQuarter() || objectives.status == Infrastructure.Enum.StatusObjectives.end || objectives.status == Infrastructure.Enum.StatusObjectives.notStarted)
                 {
                     return result.BuildError("objectives has expired!");
                 }
@@ -136,7 +130,7 @@ namespace OKR.Service.Implementation
             progressUpdates.CreatedBy = userName;
             progressUpdates.CreatedOn = DateTime.UtcNow;
             progressUpdates.Note = updateString;
-            progressUpdates.KeyResultId = keyresult.Id;
+            progressUpdates.KeyResultId = keyresult.Id; 
             progressUpdates.OldPoint = keyresult.CurrentPoint;
             progressUpdates.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
 

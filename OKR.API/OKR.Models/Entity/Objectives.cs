@@ -12,8 +12,8 @@ namespace OKR.Models.Entity
     public class Objectives : BaseEntity
     {
         public string Name { get; set; }
-        public DateTime StartDay { get; set; }
-        public DateTime Deadline { get; set; }
+        public Quarter Quarter {  get; set; }
+        public int Year { get; set; }
         public TargetType TargetType { get; set; } = 0;
         public StatusObjectives status { get; set; } = StatusObjectives.working;
         public ICollection<UserObjectives>? UserObjectives { get; set; }

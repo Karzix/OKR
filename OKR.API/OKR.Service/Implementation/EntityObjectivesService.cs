@@ -14,6 +14,7 @@ using OKR.Service.Contract;
 using System.Data.Entity;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 using static OKR.Infrastructure.Enum.FormatTargetType;
+using static OKR.Infrastructure.Enum.helperQuarter;
 
 namespace OKR.Service.Implementation
 {
@@ -127,32 +128,32 @@ namespace OKR.Service.Implementation
                                     //predicate = BuildFilterTargetType(predicate, Filters);
                                     break;
                                 }
-                            case "startDay":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
-                                    }
-                                    break;
-                                }
-                            case "deadline":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
-                                    }
-                                    break;
-                                }
+                            //case "startDay":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
+                            //case "deadline":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
@@ -224,32 +225,32 @@ namespace OKR.Service.Implementation
                                     predicate = BuildFilterTargetType(predicate, Filters);
                                     break;
                                 }
-                            case "startDay":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
-                                    }
-                                    break;
-                                }
-                            case "deadline":
-                                {
-                                    string[] dateStrings = filter.Value.Split(',');
-                                    var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                    //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
-                                    if (dateStrings[1] != null)
-                                    {
-                                        var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
-                                    }
-                                    break;
-                                }
+                            //case "startDay":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
+                            //case "deadline":
+                            //    {
+                            //        string[] dateStrings = filter.Value.Split(',');
+                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //        //if (filter.Value != "")
+                            //        predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
+                            //        if (dateStrings[1] != null)
+                            //        {
+                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                            //            predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
+                            //        }
+                            //        break;
+                            //    }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
@@ -333,7 +334,7 @@ namespace OKR.Service.Implementation
                     var objectId_point = _userObjectivesRepository.caculatePercentObjectives(userObjectivesAsquery);
                     dto = userObjectivesAsquery.Include(x => x.Objectives).Select(x => new EntityObjectivesDto
                     {
-                        Deadline = x.Objectives.Deadline,
+                        Quarter = x.Objectives.Quarter,
                         Id = x.Id,
                         ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)
                         .Select(k => new KeyResultDto
@@ -358,7 +359,7 @@ namespace OKR.Service.Implementation
                         Name = x.Objectives.Name,
                         ObjectivesId = x.ObjectivesId,
                         Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0,
-                        StartDay = x.Objectives.StartDay,
+                        Year = x.Objectives.Year,
                         TargetType = x.Objectives.TargetType,
                         CreateBy = x.Objectives.CreatedBy,
                     }).First();
@@ -371,7 +372,7 @@ namespace OKR.Service.Implementation
                     var objectId_point = _objectiveRepository.caculatePercentObjectives(objectivesAsquery);
                     dto = departmentObjectivesAsquery.Include(x => x.Objectives).Select(x => new EntityObjectivesDto
                     {
-                        Deadline = x.Objectives.Deadline,
+                        Quarter = x.Objectives.Quarter,
                         Id = x.Id,
                         ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)
                         .Select(k => new KeyResultDto
@@ -396,7 +397,7 @@ namespace OKR.Service.Implementation
                         Name = x.Objectives.Name,
                         ObjectivesId = x.ObjectivesId,
                         Point = objectId_point.ContainsKey(x.ObjectivesId) ? objectId_point[x.ObjectivesId] : 0,
-                        StartDay = x.Objectives.StartDay,
+                        Year = x.Objectives.Year,
                         TargetType = x.Objectives.TargetType,
                         CreateBy = x.Objectives.CreatedBy,
                     }).First();
@@ -421,7 +422,7 @@ namespace OKR.Service.Implementation
                 //var departmentObjectives = _departmentObjectivesRepository.AsQueryable().Where(x => x.Id == dto.Id).FirstOrDefault();
 
                 var objectives = _objectiveRepository.AsQueryable().Where(x => x.Id == dto.ObjectivesId).First();
-                if (objectives.Deadline <= now)
+                if (objectives.Year <= now.Year || objectives.Quarter != GetCurrentQuarter())
                 {
                     return result.BuildError("cannot be changed because the deadline has passed");
                 }
@@ -451,8 +452,8 @@ namespace OKR.Service.Implementation
                 {
                     Id = x.Id,
                     Name = x.Objectives.Name,
-                    Deadline = x.Objectives.Deadline,
-                    StartDay = x.Objectives.StartDay,
+                    Quarter = x.Objectives.Quarter,
+                    Year = x.Objectives.Year,
                     TargetType = x.Objectives.TargetType,
                     TargetTypeName = getTargetTypeName(x.Objectives.TargetType),
                     ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)
@@ -500,8 +501,8 @@ namespace OKR.Service.Implementation
                 {
                     Id = x.Id,
                     Name = x.Objectives.Name,
-                    Deadline = x.Objectives.Deadline,
-                    StartDay = x.Objectives.StartDay,
+                    Quarter = x.Objectives.Quarter,
+                    Year = x.Objectives.Year,
                     TargetType = x.Objectives.TargetType,
                     TargetTypeName = getTargetTypeName(x.Objectives.TargetType),
                     ListKeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.ObjectivesId)

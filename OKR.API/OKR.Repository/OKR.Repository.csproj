@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Maynghien.Infrastructure\Maynghien.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\OKR.Infrastructure\OKR.Infrastructure.csproj" />
     <ProjectReference Include="..\OKR.DTO\OKR.DTO.csproj" />
     <ProjectReference Include="..\OKR.Models\OKR.Models.csproj" />
   </ItemGroup>
