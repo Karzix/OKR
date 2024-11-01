@@ -146,6 +146,8 @@ namespace OKR.Service.Implementation
                     CreateOn = x.CreatedOn,
                     DepartmentObjectivesId = x.DepartmentObjectivesId,
                     UserObjectivesId = x.UserObjectivesId,
+                    Modifiedby = x.Modifiedby,
+                    ModifiedOn = x.ModifiedOn,
                 }).ToList();
                 var searchResult = new SearchResponse<EvaluateTargetDto>
                 {

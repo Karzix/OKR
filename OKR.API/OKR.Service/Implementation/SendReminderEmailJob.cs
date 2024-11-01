@@ -168,10 +168,10 @@ namespace OKR.Service.Implementation
                 //string content = "";
                 var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Email.html");
                 var mailText = await File.ReadAllTextAsync(templatePath);
-
+                DateTime nextQuarterStartDate = GetFirstDayOfNextQuarter(DateTime.Now);
 
                 mailText = mailText.Replace("{{ObjectiveName}}", objectives.Name);
-                mailText = mailText.Replace("{{Dealine}}", objectives.Deadline.Value.AddHours(7).ToShortDateString());
+                mailText = mailText.Replace("{{Dealine}}", nextQuarterStartDate.ToShortDateString());
 
                 //var listKeyresuls = _keyResultRepository.AsQueryable().Where(x => x.ObjectivesId == objectives.Id).ToList();
                 var keyresults = BuildKeyresult(objectives.ListKeyResults);
@@ -255,6 +255,32 @@ namespace OKR.Service.Implementation
             }
             if (list.Count > 0) 
                 _objectivesRepository.EditRange(list);
+        }
+        private DateTime GetFirstDayOfNextQuarter(DateTime date)
+        {
+            int month = date.Month;
+            int year = date.Year;
+            int nextQuarterStartMonth;
+
+            if (month <= 3) 
+            {
+                nextQuarterStartMonth = 4; 
+            }
+            else if (month <= 6)
+            {
+                nextQuarterStartMonth = 7; 
+            }
+            else if (month <= 9) 
+            {
+                nextQuarterStartMonth = 10;
+            }
+            else 
+            {
+                nextQuarterStartMonth = 1; 
+                year++; 
+            }
+
+            return new DateTime(year, nextQuarterStartMonth, 1);
         }
     }
 }

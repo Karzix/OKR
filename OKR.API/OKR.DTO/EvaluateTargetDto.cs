@@ -15,5 +15,7 @@ namespace OKR.DTO
         public string Content { get; set; }
         public DateTime? CreateOn { get; set; }
         public string? CreateBy { get; set; }
+        public DateTime? ModifiedOn { get; set; }
+        public string? Modifiedby { get; set; }
     }
 }

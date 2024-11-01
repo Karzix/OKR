@@ -128,32 +128,14 @@ namespace OKR.Service.Implementation
                                     //predicate = BuildFilterTargetType(predicate, Filters);
                                     break;
                                 }
-                            //case "startDay":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
-                            //case "deadline":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
+                            case "quarter":
+                                {
+                                    var fils = filter.Value.Split(":"); // VD: "1:2021" => quarter 1: year 2024
+                                    var quarter = (Quarter)int.Parse(fils[0]);
+                                    var year = int.Parse(fils[1]);
+                                    predicate = predicate.And(x=>x.Objectives.Quarter == quarter && x.Objectives.Year == year);
+                                    break;
+                                }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
@@ -225,32 +207,14 @@ namespace OKR.Service.Implementation
                                     predicate = BuildFilterTargetType(predicate, Filters);
                                     break;
                                 }
-                            //case "startDay":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
-                            //case "deadline":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
+                            case "quarter":
+                                {
+                                    var fils = filter.Value.Split(":"); // VD: "1:2021" => quarter 1: year 2024
+                                    var quarter = (Quarter)int.Parse(fils[0]);
+                                    var year = int.Parse(fils[1]);
+                                    predicate = predicate.And(x => x.Objectives.Quarter == quarter && x.Objectives.Year == year);
+                                    break;
+                                }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
