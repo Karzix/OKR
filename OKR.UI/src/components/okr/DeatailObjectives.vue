@@ -12,6 +12,7 @@
       
       <div>
         <el-icon @click="copyLink()"><Share /></el-icon>
+        <el-icon @click="DeleteEntityObjectives()" v-if="Cookies.get('userName')?.toString() == props.objective.createBy"><Delete /></el-icon>
       </div>
     </div>
 
@@ -37,8 +38,9 @@
       <el-tab-pane label="Objectives" name="Objectives">
         <keyresultsOfObjectives
           :objective="props.objective"
-          @on-search-objective="
+          @onSearchObjective="
             () => {
+              console.log('onSearchObjective_deatailObjectives');
               keyChart++;
               emit('onSearchObjective');
             }
@@ -87,12 +89,12 @@ import {
 } from "../maynghien/Common/handleSearchFilter";
 import SeeObjectives from "@/views/OKR/SeeObjectives.vue";
 import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
-import { Share } from "@element-plus/icons-vue";
+import { Share, Delete } from "@element-plus/icons-vue";
 import { axiosInstance, urlUI } from "@/Service/axiosConfig";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { EntityObjectives } from "@/Models/EntityObjectives";
 import { deepCopy } from "@/Service/deepCopy";
-import { el } from "element-plus/es/locales.mjs";
+// import { el } from "element-plus/es/locales.mjs";
 
 const props = defineProps<{
   objective: EntityObjectives;
@@ -230,6 +232,43 @@ const getTagType = (status : number) => {
       return "";
   }
 }
+
+const DeleteEntityObjectives = () => {
+  var id  = props.entityObjectivesId;
+  ElMessageBox.confirm(
+    'you definitely want to delete? once deleted it cannot be restored!!',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+       axiosInstance.delete("EntityObjectives/"+id).then((res) => {
+        var respone = res.data;
+        if(respone.isSuccess){
+          ElMessage.success("Delete objective OK");
+          emit('onSearchObjective');
+          emit('close');
+        }
+        else {
+          ElMessage.error(respone.message);
+        }
+      })
+      // ElMessage({
+      //   type: 'success',
+      //   message: 'Delete completed',
+      // })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: 'Delete canceled',
+      })
+    })
+  
+}
 </script>
 
 <style scoped>
@@ -244,6 +283,7 @@ const getTagType = (status : number) => {
   display: flex;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap;
 }
 
 .objective-details {

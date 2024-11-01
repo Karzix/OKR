@@ -76,7 +76,12 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<string>();
             try
             {
+                var userNamme = _contextAccessor.HttpContext.User.Identity.Name;
                 var evaluateTarget = _evaluateTargetRepository.Get(id);
+                if (evaluateTarget.CreatedBy != userNamme)
+                {
+                    return result.BuildError("you are not the creator");
+                }
                 evaluateTarget.IsDeleted = true;
                 _evaluateTargetRepository.Edit(evaluateTarget);
                 return result.BuildResult("Delete OK");
@@ -94,7 +99,12 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<EvaluateTargetDto>();
             try
             {
+                var userNamme = _contextAccessor.HttpContext.User.Identity.Name;
                 var evaluateTarget = _evaluateTargetRepository.Get(request.Id.Value);
+                if (evaluateTarget.CreatedBy != userNamme)
+                {
+                    return result.BuildError("you are not the creator\r\n");
+                }
                 evaluateTarget.Content = request.Content;
                 evaluateTarget.ModifiedOn = DateTime.UtcNow;
                 evaluateTarget.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;

@@ -40,6 +40,9 @@ import { ElMessage } from 'element-plus';
 const props = defineProps<{
   EntotyOfjectivesId: string;
 }>();
+const emit = defineEmits<{
+  (e: "onSuccess",request : DepartmentProgressApprovalDto): void;
+}>();
 const noMore = ref(false);
 const data = ref<SearchResponse<DepartmentProgressApprovalDto[]>>({
   data: [] as DepartmentProgressApprovalDto[],
@@ -94,9 +97,17 @@ const saveState = (request : DepartmentProgressApprovalDto) => {
         ElMessage.error(res.data.message);
       } else {
     
-  }})
+      }
+      remove(request);
+      emit("onSuccess", request); 
+    })
 };
-
+const remove = (request : DepartmentProgressApprovalDto) => {
+  const index = data.value.data?.findIndex(item => item.id === request.id);
+  if (index != undefined && index !== -1) {
+    data.value.data?.splice(index, 1);
+  }
+};
 </script>
 <style>
 .btn-add-item :hover{

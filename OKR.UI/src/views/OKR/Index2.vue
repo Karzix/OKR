@@ -66,13 +66,15 @@
                   :search-request="searchRequest"
                   @onEditObjective="editObjective"
                   @onDeatail="handleDeatail"
-                  
+                  @onSearch = "() => {Search()}"
+                  :key="bodyIndexKey"
+
                 />
               </div>
               <div v-if="page == 1">
                 <ProgressUpdates
                   :search-request="searchRequest"
-                  :test="TargetType[item]"
+                  
                 />
               </div>
             </div>
@@ -91,7 +93,7 @@
       <CreateObjective
         :objective="editItem"
         :is-edit="EditDialog"
-        @onSearchObjective="Search()"
+        @onSearchObjective="() => {bodyIndexKey ++; Search()}"
         @onClose="
         () => {
           createDialog = false;
@@ -105,10 +107,11 @@
   <el-dialog v-model="DeatailDialog" class="OKR-Index2-dialogOKR">
     <Deatail
       :objective="editItem"
-      @onSearchObjective="Search()"
+      @onSearchObjective="() => { console.log('onSearchObjective_index2');bodyIndexKey ++; Search()}"
       :target-type="targetType"
       :entity-objectives-id="entityObjectivesId"
       v-if="DeatailDialog"
+      @close="() => {DeatailDialog = false; }"
     />
   </el-dialog>
 </template>
@@ -221,6 +224,7 @@ const searchKey = ref<string>("");
 const bodyIndexKey = ref(0);
 const progressUpdatesKey = ref(0);
 const entityObjectivesId = ref("");
+// const 
 const targetTypeValues = Object.keys(TargetType)
   .map((key) => Number(key))
   .filter((value) => !isNaN(value));
@@ -234,12 +238,12 @@ const Search = async () => {
   );
   overalProgress.value = responeOverallProgress.data.data;
 
-  if (page.value === 0) {
-    bodyIndexKey.value++;
-  } else if (page.value === 1) {
-    progressUpdatesKey.value++;
-  }
-  searchKey.value = `${targetType.value}-${page.value}-${bodyIndexKey.value}-${progressUpdatesKey.value}`;
+  // if (page.value === 0) {
+  //   bodyIndexKey.value++;
+  // } else if (page.value === 1) {
+  //   progressUpdatesKey.value++;
+  // }
+  // searchKey.value = `${targetType.value}-${page.value}-${bodyIndexKey.value}-${progressUpdatesKey.value}`;
 };
 
 const editObjective = (entityObjectives: EntityObjectives) => {
@@ -279,7 +283,15 @@ const AddFilterAndSearch = (filters: Filter[]) => {
     handleSearch.addFilter(searchRequest.value.filters as [], filter);
   });
   // searchRequest.value.filters?.push(...filters);
+  var filter = new Filter();
+  filter.FieldName = "targetType";
+  filter.Value = targetType.value;
+  handleSearch.addFilter(searchRequest.value.filters as [], filter);
   Search();
+  
+  
+  bodyIndexKey.value++;
+
 };
 
 const AddFilterTargetType = (emunTarget: string) => {
@@ -309,6 +321,7 @@ watch(
   () => targetType.value,
   () => {
     searchRequest.value.PageIndex = 1;
+    page.value = 0;
     AddFilterTargetType(targetType.value);
     Search();
   }

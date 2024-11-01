@@ -114,11 +114,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.CreatedOn.Value.Date >= dayStart);
+                                    predicate = predicate.And(m => m.CreatedOn.Value >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.CreatedOn.Value.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.CreatedOn.Value <= dayEnd);
                                     }
                                     break;
                                 }
@@ -132,11 +132,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.StartDay.Date >= dayStart);
+                                    predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.StartDay.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
                                     }
                                     break;
                                 }
@@ -145,11 +145,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.Deadline.Date >= dayStart);
+                                    predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.Deadline.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
                                     }
                                     break;
                                 }
@@ -203,7 +203,7 @@ namespace OKR.Service.Implementation
                         {
                             case "createBy":
                                 {
-                                    predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
+                                    //predicate = predicate.And(x => x.CreatedBy.Equals(filter.Value));
                                     break;
                                 }
                             case "createOn":
@@ -211,11 +211,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.CreatedOn.Value.Date >= dayStart);
+                                    predicate = predicate.And(m => m.CreatedOn.Value >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.CreatedOn.Value.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.CreatedOn.Value <= dayEnd);
                                     }
                                     break;
                                 }
@@ -229,11 +229,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.StartDay.Date >= dayStart);
+                                    predicate = predicate.And(m => m.Objectives.StartDay >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.StartDay.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.Objectives.StartDay <= dayEnd);
                                     }
                                     break;
                                 }
@@ -242,11 +242,11 @@ namespace OKR.Service.Implementation
                                     string[] dateStrings = filter.Value.Split(',');
                                     var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
                                     //if (filter.Value != "")
-                                    predicate = predicate.And(m => m.Objectives.Deadline.Date >= dayStart);
+                                    predicate = predicate.And(m => m.Objectives.Deadline >= dayStart);
                                     if (dateStrings[1] != null)
                                     {
                                         var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                                        predicate = predicate.And(m => m.Objectives.Deadline.Date <= dayEnd);
+                                        predicate = predicate.And(m => m.Objectives.Deadline <= dayEnd);
                                     }
                                     break;
                                 }
@@ -534,6 +534,38 @@ namespace OKR.Service.Implementation
                 .ToList();
 
             return (data, numOfRecords);
+        }
+
+        public AppResponse<string> DeleteEntityObjectives(Guid Id)
+        {
+            var result = new AppResponse<string>();
+            try
+            {
+                var dpo = _departmentObjectivesRepository.AsQueryable().Where(x=>x.Id == Id).FirstOrDefault();
+                if (dpo != null)
+                {
+                    dpo.IsDeleted = true;
+                    _departmentObjectivesRepository.Edit(dpo);
+                }
+                else
+                {
+                    var uo = _userObjectivesRepository.AsQueryable().Where(x => x.Id == Id).FirstOrDefault();
+                    if (uo != null)
+                    {
+                        uo.IsDeleted = true;
+                        _userObjectivesRepository.Edit(uo);
+                    }
+                }
+                //var objectives = _objectiveRepository.Get(dpo.ObjectivesId);
+                //objectives.IsDeleted = true;
+                //_objectiveRepository.Edit(objectives);
+                result.BuildResult("delete OK");
+            }
+            catch(Exception ex)
+            {
+                result.BuildError(ex.Message + " " + ex.StackTrace);
+            }
+            return result;
         }
     }
 }

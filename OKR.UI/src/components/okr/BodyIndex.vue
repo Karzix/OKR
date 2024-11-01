@@ -15,6 +15,7 @@
             <h3>
               {{ item.name }}
               <el-icon
+                v-if="Cookies.get('userName') == item.createBy"
                 @click.stop="
                   () => {
                     if (isLogin) editObjective(item);
@@ -37,7 +38,10 @@
                     <el-icon class="icon-Notification"><BellFilled /></el-icon>
                   </el-badge>
                 </template>
-                <DepartmentProgressQueue :EntotyOfjectivesId="item.id ?? ''" @close="DialogDepartmentProgressQueueVisible = false"/>
+                <DepartmentProgressQueue :EntotyOfjectivesId="item.id ?? ''" 
+                @close="DialogDepartmentProgressQueueVisible = false"
+                @onSuccess="(request) => RecalculateObjectives(request, item)"
+                />
               </el-popover>
               
             </h3>
@@ -67,13 +71,15 @@ import { Edit, BellFilled } from "@element-plus/icons-vue";
 import { TargetType } from "@/Models/Enum/TargetType";
 //@ts-ignore
 import DepartmentProgressQueue from "../DepartmentProgressApproval/DepartmentProgressQueue.vue";
-
+import {caculateObjective} from "@/Service/OKR/caculateKeyResult";
+import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressApprovalDto";
 const props = defineProps<{
   searchRequest: SearchRequest;
 }>();
 const emit = defineEmits<{
   (e: "onEditObjective", objective: EntityObjectives): void;
   (e: "onDeatail", objective: EntityObjectives): void;
+  (e: "onSearch"): void;
 }>();
 const defaultProps = {
   children: "children",
@@ -189,7 +195,14 @@ const showDialogDepartmentProgressQueue = () => {
   DialogDepartmentProgressQueueVisible.value = true;
   console.log("showDialogDepartmentProgressQueue");
 }
-
+const RecalculateObjectives = (request : DepartmentProgressApprovalDto, item : EntityObjectives) => {
+  const keyResult = item.listKeyResults.filter(x => x.id == request.keyresultID)[0];
+  if (keyResult) {
+    keyResult.currentPoint = request.addedPoints + (keyResult.currentPoint ?? 0);
+    item.point = caculateObjective(item);
+    emit("onSearch");
+  }
+}
 </script>
 <style scoped>
 .infinite-list-wrapper {

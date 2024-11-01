@@ -120,19 +120,24 @@ namespace OKR.Service.Implementation
                                     predicate = predicate.And(x=>x.KeyResultId.Equals(filter.Value));
                                     break;
                                 }
+                            case "objectivesId":
+                                {
+                                    predicate = predicate.And(x=>x.KeyResults.ObjectivesId == Guid.Parse(filter.Value));
+                                    break;
+                                }
                             default:
                                 break;
                         }
                     }
-                var userName = _httpContextAccessor.HttpContext.User.Identity.Name;
-                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0)
-                {
-                    predicate = predicate.And(x => x.KeyResults.Objectives.TargetType == TargetType.individual);
-                    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
-                    {
-                        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
-                    }
-                }
+                //var userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+                //if (Filters.Where(x => x.FieldName == "targetType").Count() == 0)
+                //{
+                //    predicate = predicate.And(x => x.KeyResults.Objectives.TargetType == TargetType.individual);
+                //    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                //    {
+                //        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                //    }
+                //}
 
                 predicate = predicate.And(x => x.KeyResults.Objectives.IsDeleted != true);
                 return predicate;

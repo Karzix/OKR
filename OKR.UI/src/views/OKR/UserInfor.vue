@@ -17,7 +17,11 @@
         <div v-for="item in Individual" :key="item.id" class="objective-card" @click="DetailObjectives(item)">
           <p><strong>{{ item.name }}</strong></p>
           <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree">
+            <template #default="{ node, data }">
+              <div class="tree-node-label">{{ data.label }}</div>
+            </template>
+          </el-tree>
         </div>
         <p class="read-more" @click="handleShowDialog('0')">Read More</p>
       </el-card>
@@ -29,10 +33,14 @@
             <el-progress :percentage="progressBranch" :color="customColors" />
           </div>
         </template>
-        <div v-for="item in Branch" :key="item.id" class="objective-card">
+        <div v-for="item in Branch" :key="item.id" class="objective-card" @click="DetailObjectives(item)">
           <p><strong>{{ item.name }}</strong></p>
           <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree" >
+            <template #default="{ node, data }">
+              <div class="tree-node-label">{{ data.label }}</div>
+            </template>
+          </el-tree>
         </div>
         <p class="read-more" @click="handleShowDialog('1')">Read More</p>
       </el-card>
@@ -44,10 +52,14 @@
             <el-progress :percentage="progressTeam" :color="customColors" />
           </div>
         </template>
-        <div v-for="item in Team" :key="item.id" class="objective-card">
+        <div v-for="item in Team" :key="item.id" class="objective-card" @click="DetailObjectives(item)">
           <p><strong>{{ item.name }}</strong></p>
           <el-progress :percentage="item.point" :color="customColors" />
-          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree" />
+          <el-tree :data="buildTree(item)" :props="defaultProps" class="objective-tree">
+            <template #default="{ node, data }">
+              <div class="tree-node-label">{{ data.label }}</div>
+            </template>
+          </el-tree>
         </div>
         <p class="read-more" @click="handleShowDialog('2')">Read More</p>
       </el-card>
@@ -65,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import { Minus, Plus } from "@element-plus/icons-vue";
 import { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 import { axiosInstance } from "@/Service/axiosConfig";
@@ -136,7 +148,7 @@ const Search = async (searchRequest: SearchRequest, url: string): Promise<Object
   }
 };
 
-onMounted(async () => {
+onBeforeMount(async () => {
   var searchRequest = new SearchRequest();
   searchRequest.PageIndex = 1;
   searchRequest.PageSize = 5;
@@ -157,14 +169,17 @@ onMounted(async () => {
 
   addFilter(searchRequest.filters, deepCopy(filtertargetType)); 
   Individual.value = await Search(searchRequest,"EntityObjectives/search");
+  progressIndividual.value = await getProgress(searchRequest);
   // searchRequest.filters = [];
   filtertargetType.Value = "1";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Branch.value = await Search(searchRequest,"EntityObjectives/search");
+  progressBranch.value = await getProgress(searchRequest);
   // searchRequest.filters = [];
   filtertargetType.Value = "2";
   addFilter(searchRequest.filters, deepCopy(filtertargetType));
   Team.value = await Search(searchRequest,"EntityObjectives/search");
+  progressTeam.value = await getProgress(searchRequest);
 });
 
 const handleShowDialog = (TargetType: string) => {
@@ -188,6 +203,14 @@ const getUser = async () => {
   })
 }
 getUser();
+
+const getProgress = async (searchRequest: SearchRequest) =>{
+  var responeOverallProgress = await axiosInstance.post(
+    "Objectives/overal-progress",
+    searchRequest
+  );
+  return responeOverallProgress.data.data;
+}
 </script>
 <style scoped>
 .container {
@@ -272,5 +295,17 @@ getUser();
   .list-objective {
     gap: 15px; /* Reduce gap between cards */
   }
+}
+.tree-node-label {
+  white-space: normal;
+  padding: 5px 0;
+  min-height: 30px;
+
+  align-items: center;
+}
+</style>
+<style>
+.el-tree-node__content {
+    height: 100% !important;
 }
 </style>

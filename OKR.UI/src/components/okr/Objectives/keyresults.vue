@@ -169,6 +169,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
 }
-
+.sidequests > label{
+  white-space: normal;
+  height: 100%;
+  margin: 10px 10px;
+}
 
 </style>
