@@ -12,11 +12,22 @@ namespace OKR.Models.Entity
     public class Objectives : BaseEntity
     {
         public string Name { get; set; }
-        public Quarter Quarter {  get; set; }
-        public int Year { get; set; }
+        public DateTime StartDay { get; set; }
+        public DateTime EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
         public StatusObjectives status { get; set; } = StatusObjectives.working;
-        public ICollection<UserObjectives>? UserObjectives { get; set; }
-        public ICollection<DepartmentObjectives>? DepartmentObjectives { get; set; }
+        [ForeignKey("Department")]
+        public Guid? DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public Department? Department { get; set; }
+
+
+        [ForeignKey("ApplicationUser")]
+        public string? ApplicationUserId { get; set; }
+        [ForeignKey("ApplicationUserId")]
+        public ApplicationUser? ApplicationUser { get; set; }
+
+        public bool IsPublic { get; set; } = true;
+        public bool IsUserObjectives { get; set; } = true;
     }
 }

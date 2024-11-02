@@ -18,6 +18,7 @@ namespace OKR.Models.Entity
         public TypeUnitKeyResult? Unit {  get; set; } // % Percent, # value
         public int CurrentPoint { get; set; }
         public int MaximunPoint { get; set; }
+        public int Percentage { get; set; }
 
 
         [ForeignKey("Objectives")]
