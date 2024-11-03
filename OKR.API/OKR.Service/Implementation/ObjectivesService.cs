@@ -11,6 +11,7 @@ using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
 using System.Data.Entity;
+using System.Security.Claims;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 using static OKR.Infrastructure.Enum.FormatTargetType;
 
@@ -22,101 +23,58 @@ namespace OKR.Service.Implementation
         private IObjectivesRepository _objectiveRepository;
         private IMapper _mapper;
         private IKeyResultRepository _keyResultRepository;
-        private ISidequestsRepository _questsRepository;
         private UserManager<ApplicationUser> _userManager;
         private IDepartmentRepository _departmentRepository;
-        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
 
         public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
-            IKeyResultRepository keyResultRepository, ISidequestsRepository sidequestsRepository, UserManager<ApplicationUser> userManager,
-            IDepartmentRepository departmentRepository, IDepartmentObjectivesRepository departmentObjectivesRepository)
+            IKeyResultRepository keyResultRepository, UserManager<ApplicationUser> userManager,
+            IDepartmentRepository departmentRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
             _mapper = mapper;
             _keyResultRepository = keyResultRepository;
-            _questsRepository = sidequestsRepository;
             _userManager = userManager;
             _departmentRepository = departmentRepository;
-            _departmentObjectivesRepository = departmentObjectivesRepository;
         }
 
-        public AppResponse<ObjectiveDto> Create(ObjectiveDto request)
+        public async Task<AppResponse<ObjectiveDto>> Create(ObjectiveDto request)
         {
             var result = new AppResponse<ObjectiveDto>();
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                var user = _userManager.Users.Where(x=>x.UserName == userName).FirstOrDefault();
                 var now = DateTime.UtcNow;
-                if(request.ListKeyResults == null || request.ListKeyResults.Count == 0)
+                var user = await _userManager.FindByEmailAsync(userName);
+                var objectives = _mapper.Map<Objectives>(request);
+                objectives.Id = Guid.NewGuid();
+                objectives.KeyResults.Clear();
+                objectives.CreatedBy = userName;
+                var Day = GetDateRange(request.Period + ":" +request.Year);
+                objectives.StartDay = Day.StartDate;
+                objectives.EndDay = Day.EndDate;
+                if (request.TargetType == TargetType.individual)
                 {
-                    return result.BuildError("requires at least one keyResult");
+                    objectives.ApplicationUserId = user.Id;
                 }
-                foreach(var item in request.ListKeyResults)
+                else
                 {
-                    if(item.Unit == TypeUnitKeyResult.Checked)
+                    var role = GetUserRole();
+                    if((role == "Teamleader" && request.TargetType == TargetType.company) || (role == "Admin" && request.TargetType == TargetType.team))
                     {
-                        if(item.Sidequests.Count() == 0)
-                        {
-                            result.BuildError(item.Description + " requires at least one Sidequests");
-                        }
+                        return result.BuildError("wrong range!");
                     }
-                    else
-                    {
-                        if(item.MaximunPoint == 0)
-                        {
-                            return result.BuildError("MaximunPoint need to be greater than 0");
-                        }
-                        if(item.CurrentPoint < 0)
-                        {
-                            return result.BuildError("CurrentPoint cannot be negative");
-                        }
-                    }
+                    objectives.DepartmentId = user.DepartmentId;
                 }
-                if(now > request.Deadline)
+                var listKeyresults = _mapper.Map<List<KeyResults>>(request.KeyResults);
+                listKeyresults.ForEach(x =>
                 {
-                    return result.BuildError("The deadline must be greater than the current date");
-                }
-                var objective =_mapper.Map<Objectives>(request);
-                objective.Id = Guid.NewGuid();
-                objective.CreatedBy = userName;
-
-                var keyResults = new List<KeyResults>();
-                var ListKeyResultsDtoTemp = new List<KeyResultDto>();
-                foreach(var k in request.ListKeyResults)
-                {
-                    var newKeyResult = _mapper.Map<KeyResults>(k);
-                    newKeyResult.Id = Guid.NewGuid();
-                    newKeyResult.CreatedBy = userName;
-                    keyResults.Add(newKeyResult);
-
-                    var newKeyResultDto =_mapper.Map<KeyResultDto>(newKeyResult);
-                    newKeyResultDto.Sidequests = k.Sidequests;
-                    ListKeyResultsDtoTemp.Add(newKeyResultDto);
-                }
-
-                var ListSidequests = new List<Sidequests>();
-                foreach (var k in ListKeyResultsDtoTemp)
-                {
-                    foreach (var s in k.Sidequests != null ? k.Sidequests : [])
-                    {
-                        ListSidequests.Add(new Sidequests()
-                        {
-                            CreatedBy = userName,
-                            CreatedOn = DateTime.Now,
-                            Id = Guid.NewGuid(),
-                            KeyResultsId = k.Id.Value,
-                            Name = s.Name,
-                        });
-                    }
-                }
-                _objectiveRepository.Add(objective,keyResults, ListSidequests, user.DepartmentId);
-
-                request.Id = objective.Id;
-                request.ListKeyResults = _mapper.Map<List<KeyResultDto>>(keyResults);
-
-
+                    x.CreatedBy = userName;
+                    x.CreatedOn = now;
+                    x.ObjectivesId = objectives.Id;
+                    x.Id = Guid.NewGuid();
+                });
+                _objectiveRepository.Add(objectives,listKeyresults);
                 result.BuildResult(request);
             }
             catch (Exception ex)
@@ -151,7 +109,7 @@ namespace OKR.Service.Implementation
                 var ojective = _objectiveRepository.Get(Id);
                 var listKeyResult = _keyResultRepository.FindBy(x=>x.ObjectivesId == Id).ToList();
                 var data = _mapper.Map<ObjectiveDto>(ojective);
-                data.ListKeyResults = _mapper.Map<List<KeyResultDto>>(listKeyResult);
+                data.KeyResults = _mapper.Map<List<KeyResultDto>>(listKeyResult);
 
                 result.BuildResult(data);
             }
@@ -179,7 +137,7 @@ namespace OKR.Service.Implementation
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 
                 model = model.Skip(startIndex).Take(pageSize);
-                var objectId_point = _objectiveRepository.caculatePercentObjectives(model);
+                //var objectId_point = _objectiveRepository.caculatePercentObjectives(model);
                 var List = model.Include(x=>x.TargetType)
                     .Select(x => new ObjectiveDto
                     {
@@ -187,7 +145,7 @@ namespace OKR.Service.Implementation
                         Name = x.Name,
                         TargetType = x.TargetType,
                         TargetTypeName = getTargetTypeName(x.TargetType),
-                        ListKeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id)
+                        KeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id)
                         .Select(k=> new KeyResultDto
                         {
                             Active = k.Active,
@@ -197,16 +155,15 @@ namespace OKR.Service.Implementation
                             Id = k.Id,
                             MaximunPoint = k.MaximunPoint,
                             Unit = k.Unit,
-                            Sidequests = _questsRepository.AsQueryable().Where(s => s.KeyResultsId == k.Id).
-                            Select(s=> new SidequestsDto
-                            {
-                                Id=s.Id,
-                                Name=s.Name,
-                                Status = s.Status,
-                                KeyResultsId = s.KeyResultsId,
-                            }).ToList(),
                         }).ToList(),
-                        Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
+                        //Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
+                        ApplicationUserId = x.ApplicationUserId,
+                        DepartmentId = x.DepartmentId,
+                        EndDay = x.EndDay,
+                        IsPublic = x.IsPublic,
+                        IsUserObjectives = x.IsUserObjectives,
+                        StartDay = x.StartDay,
+                        status = x.status,
                     })
                     .ToList();
 
@@ -257,36 +214,9 @@ namespace OKR.Service.Implementation
                                 }
                             case "targetType":
                                 {
-                                   predicate = BuildFilterTargetType(predicate, Filters);
-
+                                    predicate = BuildFilterTargetType(predicate, Filters);
                                     break;
                                 }
-                            //case "startDay":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.StartDay >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.StartDay <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
-                            //case "deadline":
-                            //    {
-                            //        string[] dateStrings = filter.Value.Split(',');
-                            //        var dayStart = DateTime.ParseExact(dateStrings[0], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //        //if (filter.Value != "")
-                            //        predicate = predicate.And(m => m.Deadline >= dayStart);
-                            //        if (dateStrings[1] != null)
-                            //        {
-                            //            var dayEnd = DateTime.ParseExact(dateStrings[1], "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                            //            predicate = predicate.And(m => m.Deadline <= dayEnd);
-                            //        }
-                            //        break;
-                            //    }
                             case "status":
                                 {
                                     if (filter.Value.IsNullOrEmpty())
@@ -296,6 +226,18 @@ namespace OKR.Service.Implementation
                                     var enumN = int.Parse(filter.Value);
                                     StatusObjectives statusObjectives = (StatusObjectives)enumN;
                                     predicate = predicate.And(x => x.status == statusObjectives);
+                                    break;
+                                }
+                            case "period":
+                                {
+                                    //var parts = filter.Value.Split(':');
+                                    //int period = int.Parse(parts[0]);
+                                    //int year = int.Parse(parts[1]);
+
+                                    var (quarterStart, quarterEnd) = GetDateRange(filter.Value);
+
+                                    predicate = predicate.And(m =>
+                                        (m.StartDay <= quarterEnd && m.EndDay >= quarterStart));
                                     break;
                                 }
                             default:
@@ -329,18 +271,10 @@ namespace OKR.Service.Implementation
                 TargetType targetType = (TargetType)int.Parse(filter.Value);
                 var query = BuildFilterExpression(request.Filters);
                 var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
-                var model = _objectiveRepository.FindByPredicate(query)
-                    .Include(x => x.UserObjectives)
-                    .Include(x => x.DepartmentObjectives);
-                if(targetType == TargetType.individual)
-                {
-                    model = model.Where(x => x.UserObjectives.Where(uo => uo.IsDeleted != true).Count() != 0);
-                }
-                else
-                {
-                    model = model.Where(x => x.DepartmentObjectives.Where(dpo => dpo.IsDeleted != true).Count() != 0);
-                }
-                var test = model.ToList();
+                var model = _objectiveRepository.FindByPredicate(query);
+               
+               
+                //var test = model.ToList();
                 var point = _objectiveRepository.caculateOveralProgress(model);
                 result.BuildResult(point);
             }
@@ -358,85 +292,42 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-
+                var objecticves = _objectiveRepository.FindBy(x=>x.Id == request.Id).Include(x=>x.KeyResults).First();
+                var keyresults = objecticves.KeyResults.ToList();
                 //edit
-                var objectives = _objectiveRepository.Get(request.Id.Value);
-                if(objectives.CreatedBy != userName)
+                keyresults.ForEach(x =>
                 {
-                    return result.BuildError("you are not the owner");
-                }
-                var listKeyResults = _keyResultRepository.FindBy(x => x.ObjectivesId == objectives.Id).ToList();
-                var listkrID = listKeyResults.Select(x=>x.Id).ToList();
-                var listSidequests = _questsRepository.AsQueryable().Where(x => listkrID.Contains(x.KeyResultsId)).ToList();
-
-                //objectives.StartDay = request.StartDay.Value;
-                //objectives.Deadline = request.Deadline.Value;
-                objectives.Name = request.Name;
-                objectives.TargetType = (TargetType)request.TargetType;
-
-                foreach (var item in listKeyResults)
-                {
-                    item.IsDeleted = true;
-                }
-                foreach(var item in listSidequests)
-                {
-                    item.IsDeleted = true;
-                }
-                foreach (var item in request.ListKeyResults)
-                {
-                    var kr = listKeyResults.Where(x => x.Id == item.Id).FirstOrDefault();
-                    if (kr == null)
+                    var dto = request.KeyResults.Where(dto => dto.Id == x.Id).FirstOrDefault();
+                    if(dto == null)
                     {
-                        continue;
+                        //delete
+                        x.IsDeleted = true;
                     }
-                    kr.IsDeleted = false;
-                    kr.ModifiedOn = DateTime.Now;
-                    kr.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
-                    kr.MaximunPoint = item.MaximunPoint.Value;
-                    kr.Deadline = item.Deadline.Value;
-                    kr.Active = item.Active.Value;
-                    kr.CurrentPoint = item.CurrentPoint.Value;
-                    kr.Description = item.Description;
-                    kr.Unit = item.Unit.Value;
-                    foreach (var sqdto in item.Sidequests)
+                    else
                     {
-                        var sq = listSidequests.Where(x=>x.Id == sqdto.Id).First();
-                        sq.IsDeleted = false;
-                        sq.ModifiedOn = DateTime.Now;
-                        sq.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
-                        sq.Name = sqdto.Name;
-                        sq.Status = (bool)sqdto.Status;
-                        sq.KeyResultsId = kr.Id;
+                        var change = AreKeyResultsEqual(dto, x);
+                        if (change)
+                        {
+                            x.Deadline = dto.Deadline.Value;
+                            x.IsDeleted = false;
+                            x.MaximunPoint = (int)dto.MaximunPoint;
+                            x.Percentage = (int)dto.Percentage;
+                            x.Modifiedby = userName;
+                            x.ModifiedOn = DateTime.UtcNow;
+                        }
                     }
-                }
-
-                //create new
-                var ListNewKeyresultsDto = request.ListKeyResults.Where(x => listKeyResults.All(kr => kr.Id != x.Id)).ToList();
-                var ListNewKeyresults = new List<KeyResults>();
-                var ListNewSidequests = new List<Sidequests>();
-                ListNewKeyresultsDto.ForEach(X =>
-                {
-                    var newKR = _mapper.Map<KeyResults>(X);
-                    newKR.Id = Guid.NewGuid();
-                    newKR.CreatedBy = userName;
-                    newKR.CreatedOn = DateTime.Now;
-                    newKR.ObjectivesId = objectives.Id;
-                    ListNewKeyresults.Add(newKR);
-                    X.Sidequests.ForEach(sq =>
-                    {
-                        var newSQ = _mapper.Map<Sidequests>(sq);
-                        newSQ.Id = Guid.NewGuid();
-                        newSQ.CreatedBy = userName;
-                        newSQ.KeyResultsId = newKR.Id;
-                        newSQ.CreatedOn = DateTime.Now;
-                        ListNewSidequests.Add(newSQ);
-                    });
+                    
                 });
-
-                listKeyResults.AddRange(ListNewKeyresults);
-                listSidequests.AddRange(ListNewSidequests);
-
-                _objectiveRepository.Edit(objectives, listKeyResults, listSidequests);
+                //create 
+                var newKeyresults = request.KeyResults.Where(x=>x.Id == null).ToList();
+                newKeyresults.ForEach(x =>
+                {
+                    var newkeyresult = _mapper.Map<KeyResults>(x);
+                    newkeyresult.Id = Guid.NewGuid();
+                    newkeyresult.CreatedBy = userName;
+                    keyresults.Add(newkeyresult);
+                });
+                _objectiveRepository.Edit(objecticves, keyresults);
                 result.BuildResult(request);
 
             }
@@ -452,33 +343,117 @@ namespace OKR.Service.Implementation
             var filter = Filters.Where(x => x.FieldName == "targetType").First();
             var enumN = int.Parse(filter.Value);
             TargetType targetType = (TargetType)enumN;
-            if(targetType == TargetType.individual)
+            
+            predicate = predicate.And(x => x.TargetType == targetType);
+            if (targetType == TargetType.individual || targetType == TargetType.company)
             {
                 return predicate;
             }
-            predicate = predicate.And(x => x.TargetType == targetType);
-            var filterUserName = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
-            ApplicationUser user;
-            if (filterUserName != null)
+            else if(targetType == TargetType.team)
             {
-                user =  _userManager.Users.Where(x=>x.UserName == filterUserName.Value).FirstOrDefault();
-            }
-            else
-            {
-                user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
-            }
-            if (user.DepartmentId == null)
-            {
-                throw new Exception("User does not have a department.");
-            }
-            var department = _departmentRepository.GetParentOfChildDepartment(enumN, user.DepartmentId.Value);
-            var departmentObjectiveIds = _departmentObjectivesRepository.AsQueryable()
-                 .Where(doj => doj.DepartmentId == department.Id)
-                 .Select(doj => doj.ObjectivesId);
+                Department department = new Department();
+                ApplicationUser user = new ApplicationUser();
+                var filterCreateBy = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
+                if (filterCreateBy == null)
+                {
+                    user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
+                }
+                else
+                {
+                    user = _userManager.Users.Where(x => x.UserName == filterCreateBy.Value).FirstOrDefault();
+                }
+                if (user.DepartmentId == null)
+                {
+                    throw new Exception("User does not have a department.");
+                }
+                predicate = predicate.And(x=>x.DepartmentId == user.DepartmentId);
 
-            predicate = predicate.And(x => departmentObjectiveIds.Contains(x.Id));
+            }
 
             return predicate;
         }
+        public string GetUserRole()
+        {
+            var user = _contextAccessor.HttpContext?.User;
+
+            if (user == null || !user.Identity.IsAuthenticated)
+            {
+                return null; 
+            }
+            var role = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            return role;
+        }
+
+
+        private (DateTime StartDate, DateTime EndDate) GetDateRange(string timePeriod)
+        {
+            var parts = timePeriod.Split(':');
+            if (parts.Length != 2)
+            {
+                throw new ArgumentException("Invalid time period format. Expected format is {period}:{year}.");
+            }
+
+            string period = parts[0];
+            if (!int.TryParse(parts[1], out int year))
+            {
+                throw new ArgumentException("Invalid year format.");
+            }
+
+            DateTime startDate, endDate;
+
+            switch (period)
+            {
+                case "Q1":
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 3, 31);
+                    break;
+                case "Q2":
+                    startDate = new DateTime(year, 4, 1);
+                    endDate = new DateTime(year, 6, 30);
+                    break;
+                case "Q3":
+                    startDate = new DateTime(year, 7, 1);
+                    endDate = new DateTime(year, 9, 30);
+                    break;
+                case "Q4":
+                    startDate = new DateTime(year, 10, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                case "H1":
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 6, 30);
+                    break;
+                case "H2":
+                    startDate = new DateTime(year, 7, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                case "FY": // Full year
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid period format. Expected Q1, Q2, Q3, Q4, H1, H2, or FY.");
+            }
+
+            return (startDate, endDate);
+        }
+
+        private bool AreKeyResultsEqual(KeyResultDto dto, KeyResults entity)
+        {
+            if (dto == null || entity == null)
+            {
+                return false;
+            }
+
+            return dto.Description == entity.Description &&
+                   dto.Active == entity.Active &&
+                   dto.Deadline == entity.Deadline &&
+                   dto.Unit == entity.Unit &&
+                   //dto.CurrentPoint == entity.CurrentPoint &&
+                   dto.MaximunPoint == entity.MaximunPoint &&
+                   dto.Percentage == entity.Percentage; 
+        }
+
     }
 }

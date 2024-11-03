@@ -11,9 +11,9 @@ namespace OKR.Repository.Contract
 {
     public interface IObjectivesRepository : IGenericRepository<Objectives,OKRDBContext, ApplicationUser>
     {
-        void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests, Guid? DepartmentId);
+        void Add(Objectives obj, List<KeyResults> keyResults);
         Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input);
         int caculateOveralProgress(IQueryable<Objectives> input);
-        void Edit(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests);
+        void Edit(Objectives obj, List<KeyResults> keyResults);
     }
 }

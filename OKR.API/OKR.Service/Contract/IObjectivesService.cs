@@ -6,7 +6,7 @@ namespace OKR.Service.Contract
 {
     public interface IObjectivesService
     {
-        public AppResponse<ObjectiveDto> Create(ObjectiveDto request);
+        public Task<AppResponse<ObjectiveDto>> Create(ObjectiveDto request);
         public AppResponse<SearchResponse<ObjectiveDto>> Search(SearchRequest request);
         public AppResponse<ObjectiveDto> Get(Guid Id);
         public AppResponse<string> Delete(Guid Id);

@@ -40,7 +40,7 @@ namespace OKR.API.Controllers
         [AllowAnonymous]
         public IActionResult Search(SearchRequest request)
         {
-            var result =  _objectiveService.Search(request);
+            var result = _objectiveService.Search(request);
             return Ok(result);
         }
         [HttpPost]
@@ -48,7 +48,7 @@ namespace OKR.API.Controllers
         [AllowAnonymous]
         public IActionResult OverallProgress(SearchRequest request)
         {
-            var result =  _objectiveService.CaculateOveralProgress(request);
+            var result = _objectiveService.CaculateOveralProgress(request);
             return Ok(result);
         }
         [HttpPut]
@@ -57,6 +57,12 @@ namespace OKR.API.Controllers
             var result = _objectiveService.Edit(request);
             return Ok(result);
         }
-
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var result = _objectiveService.Delete(id);
+            return Ok(result);
+        }
     }
 }

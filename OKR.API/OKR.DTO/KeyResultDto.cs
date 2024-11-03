@@ -19,6 +19,6 @@ namespace OKR.DTO
         public int? MaximunPoint { get; set; }
         public string? Note { get; set; }
         public int? AddedPoints { get; set; }
-        public List<SidequestsDto>? Sidequests { get; set; }
+        public int? Percentage {  get; set; }
     }
 }

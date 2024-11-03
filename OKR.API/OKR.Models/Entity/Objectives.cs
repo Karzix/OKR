@@ -15,7 +15,7 @@ namespace OKR.Models.Entity
         public DateTime StartDay { get; set; }
         public DateTime EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
-        public StatusObjectives status { get; set; } = StatusObjectives.working;
+        public StatusObjectives status { get; set; } = StatusObjectives.noStatus;
         [ForeignKey("Department")]
         public Guid? DepartmentId { get; set; }
         [ForeignKey("DepartmentId")]
@@ -29,5 +29,9 @@ namespace OKR.Models.Entity
 
         public bool IsPublic { get; set; } = true;
         public bool IsUserObjectives { get; set; } = true;
+
+        public ICollection<KeyResults>? KeyResults { get; set; }
+        public string Period { get; set; }
+        public int Year { get; set; }
     }
 }
