@@ -5,6 +5,7 @@
                 v-model="item.percentage"
                 :controls="false"
                 style="width: 55px; min-width: 55px !important;"
+                :disabled="!props.isCreateOrEdit"
             />
             <p class="keyresult-title">{{ item.description }} </p>
         </div>
@@ -23,6 +24,7 @@ const emit = defineEmits<{
 }>();
 const props = defineProps<{
   keyresults: KeyResult[];
+  isCreateOrEdit: boolean;
 }>();
 </script>
 

@@ -18,4 +18,7 @@ export class Objectives {
     year?: number;
     id?: string;
     point?: number;
+    lastProgressUpdate: Date | undefined;
+    createdBy?: string | undefined;
+    createdOn: Date | undefined;
 }

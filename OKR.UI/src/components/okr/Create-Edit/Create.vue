@@ -38,7 +38,7 @@
         <el-button :icon="Plus" @click="onShowDialogCreateKeyResult">Add new</el-button> 
       </div>
       <div class="keyresults">
-        <ListKeyresult :keyresults="objectives.keyResults"></ListKeyresult>
+        <ListKeyresult :keyresults="objectives.keyResults" :is-create-or-edit="true"></ListKeyresult>
       </div>
     </div>
     <div class="right">

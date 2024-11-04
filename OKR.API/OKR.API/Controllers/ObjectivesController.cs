@@ -28,10 +28,10 @@ namespace OKR.API.Controllers
         }
 
         [HttpGet]
-        [Route("{Id}")]
-        public IActionResult Get(Guid Id)
+        [Route("{id}")]
+        public IActionResult Get(Guid id)
         {
-            var result = _objectiveService.Get(Id);
+            var result = _objectiveService.Get(id);
             return Ok(result);
         }
 

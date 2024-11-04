@@ -1,0 +1,190 @@
+<template>
+    <div class="detail-objectives">
+        <div class="left">
+            <div class="left-header">
+                <p class="user-name">{{ objectives.createdBy }}</p>
+                <el-button-group class="ml-4">
+                    <el-button type="primary" :icon="Edit" v-if="isOwner"/>
+                    <el-button type="primary" :icon="Share" />
+                    <el-button type="primary" :icon="Delete" v-if="isOwner"/>
+                </el-button-group>
+            </div>
+            <div>
+            <p class="title">{{ objectives.name }}</p>
+            </div>
+            <div class="objective-progress">
+                <el-progress :percentage="63" color="#6366F1" />
+                <p class="progress-caption">The objectives progress is calculated from the key results</p>
+            </div>
+            <div class="objective-status">
+                <p class="label">Status: </p>
+                <el-tag :type="getTagType(objectives.status)">{{ getStatusText(objectives.status) }}</el-tag>
+            </div>
+            <div class="keyresults">
+                <ListKeyresult :keyresults="keyresults" :is-create-or-edit="false"/>
+            </div>
+        </div>
+        <div class="right">
+            <div class="right-item">
+                <p class="label">Created: </p>
+                <p class="value">{{ formatDate(objectives.createdOn) }}</p>
+            </div>
+            <div class="right-item">
+                <p class="label">Start date: </p>
+                <p class="value">{{ formatDate(objectives.startDay) }}</p>
+            </div>
+            <div class="right-item">
+                <p class="label">End date: </p>
+                <p class="value">{{ formatDate(objectives.endDay) }}</p>
+            </div>
+            <div class="right-item">
+                <p class="label">Last progress update: </p>
+                <p class="value">{{ objectives.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(objectives.lastProgressUpdate) : '' }}</p>
+            </div>
+            <div class="right-item">
+                <p class="label">Visibility: </p>
+                <p class="value">{{  objectives.isPublic ? 'Public' : 'Private' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="comment-progress">
+        <el-tabs v-model="tabs" class="demo-tabs">
+            <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest" :targetType="'0'"></EvaluateTarget></el-tab-pane>
+            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
+        </el-tabs>
+    </div>
+</template>
+<script setup lang="ts">
+import { Edit, Share, Delete } from "@element-plus/icons-vue";
+import { onBeforeMount, onMounted, ref } from "vue";
+import { KeyResult } from "@/Models/KeyResult";
+import ListKeyresult from "./Create-Edit/ListKeyresult.vue";
+import type { SearchRequest } from "../maynghien/BaseModels/SearchRequest";
+import ProgressUpdate from "./ProgressUpdate.vue";
+import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
+import type { Objectives } from "@/Models/Objective";
+import { TargetType } from "@/Models/Enum/TargetType";
+import { axiosInstance } from "@/Service/axiosConfig";
+import { getTagType,getStatusText } from "@/Models/EntityObjectives";
+import { formatDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
+import { Filter } from "../maynghien/BaseModels/Filter";
+import { addFilter } from "../maynghien/Common/handleSearchFilter";
+import { deepCopy } from "@/Service/deepCopy";
+
+
+const props = defineProps<{
+    objectivesId : string;
+    isOwner?: boolean
+}>()
+const objectives = ref<Objectives>({
+  id: undefined,
+  name: "",
+  startDay: undefined,
+  endDay: undefined,
+  keyResults: [],
+  targetType: TargetType.Individual,
+  targetTypeName: "",
+  point: 0,
+  status: 0,
+  isPublic: true,
+  isUserObjectives: true,
+  year: new Date().getFullYear(),
+  period: "Q1",
+  createdOn: new Date(),
+  lastProgressUpdate: new Date(),
+});
+const keyresults = ref<KeyResult[]>([{  
+    id: "1",
+    description: "keyresult 1",
+    currentPoint: 0,
+    status: 1,
+    maximunPoint: 100,
+    deadline: new Date(),
+    unit: 0,
+    active: true,
+    note: "",
+    percentage: 50
+},{
+    id: "2",
+    description: "keyresult 2",
+    currentPoint: 0,
+    status: 1,
+    maximunPoint: 100,
+    deadline: new Date(),
+    unit: 0,
+    active: true,
+    note: "",
+    percentage: 50
+}]);
+const tabs = ref("comment");
+
+const searchRequest = ref<SearchRequest>({
+  PageIndex: 1,
+  PageSize: 10,
+  filters: [],
+  SortBy: undefined,
+});
+
+const getObjectives = async () => {
+    var filter = new Filter();
+    filter.FieldName = "objectivesId";
+    filter.Value = props.objectivesId;
+    addFilter(searchRequest.value.filters as [],deepCopy(filter));
+    var url = `Objectives/${props.objectivesId}`
+    await axiosInstance.get(url).then((res) => {
+        objectives.value = res.data.data
+    })
+}
+
+
+onMounted(() => {
+    getObjectives()
+})
+</script>
+
+<style scoped>
+.objective-progress .progress-caption {
+    font-size: 12px;
+    color: #6b7280; 
+    margin-top: 8px;
+}
+.detail-objectives{
+    display: flex;
+    gap: 20px;
+}
+.left{
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.left-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.title{
+    font-size: 24px;
+    font-weight: bold;
+}
+.objective-status >.label{
+    font-weight: bold;
+}
+.objective-status{
+    display: flex; 
+    align-items: center;
+    gap: 10px;
+}
+.value{
+    font-weight: bold;
+    font-size: 18px;
+    padding-left: 10px;
+}
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-left: 2px solid #ccc;
+    padding-left: 15px;
+}
+</style>

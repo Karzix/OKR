@@ -80,6 +80,11 @@
           }}</span>
         </template>
       </el-table-column>
+      <el-table-column width="50">
+        <template #default="scope">
+          <el-button type="info" link @click="onShowDialogDetail(scope.row.id, scope.row.createdBy)"><el-icon><MoreFilled /></el-icon></el-button>
+        </template>
+      </el-table-column>
       <template #append>
         <div style="text-align: center; padding: 10px;" @click="handleAddRow" class="btn-add-item" v-if="!noMore">
           <el-text class="mx-1" type="primary">see more...</el-text>
@@ -90,6 +95,9 @@
       </template>
     </el-table>
   </div>
+  <el-dialog v-model="dialogDetail" width="900px">
+    <DetailObjectives :objectives-id="idObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"></DetailObjectives>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -108,6 +116,10 @@ import { Filter } from "../maynghien/BaseModels/Filter";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import { defineExpose } from 'vue';
+import {MoreFilled} from '@element-plus/icons-vue'
+import DetailObjectives from "./DetailObjectives.vue";
+import { id } from "element-plus/es/locales.mjs";
+import Cookies from "js-cookie";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -132,7 +144,9 @@ const customCSS = {
 }
 const noMore = ref(false);
 const loadingTable = ref(false);
-
+const dialogDetail = ref(false);
+const idObjectivesSelect = ref<string>("");
+const allowEdit = ref(false);
 const search = async () => {
   try{
     loadingTable.value = true;
@@ -171,6 +185,16 @@ const onAddFilterAndSearch = (filter : Filter[]) => {
   listObjectivesDisplay.value = [];
   searchRequest.value.PageIndex = 1;
   search();
+}
+const onShowDialogDetail = (idObjectives : string, createBy : string = "") =>{
+  allowEdit.value = false;
+  if(createBy && createBy == (Cookies.get("userName")?.toString() ?? "")){
+    allowEdit.value = true;
+  }
+
+
+  idObjectivesSelect.value = idObjectives;
+  dialogDetail.value = true;
 }
 onMounted(() => {
   search();

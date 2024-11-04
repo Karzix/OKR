@@ -1,3 +1,4 @@
+import type { StatusObjectives } from "./EntityObjectives";
 import type { Sidequest } from "./Sidequests";
 
 export class KeyResult {
@@ -8,8 +9,8 @@ export class KeyResult {
   unit: number | undefined;
   currentPoint: number | undefined;
   maximunPoint: number | undefined;
-  // objectId: string | undefined;
-  sidequests: Sidequest[] = [];
   note: string = "";
   addedPoints?: number = 0;
+  status: StatusObjectives | undefined;
+  percentage?: number = 0 // percentage 
 }

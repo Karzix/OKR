@@ -25,10 +25,11 @@ namespace OKR.Service.Implementation
         private IKeyResultRepository _keyResultRepository;
         private UserManager<ApplicationUser> _userManager;
         private IDepartmentRepository _departmentRepository;
+        private IProgressUpdatesRepository _progressUpdatesRepository;
 
         public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
             IKeyResultRepository keyResultRepository, UserManager<ApplicationUser> userManager,
-            IDepartmentRepository departmentRepository)
+            IDepartmentRepository departmentRepository, IProgressUpdatesRepository progressUpdatesRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
@@ -36,6 +37,7 @@ namespace OKR.Service.Implementation
             _keyResultRepository = keyResultRepository;
             _userManager = userManager;
             _departmentRepository = departmentRepository;
+            _progressUpdatesRepository = progressUpdatesRepository;
         }
 
         public async Task<AppResponse<ObjectiveDto>> Create(ObjectiveDto request)
@@ -45,7 +47,7 @@ namespace OKR.Service.Implementation
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var now = DateTime.UtcNow;
-                var user = await _userManager.FindByEmailAsync(userName);
+                var user = await _userManager.FindByNameAsync(userName);
                 var objectives = _mapper.Map<Objectives>(request);
                 objectives.Id = Guid.NewGuid();
                 objectives.KeyResults.Clear();
@@ -110,7 +112,10 @@ namespace OKR.Service.Implementation
                 var listKeyResult = _keyResultRepository.FindBy(x=>x.ObjectivesId == Id).ToList();
                 var data = _mapper.Map<ObjectiveDto>(ojective);
                 data.KeyResults = _mapper.Map<List<KeyResultDto>>(listKeyResult);
-
+                data.LastProgressUpdate = _progressUpdatesRepository.AsQueryable()
+                    .Where(x=>x.KeyResults.ObjectivesId == ojective.Id).OrderByDescending(x => x.CreatedOn)
+                    .Select(x=>x.CreatedOn)
+                    .FirstOrDefault();
                 result.BuildResult(data);
             }
             catch (Exception ex)
@@ -155,6 +160,7 @@ namespace OKR.Service.Implementation
                             Id = k.Id,
                             MaximunPoint = k.MaximunPoint,
                             Unit = k.Unit,
+                            Status = x.status
                         }).ToList(),
                         //Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
                         ApplicationUserId = x.ApplicationUserId,
@@ -164,6 +170,10 @@ namespace OKR.Service.Implementation
                         IsUserObjectives = x.IsUserObjectives,
                         StartDay = x.StartDay,
                         status = x.status,
+                        Period = x.Period,
+                        Year = x.Year,
+                        CreatedBy = x.CreatedBy,
+                        CreatedOn = x.CreatedOn
                     })
                     .ToList();
 
@@ -244,15 +254,15 @@ namespace OKR.Service.Implementation
                                 break;
                         }
                     }
-                var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
-                {
-                    predicate = predicate.And(x => x.TargetType == TargetType.individual);
-                    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
-                    {
-                        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
-                    }
-                }
+                //var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                //if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
+                //{
+                //    predicate = predicate.And(x => x.TargetType == TargetType.individual);
+                //    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
+                //    {
+                //        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
+                //    }
+                //}
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
             }
@@ -454,6 +464,19 @@ namespace OKR.Service.Implementation
                    dto.MaximunPoint == entity.MaximunPoint &&
                    dto.Percentage == entity.Percentage; 
         }
-
+        public AppResponse<List<string>> GetPeriods()
+        {
+            var result = new AppResponse<List<string>>();
+            try
+            {
+                var list = _objectiveRepository.AsQueryable().Distinct().Select(x => x.Period + ":" + x.Year).ToList();
+                result.BuildResult(list);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
+        }
     }
 }

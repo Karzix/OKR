@@ -16,7 +16,7 @@ namespace OKR.DTO
         public DateTime? EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
         public string? TargetTypeName { get; set; }
-        public StatusObjectives status { get; set; } = StatusObjectives.noStatus;
+        public StatusObjectives status { get; set; }
         public Guid? DepartmentId { get; set; }
         public string? ApplicationUserId { get; set; }
 
@@ -25,5 +25,8 @@ namespace OKR.DTO
         public List<KeyResultDto> KeyResults { get; set; }
         public string? Period {  get; set; }
         public int? Year {  get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTime? CreatedOn { get; set; }
+        public DateTime? LastProgressUpdate { get; set; }
     }
 }
