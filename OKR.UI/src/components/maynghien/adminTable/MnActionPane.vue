@@ -30,7 +30,22 @@
                                     value-format="DD/MM/YYYY"  
                                     style="width: 290px;"
                                 />
-                              </div>
+                              </div> 
+                              <!-- <div v-if="filter.Type == 'customDropdown'">
+                                
+                              </div> -->
+                            <el-select v-model="filter.Value" :placeholder="filter.DisplayName" class="action-input" style="min-width: 100px;"
+                                v-if="filter.Type == 'customDropdown'"  filterable>
+                                <el-option label="" value="" />
+
+                                <el-option v-for="item in filter.dropdownData.data"
+                                    :key="item[filter.dropdownData.keyMember]"
+                                    :label="item[filter.dropdownData.displayMember]"
+                                    :value="item[filter.dropdownData.keyMember]" />
+                                <template #footer>
+                                    <el-link type="primary" @click="() => { emit('onCustomDropdown');}">Show more</el-link>
+                                </template>
+                            </el-select>
                         </div>
                         <el-button v-if="filters != undefined && filters.length > 0" :icon="Search"
                             @click="handlebtnSearchClicked"> </el-button>
@@ -87,10 +102,12 @@ const emit = defineEmits<{
     (e: 'onBtnAddClicked'): void;
     (e: 'onBtnSearchClicked', filters: Filter[]): void;
     (e: 'onCustomAction', item: CustomActionResponse): void;
+    (e: 'onCustomDropdown'): void;
 }>();
 const filters = ref<Filter[]>([]);
 
 const dropdownData = ref<any[]>([]);
+
 props.tableColumns.forEach(colum => {
     if (colum.showSearch) {
         const newFilter: Filter = {
@@ -173,6 +190,7 @@ watch(() => props.tableColumns, async () => {
 
 .action-pane .action-input {
     padding-right: 5px;
+    min-width: 200px !important;
 }
 .demonstration{
     display: flex;

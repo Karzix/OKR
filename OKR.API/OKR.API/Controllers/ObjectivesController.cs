@@ -21,9 +21,9 @@ namespace OKR.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(ObjectiveDto request)
+        public async Task<IActionResult> Create(ObjectiveDto request)
         {
-            var result = _objectiveService.Create(request);
+            var result = await _objectiveService.Create(request);
             return Ok(result);
         }
 
@@ -62,6 +62,13 @@ namespace OKR.API.Controllers
         public IActionResult Delete(Guid id)
         {
             var result = _objectiveService.Delete(id);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("periods")]
+        public IActionResult GetPeriod()
+        {
+            var result= _objectiveService.GetPeriods();
             return Ok(result);
         }
     }

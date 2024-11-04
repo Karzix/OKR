@@ -20,22 +20,22 @@ namespace OKR.Repository.Implementation
         {
             var point = 0.0;
             var keyresults = input;
-            var sidequest = _context.Sidequests.Where(x => x.KeyResultsId == keyresults.Id || x.IsDeleted != true);
-            if (keyresults.Unit == TypeUnitKeyResult.Checked)
-            {
-                point = (sidequest.Where(x => x.Status == true).Count() / (double)sidequest.Count());
-                return (int)point;
-            }
+            //var sidequest = _context.Sidequests.Where(x => x.KeyResultsId == keyresults.Id || x.IsDeleted != true);
+            //if (keyresults.Unit == TypeUnitKeyResult.Checked)
+            //{
+            //    //point = (sidequest.Where(x => x.Status == true).Count() / (double)sidequest.Count());
+            //    return (int)point;
+            //}
             
-            if(sidequest.Count() > 0)
-            {
-                point = sidequest.Where(x=>x.Status == true).Count() / (double)sidequest.Count();
-                point = (point / 2.0) + (keyresults.CurrentPoint/ (double)keyresults.MaximunPoint )/ 2.0;
-            }
-            else
-            {
-                point = (keyresults.CurrentPoint / (double)keyresults.MaximunPoint);
-            }
+            //if(sidequest.Count() > 0)
+            //{
+            //    point = sidequest.Where(x=>x.Status == true).Count() / (double)sidequest.Count();
+            //    point = (point / 2.0) + (keyresults.CurrentPoint/ (double)keyresults.MaximunPoint )/ 2.0;
+            //}
+            //else
+            //{
+            //    point = (keyresults.CurrentPoint / (double)keyresults.MaximunPoint);
+            //}
             return (int)(point * 100);
         }
     }

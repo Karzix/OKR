@@ -1,5 +1,5 @@
 export enum TargetType {
     Individual,
-    Branch,
-    Team,
+    Department,
+    Company,
 }

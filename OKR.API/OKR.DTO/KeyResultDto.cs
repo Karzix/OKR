@@ -20,5 +20,6 @@ namespace OKR.DTO
         public string? Note { get; set; }
         public int? AddedPoints { get; set; }
         public int? Percentage {  get; set; }
+        public StatusObjectives Status { get; set; }
     }
 }
