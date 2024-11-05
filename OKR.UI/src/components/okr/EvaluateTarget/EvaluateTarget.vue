@@ -6,7 +6,7 @@
       <div class="comment" v-for="(item, index)  in listEvaluateTarget" :key="item.id">
         <p class="comment-header">
           <strong>{{ item.createBy }}</strong> -
-          <span class="timestamp">{{ formatDate_dd_mm_yyyy_hh_mm(item.createOn) }}</span>
+          <span class="timestamp">{{ item.createOn ? formatDate_dd_mm_yyyy_hh_mm(item.createOn) : '' }}</span>
         </p>
         <p class="comment-body" v-if="!isEdit">{{ item.content }}</p>
         <div class="comment-body-edit" v-else>

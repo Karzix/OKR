@@ -133,6 +133,8 @@ const objectives = ref<Objectives>({
   isUserObjectives: true,
   year: new Date().getFullYear(),
   period: "Q1",
+  lastProgressUpdate: new Date(),
+  createdOn: new Date(),
 });
 const props = defineProps<{
   objectives: Objectives;
@@ -149,6 +151,8 @@ const keyresults = ref<KeyResult>({
   unit: 0,
   active: true,
   note: "",
+  lastProgressUpdate: new Date(),
+  createdOn: new Date(),
 });
 const dialogAddKeyResult = ref(false);
 const isEdit = ref(false);
@@ -233,6 +237,8 @@ const onShowDialogCreateKeyResult = () => {
         unit: 0,
         active: true,
         note: "",
+        lastProgressUpdate: new Date(),
+  createdOn: new Date(),
     };
     isEdit.value = false;
     dialogAddKeyResult.value = true;
@@ -268,6 +274,8 @@ const onSave = async () => {
                 isUserObjectives: true,
                 year: new Date().getFullYear(),
                 period: "Q1",
+                lastProgressUpdate: new Date(),
+                createdOn: new Date(),
             };
             dialogAddKeyResult.value = false;
         } else {
@@ -325,6 +333,8 @@ onMounted(() => {
         isUserObjectives: true,
         year: new Date().getFullYear(),
         period: "Q1",
+        lastProgressUpdate: new Date(),
+        createdOn: new Date(),
     }
   }
 })

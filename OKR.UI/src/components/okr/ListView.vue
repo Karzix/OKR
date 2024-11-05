@@ -120,6 +120,7 @@ import {MoreFilled} from '@element-plus/icons-vue'
 import DetailObjectives from "./DetailObjectives.vue";
 import { id } from "element-plus/es/locales.mjs";
 import Cookies from "js-cookie";
+import type { KeyResult } from "@/Models/KeyResult";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -142,6 +143,11 @@ const customCSS = {
   withEndDate: 200,
 
 }
+const props = defineProps<{
+  searchRequest: SearchRequest;
+}>();
+
+
 const noMore = ref(false);
 const loadingTable = ref(false);
 const dialogDetail = ref(false);
@@ -197,6 +203,7 @@ const onShowDialogDetail = (idObjectives : string, createBy : string = "") =>{
   dialogDetail.value = true;
 }
 onMounted(() => {
+  searchRequest.value = props.searchRequest;
   search();
 });
 defineExpose({ onAddFilterAndSearch });

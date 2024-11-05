@@ -21,7 +21,7 @@
                 <el-tag :type="getTagType(objectives.status)">{{ getStatusText(objectives.status) }}</el-tag>
             </div>
             <div class="keyresults">
-                <ListKeyresult :keyresults="keyresults" :is-create-or-edit="false"/>
+                <ListKeyresult :keyresults="objectives.keyResults" :is-create-or-edit="false" @on-select-key-result="onSelectKeyResult"/>
             </div>
         </div>
         <div class="right">
@@ -53,6 +53,9 @@
             <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
         </el-tabs>
     </div>
+    <el-dialog v-model="showDialogDetailKeyresult">
+        <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect"></DetailKeyresult>
+    </el-dialog>
 </template>
 <script setup lang="ts">
 import { Edit, Share, Delete } from "@element-plus/icons-vue";
@@ -70,6 +73,7 @@ import { formatDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
 import { Filter } from "../maynghien/BaseModels/Filter";
 import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
+import DetailKeyresult from "./Objectives/DetailKeyresult.vue";
 
 
 const props = defineProps<{
@@ -93,31 +97,10 @@ const objectives = ref<Objectives>({
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
 });
-const keyresults = ref<KeyResult[]>([{  
-    id: "1",
-    description: "keyresult 1",
-    currentPoint: 0,
-    status: 1,
-    maximunPoint: 100,
-    deadline: new Date(),
-    unit: 0,
-    active: true,
-    note: "",
-    percentage: 50
-},{
-    id: "2",
-    description: "keyresult 2",
-    currentPoint: 0,
-    status: 1,
-    maximunPoint: 100,
-    deadline: new Date(),
-    unit: 0,
-    active: true,
-    note: "",
-    percentage: 50
-}]);
+const keyresults = ref<KeyResult[]>([]);
 const tabs = ref("comment");
-
+const showDialogDetailKeyresult = ref(false);
+const keyresultIdSelect = ref("");
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
@@ -135,7 +118,10 @@ const getObjectives = async () => {
         objectives.value = res.data.data
     })
 }
-
+const onSelectKeyResult = (item: KeyResult) => {
+    keyresultIdSelect.value = item.id ?? "";
+    showDialogDetailKeyresult.value = true
+}
 
 onMounted(() => {
     getObjectives()

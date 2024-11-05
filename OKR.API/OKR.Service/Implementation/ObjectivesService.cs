@@ -155,7 +155,7 @@ namespace OKR.Service.Implementation
                         {
                             Active = k.Active,
                             CurrentPoint = k.CurrentPoint,
-                            Deadline = k.Deadline,
+                            //Deadline = k.Deadline,
                             Description = k.Description,
                             Id = k.Id,
                             MaximunPoint = k.MaximunPoint,
@@ -254,15 +254,11 @@ namespace OKR.Service.Implementation
                                 break;
                         }
                     }
-                //var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                //if (Filters.Where(x => x.FieldName == "targetType").Count() == 0 || Filters.Where(x => x.FieldName == "targetType").First().Value == "0")
-                //{
-                //    predicate = predicate.And(x => x.TargetType == TargetType.individual);
-                //    if (Filters.Where(x => x.FieldName == "createBy").Count() == 0)
-                //    {
-                //        predicate = predicate.And(x => x.CreatedBy.Equals(userName));
-                //    }
-                //}
+                if (Filters == null || !Filters.Any(f => f.FieldName == "period"))
+                {
+                    var currentQuarterRange = GetCurrentQuarterDateRange();
+                    predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
+                }
                 predicate = predicate.And(x => x.IsDeleted != true);
                 return predicate;
             }
@@ -318,7 +314,7 @@ namespace OKR.Service.Implementation
                         var change = AreKeyResultsEqual(dto, x);
                         if (change)
                         {
-                            x.Deadline = dto.Deadline.Value;
+                            x.Deadline = dto.EndDay.Value;
                             x.IsDeleted = false;
                             x.MaximunPoint = (int)dto.MaximunPoint;
                             x.Percentage = (int)dto.Percentage;
@@ -458,7 +454,7 @@ namespace OKR.Service.Implementation
 
             return dto.Description == entity.Description &&
                    dto.Active == entity.Active &&
-                   dto.Deadline == entity.Deadline &&
+                   dto.EndDay == entity.Deadline &&
                    dto.Unit == entity.Unit &&
                    //dto.CurrentPoint == entity.CurrentPoint &&
                    dto.MaximunPoint == entity.MaximunPoint &&
@@ -477,6 +473,15 @@ namespace OKR.Service.Implementation
                 result.BuildError(ex.Message);
             }
             return result;
+        }
+
+        private (DateTime, DateTime) GetCurrentQuarterDateRange()
+        {
+            var currentDate = DateTime.Now;
+            int currentQuarter = (currentDate.Month - 1) / 3 + 1;
+            DateTime quarterStart = new DateTime(currentDate.Year, (currentQuarter - 1) * 3 + 1, 1);
+            DateTime quarterEnd = quarterStart.AddMonths(3).AddDays(-1);
+            return (quarterStart, quarterEnd);
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div  v-for="item in props.keyresults" :key="item.description" class="keyresult-item">
+    <div  v-for="item in props.keyresults" :key="item.description" class="keyresult-item" @click="emit('onSelectKeyResult', item)">
         <div class="keyresult">
             <el-input-number
                 v-model="item.percentage"
@@ -10,7 +10,7 @@
             <p class="keyresult-title">{{ item.description }} </p>
         </div>
         
-        <el-progress :percentage="(item.currentPoint ?? 0) / (item.maximunPoint ?? 1)" style="width: 150px;min-width: 150px;" class="keyresult-progress"/>
+        <el-progress :percentage="(item.currentPoint ?? 0) / (item.maximunPoint ?? 1) * 100" style="width: 150px;min-width: 150px;" class="keyresult-progress"/>
     </div>
 </template>
 <script setup lang="ts">
@@ -21,6 +21,7 @@ import { getTagType} from '@/Models/EntityObjectives';
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
   (e: "onTurnOffDialog"): void;
+  (e: "onSelectKeyResult", item: KeyResult): void;
 }>();
 const props = defineProps<{
   keyresults: KeyResult[];

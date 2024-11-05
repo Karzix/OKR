@@ -85,6 +85,8 @@ const keyresults = ref<KeyResult>({
   unit: 0,
   active: true,
   note: "",
+  createdOn: new Date(),
+  lastProgressUpdate: new Date(),
 });
 const props = defineProps<{ 
     keyresults: KeyResult,
@@ -113,6 +115,8 @@ onMounted(() => {
       unit: 0,
       active: true,
       note: "",
+      createdOn: new Date(),
+      lastProgressUpdate: new Date(),
     }
   }
   else{

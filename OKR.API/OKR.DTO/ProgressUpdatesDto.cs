@@ -18,5 +18,6 @@ namespace OKR.DTO
         public DateTime? CreateOn { get; set; }
         public string? CreateBy { get; set; }
         public TypeUnitKeyResult? Unit { get; set; }
+        
     }
 }
