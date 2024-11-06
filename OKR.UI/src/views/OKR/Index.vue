@@ -15,7 +15,7 @@
           <el-tag type="info">8 Closed</el-tag>
         </div>
         <div class="actions">
-          <el-button-group class="view-options">
+          <!-- <el-button-group class="view-options">
             <el-button type="primary" size="small" @click="setView('list')"
               >List view</el-button
             >
@@ -23,7 +23,7 @@
               >Feed view</el-button
             >
             
-          </el-button-group>
+          </el-button-group> -->
         </div>
       </div>
     </div>

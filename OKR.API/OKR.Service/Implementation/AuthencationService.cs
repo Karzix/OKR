@@ -61,12 +61,12 @@ namespace OKR.Service.Implementation
                     var newIdentity = new ApplicationUser { UserName = login.UserName, Email = login.Email, EmailConfirmed = true };
                     await _userManager.CreateAsync(newIdentity);
                     await _userManager.AddPasswordAsync(newIdentity, "Abc@123");
-                    if (!(await _roleManager.RoleExistsAsync("superadmin")))
+                    if (!(await _roleManager.RoleExistsAsync("Admin")))
                     {
-                        IdentityRole role = new IdentityRole { Name = "superadmin" };
+                        IdentityRole role = new IdentityRole { Name = "Admin" };
                         await _roleManager.CreateAsync(role);
                     }
-                    await _userManager.AddToRoleAsync(newIdentity, "superadmin");
+                    await _userManager.AddToRoleAsync(newIdentity, "Admin");
                 }
                 if (user != null)
                 {

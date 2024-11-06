@@ -73,7 +73,7 @@ import { formatDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
 import { Filter } from "../maynghien/BaseModels/Filter";
 import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
-import DetailKeyresult from "./Objectives/DetailKeyresult.vue";
+import DetailKeyresult from "./DetailKeyresult.vue";
 
 
 const props = defineProps<{

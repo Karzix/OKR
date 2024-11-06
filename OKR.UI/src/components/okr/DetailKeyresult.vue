@@ -58,9 +58,9 @@
 import { Edit, Share, Delete } from "@element-plus/icons-vue";
 import { onBeforeMount, onMounted, ref } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
-import ListKeyresult from "../Create-Edit/ListKeyresult.vue";
-import ProgressUpdate from "../ProgressUpdate.vue";
-import EvaluateTarget from "../EvaluateTarget/EvaluateTarget.vue";
+import ListKeyresult from "./Create-Edit/ListKeyresult.vue";
+import ProgressUpdate from "./ProgressUpdate.vue";
+import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
 import type { Objectives } from "@/Models/Objective";
 import { TargetType } from "@/Models/Enum/TargetType";
 import { axiosInstance } from "@/Service/axiosConfig";
@@ -70,7 +70,7 @@ import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequ
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { addFilter } from "@/components/maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
-import lineChartKeyresult from "../lineChartKeyresult.vue";
+import lineChartKeyresult from "./lineChartKeyresult.vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 
 
