@@ -24,19 +24,19 @@ namespace OKR.Service.Implementation
         private IHttpContextAccessor _httpContextAccessor;
         private UserManager<ApplicationUser> _userManager;
         private IHttpContextAccessor _contextAccessor;
-        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
+        //private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         private IDepartmentRepository _departmentRepository;
 
         public ProgressUpdatesService(IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository,
             IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor,
-            IDepartmentObjectivesRepository departmentObjectivesRepository, IDepartmentRepository departmentRepository)
+            /*IDepartmentObjectivesRepository departmentObjectivesRepository,*/ IDepartmentRepository departmentRepository)
         {
             _mapper = mapper;
             _progressUpdatesRepository = progressUpdatesRepository;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _contextAccessor = contextAccessor;
-            _departmentObjectivesRepository = departmentObjectivesRepository;
+            //_departmentObjectivesRepository = departmentObjectivesRepository;
             _departmentRepository = departmentRepository;
         }
 
@@ -117,7 +117,7 @@ namespace OKR.Service.Implementation
                                 }
                             case "keyresultId":
                                 {
-                                    predicate = predicate.And(x=>x.KeyResultId.Equals(filter.Value));
+                                    predicate = predicate.And(x=>x.KeyResultId.Equals(Guid.Parse(filter.Value)));
                                     break;
                                 }
                             case "objectivesId":
@@ -150,34 +150,7 @@ namespace OKR.Service.Implementation
         }
         private ExpressionStarter<ProgressUpdates> BuildFilterTargetType(ExpressionStarter<ProgressUpdates> predicate, List<Filter> Filters)
         {
-            var filter = Filters.Where(x => x.FieldName == "targetType").First();
-            var emumN = int.Parse(filter.Value);
-            TargetType targetType = (TargetType)emumN;
-            predicate = predicate.And(x => x.KeyResults.Objectives.TargetType == targetType);
-            if (targetType == TargetType.individual)
-            {
-                return predicate;
-            }
-            var filterUserName = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
-            ApplicationUser user;
-            if (filterUserName != null)
-            {
-                user = _userManager.Users.Where(x => x.UserName == filterUserName.Value).FirstOrDefault();
-            }
-            else
-            {
-                user = _userManager.Users.Where(x => x.UserName == _contextAccessor.HttpContext.User.Identity.Name).FirstOrDefault();
-            }
-            if(user.DepartmentId == null)
-            {
-                throw new Exception("User does not have a department.");
-            }
-            var department = _departmentRepository.GetParentOfChildDepartment(emumN, user.DepartmentId.Value);
-            var departmentObjectiveIds = _departmentObjectivesRepository.AsQueryable()
-                 .Where(doj => doj.DepartmentId == department.Id)
-                 .Select(doj => doj.ObjectivesId);
-
-            predicate = predicate.And(x => departmentObjectiveIds.Contains(x.KeyResults.Objectives.Id));
+           
             
 
             return predicate;

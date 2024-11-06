@@ -65,6 +65,15 @@ namespace OKR.Repository.Implementation
             return result;
         }
 
+        public int caculatePercentObjectivesById(Guid id)
+        {
+            var point = _context.KeyResults
+               .Where(x => x.ObjectivesId.Equals(id) && x.MaximunPoint > 0) // Kiểm tra MaximunPoint > 0
+               .Select(x => ((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+               .Sum();
+            return (int)Math.Round(point);
+        }
+
         public void Edit(Objectives updatedObj, List<KeyResults> updatedKeyResults)
         {
             using (var transaction = _context.Database.BeginTransaction())

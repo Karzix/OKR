@@ -1,4 +1,5 @@
 import { StatusObjectives } from "./EntityObjectives";
+import type { ProgressUpdates } from "./ProgressUpdates";
 import type { Sidequest } from "./Sidequests";
 
 export class KeyResult {
@@ -19,4 +20,6 @@ export class KeyResult {
     createdOn: Date | undefined;
     startDay?: Date;
     endDay?: Date;
+
+  progressUpdates: ProgressUpdates[] = [];
 }

@@ -116,6 +116,8 @@ namespace OKR.Service.Implementation
                     .Where(x=>x.KeyResults.ObjectivesId == ojective.Id).OrderByDescending(x => x.CreatedOn)
                     .Select(x=>x.CreatedOn)
                     .FirstOrDefault();
+                data.Point = _objectiveRepository.caculatePercentObjectivesById(Id);
+
                 result.BuildResult(data);
             }
             catch (Exception ex)
@@ -176,7 +178,10 @@ namespace OKR.Service.Implementation
                         CreatedOn = x.CreatedOn
                     })
                     .ToList();
-
+                foreach (var item in List)
+                {
+                    item.Point = _objectiveRepository.caculatePercentObjectivesById((Guid)item.Id);
+                }
                 var searchUserResult = new SearchResponse<ObjectiveDto>
                 {
                     TotalRows = numOfRecords,

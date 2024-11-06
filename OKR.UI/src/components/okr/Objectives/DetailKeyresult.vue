@@ -13,14 +13,16 @@
             <p class="title">{{ keyresult.description }}</p>
             </div>
             <div class="keyresult-progress">
-                <el-progress :percentage="(keyresult.currentPoint ?? 0) / (keyresult.maximunPoint ?? 1) * 100" color="#6366F1" />
+                <el-progress :percentage="((keyresult.currentPoint ?? 0) / (keyresult.maximunPoint ?? 1) * 100).toFixed(2)"color="#6366F1" />
                 <!-- <p class="progress-caption">The objectives progress is calculated from the key results</p> -->
                  {{ keyresult.currentPoint }} / {{ keyresult.maximunPoint }}
             </div>
+            <div><el-button type="primary" link @click="showDialogUpdateProgress = true">progress update</el-button></div>
             <div class="keyresult-status">
                 <p class="label">Status: </p>
                 <el-tag :type="getTagType(keyresult.status)">{{ getStatusText(keyresult.status) }}</el-tag>
             </div>
+            <lineChartKeyresult :keyResult="keyresult" :key="keyresult.id"></lineChartKeyresult>
         </div>
         <div class="right">
             <div class="right-item">
@@ -47,6 +49,10 @@
             <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
        </el-tabs>
     </div>  
+
+    <el-dialog v-model="showDialogUpdateProgress">
+        <UpdateProgress :keyresults="keyresult" @on-updated-successfully="onUpdatedSuccessfully"></UpdateProgress>
+    </el-dialog>
 </template>
 <script setup lang="ts">
 import { Edit, Share, Delete } from "@element-plus/icons-vue";
@@ -64,6 +70,8 @@ import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequ
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { addFilter } from "@/components/maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
+import lineChartKeyresult from "../lineChartKeyresult.vue";
+import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 
 
 const keyresult =  ref<KeyResult>({
@@ -79,11 +87,16 @@ const keyresult =  ref<KeyResult>({
     percentage: 50,
     createdOn: new Date(),
     lastProgressUpdate: new Date(),
+    progressUpdates:[]
 });
 const tabs = ref('progress');
 const props = defineProps<{
     keyresultId : string;
 }>()
+const showDialogUpdateProgress = ref(false);
+const emit = defineEmits<{
+    (e: "updateData"): void;
+}>();
 const searchRequest = ref<SearchRequest>({
     PageIndex: 1,
     PageSize: 10,
@@ -108,6 +121,11 @@ onBeforeMount(async () => {
     addFilter(searchRequest.value.filters as [],deepCopy(filter));
     await getKeyresult();
 })
+const onUpdatedSuccessfully = (point : number) => {
+    keyresult.value.currentPoint = point;
+    showDialogUpdateProgress.value = false;
+    emit("updateData");
+}
 </script>
 <style scoped>
 .keyresult-progress .progress-caption {

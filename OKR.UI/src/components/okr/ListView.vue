@@ -24,8 +24,8 @@
               <!-- Progress Column -->
               <el-table-column :with="customCSS.withProgress">
                 <template #default="{ row }">
-                  <el-progress :percentage="row.progress" :status="getTagType(row.status)" />
-                  <span class="progress-percentage">{{ row.currentPoint/row.maximunPoint }}%</span>
+                  <el-progress :percentage="(row.currentPoint/row.maximunPoint * 100).toFixed(2)" :status="getTagType(row.status)" />
+                  <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span>
                 </template>
               </el-table-column>
 
@@ -82,7 +82,7 @@
       </el-table-column>
       <el-table-column width="50">
         <template #default="scope">
-          <el-button type="info" link @click="onShowDialogDetail(scope.row.id, scope.row.createdBy)"><el-icon><MoreFilled /></el-icon></el-button>
+          <el-button type="info" link @click="onShowDialogDetail(scope.row)"><el-icon><MoreFilled /></el-icon></el-button>
         </template>
       </el-table-column>
       <template #append>
@@ -96,7 +96,7 @@
     </el-table>
   </div>
   <el-dialog v-model="dialogDetail" width="900px">
-    <DetailObjectives :objectives-id="idObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"></DetailObjectives>
+    <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit" @update:objectives="refreshObjectives"></DetailObjectives>
   </el-dialog>
 </template>
 
@@ -151,7 +151,7 @@ const props = defineProps<{
 const noMore = ref(false);
 const loadingTable = ref(false);
 const dialogDetail = ref(false);
-const idObjectivesSelect = ref<string>("");
+const ObjectivesSelect = ref<Objectives>({} as Objectives);
 const allowEdit = ref(false);
 const search = async () => {
   try{
@@ -192,16 +192,21 @@ const onAddFilterAndSearch = (filter : Filter[]) => {
   searchRequest.value.PageIndex = 1;
   search();
 }
-const onShowDialogDetail = (idObjectives : string, createBy : string = "") =>{
+const onShowDialogDetail = (objective : Objectives) =>{
   allowEdit.value = false;
-  if(createBy && createBy == (Cookies.get("userName")?.toString() ?? "")){
+  ObjectivesSelect.value = objective;
+  if(ObjectivesSelect.value.createdBy && ObjectivesSelect.value.createdBy == (Cookies.get("userName")?.toString() ?? "")){
     allowEdit.value = true;
   }
-
-
-  idObjectivesSelect.value = idObjectives;
+  // idObjectivesSelect.value = idObjectives;
   dialogDetail.value = true;
 }
+const refreshObjectives = (objective: Objectives) => {
+  const index = listObjectivesDisplay.value.findIndex((item) => item.id === objective.id);
+  if (index !== -1) {
+    listObjectivesDisplay.value.splice(index, 1, objective); // Replace the item at the found index
+  }
+};
 onMounted(() => {
   searchRequest.value = props.searchRequest;
   search();

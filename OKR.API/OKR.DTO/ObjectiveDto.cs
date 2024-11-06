@@ -28,5 +28,6 @@ namespace OKR.DTO
         public string? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public DateTime? LastProgressUpdate { get; set; }
+        public int Point {  get; set; }
     }
 }

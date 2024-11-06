@@ -74,8 +74,12 @@ namespace OKR.Service.Implementation
                 progress.KeyResultId = keyresult.Id;
                 progress.OldPoint =keyresult.CurrentPoint;
                 progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
-
+               
                 keyresult.CurrentPoint += (int)request.AddedPoints!;
+                _keyResultRepository.Edit(keyresult);
+                //Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
+                progress.ObjectivesCompletionRate =_objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                _progressUpdatesRepository.Add(progress);
 
                 result.BuildResult(request);
             }
@@ -160,6 +164,9 @@ namespace OKR.Service.Implementation
                     //LastProgressUpdate = _progressUpdatesRepository.FindBy(pr => pr.KeyResultId == Id)
                     //.OrderByDescending(x => x.CreatedOn).Select(x => x.CreatedOn).FirstOrDefault(),
                     //Percentage = x.Percentage,
+                    ObjectivesId = x.ObjectivesId,
+                    Percentage = x.Percentage,
+                    
                     
                 }).First();
                 dto.LastProgressUpdate = _progressUpdatesRepository.AsQueryable()
@@ -168,17 +175,17 @@ namespace OKR.Service.Implementation
                     .FirstOrDefault();
                 //var dto = _mapper.Map<KeyResultDto>(keyresult);
 
-                //dto.ProgressUpdates = _progressUpdatesRepository.AsQueryable().Where(x=>x.KeyResultId == keyresult.Id)
-                //    .Select(x=> new ProgressUpdatesDto
-                //    {
-                //        CreateBy = x.CreatedBy,
-                //        CreateOn = x.CreatedOn,
-                //        Id = x.Id,
-                //        KeyResultId = x.KeyResultId,
-                //        NewPoint = x.NewPoint,
-                //        Note = x.Note,
-                //        OldPoint = x.OldPoint,
-                //    }).ToList();
+                dto.ProgressUpdates = _progressUpdatesRepository.AsQueryable().Where(x => x.KeyResultId == dto.Id).OrderByDescending(x=>x.CreatedOn)
+                    .Select(x => new ProgressUpdatesDto
+                    {
+                        CreateBy = x.CreatedBy,
+                        CreateOn = x.CreatedOn,
+                        Id = x.Id,
+                        KeyResultId = x.KeyResultId,
+                        NewPoint = x.NewPoint,
+                        Note = x.Note,
+                        OldPoint = x.OldPoint,
+                    }).ToList();
 
                 result.BuildResult(dto);
             }

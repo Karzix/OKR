@@ -15,5 +15,6 @@ namespace OKR.Repository.Contract
         Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input);
         int caculateOveralProgress(IQueryable<Objectives> input);
         void Edit(Objectives obj, List<KeyResults> keyResults);
+        int caculatePercentObjectivesById(Guid id);
     }
 }

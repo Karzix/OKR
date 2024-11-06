@@ -13,7 +13,7 @@
             <p class="title">{{ objectives.name }}</p>
             </div>
             <div class="objective-progress">
-                <el-progress :percentage="63" color="#6366F1" />
+                <el-progress :percentage="objectives.point" color="#6366F1" />
                 <p class="progress-caption">The objectives progress is calculated from the key results</p>
             </div>
             <div class="objective-status">
@@ -54,7 +54,7 @@
         </el-tabs>
     </div>
     <el-dialog v-model="showDialogDetailKeyresult">
-        <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect"></DetailKeyresult>
+        <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives"></DetailKeyresult>
     </el-dialog>
 </template>
 <script setup lang="ts">
@@ -77,8 +77,8 @@ import DetailKeyresult from "./Objectives/DetailKeyresult.vue";
 
 
 const props = defineProps<{
-    objectivesId : string;
-    isOwner?: boolean
+    isOwner?: boolean;
+    objectives: Objectives
 }>()
 const objectives = ref<Objectives>({
   id: undefined,
@@ -107,13 +107,15 @@ const searchRequest = ref<SearchRequest>({
   filters: [],
   SortBy: undefined,
 });
-
+const emit = defineEmits<{
+    (e: "update:objectives" , objectives: Objectives): void;
+}>();
 const getObjectives = async () => {
     var filter = new Filter();
     filter.FieldName = "objectivesId";
-    filter.Value = props.objectivesId;
+    filter.Value = props.objectives.id;
     addFilter(searchRequest.value.filters as [],deepCopy(filter));
-    var url = `Objectives/${props.objectivesId}`
+    var url = `Objectives/${props.objectives.id}`
     await axiosInstance.get(url).then((res) => {
         objectives.value = res.data.data
     })
@@ -122,7 +124,10 @@ const onSelectKeyResult = (item: KeyResult) => {
     keyresultIdSelect.value = item.id ?? "";
     showDialogDetailKeyresult.value = true
 }
-
+const refreshObjectives = async () => {
+    await getObjectives(); // Làm mới dữ liệu objectives
+    emit('update:objectives', objectives.value)
+};
 onMounted(() => {
     getObjectives()
 })

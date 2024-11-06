@@ -42,7 +42,7 @@
     </div>
   </div>
   <div class="ListView">
-    <ListView ref="listViewRef"></ListView>
+    <ListView ref="listViewRef" :searchRequest="searchRequest"></ListView>
   </div>
   <el-dialog v-model="dialogCreate">
     <CreateEdit :objectives="objectives"></CreateEdit>
@@ -67,6 +67,7 @@ import { axiosInstance } from "@/Service/axiosConfig";
 import { getDisplayString } from "@/Service/OKR/DisplayPeriod";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
+import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -88,6 +89,8 @@ const objectives = ref<Objectives>({
   isUserObjectives: true,
   year: new Date().getFullYear(),
   period: "Q1",
+  lastProgressUpdate: new Date(),
+  createdOn: new Date(),
 });
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
 const periods = ref<{value: string; label: string}[]>([]);
@@ -172,7 +175,12 @@ const tableColumns = ref<TableColumn[]>([
 const AddFilterAndSearch = (filters: Filter[]) => {
   listViewRef.value?.onAddFilterAndSearch(filters);
 }
-
+const searchRequest = ref<SearchRequest>({
+  PageIndex: 1,
+  PageSize: 10,
+  filters: [],
+  SortBy: undefined,
+})
 
 onBeforeMount(async () => {
   await axiosInstance.get("Objectives/periods").then((res) => {

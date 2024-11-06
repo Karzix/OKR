@@ -10,7 +10,7 @@
             <p class="keyresult-title">{{ item.description }} </p>
         </div>
         
-        <el-progress :percentage="(item.currentPoint ?? 0) / (item.maximunPoint ?? 1) * 100" style="width: 150px;min-width: 150px;" class="keyresult-progress"/>
+        <el-progress :percentage="((item.currentPoint ?? 0) / (item.maximunPoint ?? 1) * 100).toFixed(2)" style="width: 150px;min-width: 150px;" class="keyresult-progress"/>
     </div>
 </template>
 <script setup lang="ts">
