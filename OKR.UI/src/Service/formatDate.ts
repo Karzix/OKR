@@ -12,11 +12,21 @@ export function formatDate(date: any): string {
     return dS;
 }
 export function formatDate_dd_mm_yyyy_hh_mm(date : Date) {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    var typeDate = new Date();
+    if (typeof date === "string") {
+        typeDate = new Date(date);
+    } else if (date instanceof Date) {
+        typeDate = date;
+    } else {
+        console.error("Invalid date format");
+    }
+
+    const day = String(typeDate.getDate()).padStart(2, '0');
+    const month = String(typeDate.getMonth() + 1).padStart(2, '0');
+    const year = typeDate.getFullYear();
+    const hours = String(typeDate.getHours()).padStart(2, '0');
+    const minutes = String(typeDate.getMinutes()).padStart(2, '0');
   
     // Tạo chuỗi định dạng
     return `${day}/${month}/${year} - ${hours}:${minutes}`;

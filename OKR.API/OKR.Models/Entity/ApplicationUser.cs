@@ -15,10 +15,11 @@ namespace OKR.Models.Entity
         [ForeignKey("DepartmentId")]
         public Department? Department { get; set; }
 
-        [ForeignKey("Manager")]
-        public string? ManagerId { get; set; }
-        [ForeignKey("ManagerId")]
-        public ApplicationUser? Manager { get; set; }
+        //[ForeignKey("Manager")]
+        //public string? ManagerId { get; set; }
+        //[ForeignKey("ManagerId")]
+        //public ApplicationUser? Manager { get; set; }
+        public string? ManagerName { get; set; }
 
         ICollection<ApplicationUser>? Employees { get; set; }
     }

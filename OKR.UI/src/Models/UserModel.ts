@@ -8,4 +8,6 @@ export class UserModel {
     refreshToken: string | undefined;
     id: string | undefined;
     departmentName: string = "";
+    departmentId: string = "";
+    managerName: string = "";
 }

@@ -156,11 +156,11 @@ watch(() => props.editItem, () => {
 </script>
 
 <style> 
-.form-dialog {
+/* .form-dialog {
     margin-top: 0 !important;
     margin-right: 0 !important;
     height: 100%;
-}
+} */
 
 .editform .el-select {
     width: 100%;

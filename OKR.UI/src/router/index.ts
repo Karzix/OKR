@@ -8,7 +8,7 @@ import HomePageView from '@/views/HomeView.vue'
 import LoginVue from '@/views/Auth/Login.vue';
 import UserVue from '@/views/User/Index.vue'
 import BranchVue from '@/views/Department/Branch.vue'
-import TeamVue from '@/views/Department/Team.vue'
+import Department from '@/views/Department/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
 import UserInfor from '@/views/OKR/UserInfor.vue'
 import SeeObjectives from '@/views/OKR/SeeObjectives.vue';
@@ -33,14 +33,14 @@ const router = createRouter({
           component: UserVue,
           meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
+        // {
+        //   path: "Branch",
+        //   component: BranchVue,
+        //   meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
+        // },
         {
-          path: "Branch",
-          component: BranchVue,
-          meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
-        },
-        {
-          path: "Team",
-          component: TeamVue,
+          path: "Department",
+          component: Department,
           meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
       ],

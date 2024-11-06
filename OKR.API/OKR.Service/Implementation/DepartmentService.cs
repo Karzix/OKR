@@ -38,7 +38,7 @@ namespace OKR.Service.Implementation
                 var newDeparment = _mapper.Map<Department>(request);
                 newDeparment.Id = Guid.NewGuid();
                 newDeparment.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name;
-                newDeparment.Level = request.ParentDepartmentId == null ? 1 : parentDepartment.First().Level + 1; 
+                newDeparment.Level = 1; 
                 _departmentRepository.Add(newDeparment);
 
                 request.Id = newDeparment.Id;

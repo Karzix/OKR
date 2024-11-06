@@ -43,12 +43,11 @@ import Cookies from "js-cookie";
 
 const props = defineProps<{
   keyresults: KeyResult;
-  UserCreateObjectives: string
+  // UserCreateObjectives: string
 }>();
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "onSaveUpdateProgress"): void;
-  (e: "onUpdateProgress", point: number, keyresultId: string): void;
+  (e: "onUpdatedSuccessfully", point: number): void;
 }>();
 const caculateCrrentPoint = ref(0);
 const Save = async () => {
@@ -57,7 +56,7 @@ const Save = async () => {
     text: "The request is being processed",
     background: "rgba(0, 0, 0, 0.7)",
   });
-  console.log(props.UserCreateObjectives);
+  console.log(props.keyresults.createdBy);
   await axiosInstance.put("KeyResults", props.keyresults).then((res) => {
     if (!res.data.isSuccess) {
       ElMessage.error(res.data.message);
@@ -66,13 +65,11 @@ const Save = async () => {
         ElMessage.success("Your request will be processed when the owner accepts it.");
       }
       else{
-        emit("onSaveUpdateProgress");
         var crpoint = props.keyresults.currentPoint ?? 0;
         var addpoint = props.keyresults.addedPoints ?? 0;
         emit(
-          "onUpdateProgress",
-          (crpoint + addpoint),
-          props.keyresults.id ?? ""
+          "onUpdatedSuccessfully",
+          (crpoint + addpoint)
         );
       }
       
@@ -88,7 +85,7 @@ watch(() => props.keyresults.addedPoints , () => {
 
 const isTheCreator = () : boolean => {
   var userLogin = Cookies.get("userName")?.toString();
-  return userLogin == props.UserCreateObjectives;
+  return userLogin == props.keyresults.createdBy;
 }
 </script>
 <style scoped>

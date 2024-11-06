@@ -12,14 +12,13 @@
             </el-icon>
             <span>User</span>
           </el-col>
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
             <el-icon>
-              <UserFilled />
-              <UserFilled />
+              <Flag />
             </el-icon>
-            <span>Team</span>
+            <span>Department</span>
           </el-col>
-          <el-col
+          <!-- <el-col
             v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])"
             :span="6"
             class="item-menu"
@@ -29,7 +28,7 @@
               <OfficeBuilding />
             </el-icon>
             <span>Branch</span>
-          </el-col>
+          </el-col> -->
           <el-col :span="6" class="layout2-search">
             <el-select
               v-model="searchUsername"
@@ -77,17 +76,16 @@
             </el-icon>
             <span>User</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
+          <el-menu-item index="3" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
-              <UserFilled />
-              <UserFilled />
+              <Flag />
             </el-icon>
             <span>Team</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
+          <!-- <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon><OfficeBuilding /></el-icon>
             <span>Branch</span>
-          </el-menu-item>
+          </el-menu-item> -->
           <el-menu-item index="5" >
             <el-select
               v-model="searchUsername"
@@ -122,6 +120,7 @@ import {
   OfficeBuilding,
   UserFilled,
   Search,
+  Flag,
 } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import Cookies from "js-cookie";

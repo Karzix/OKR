@@ -3,27 +3,49 @@
     <BasicAdminFormVue
       :tableColumns="tableColumns"
       :apiName="'User'"
-      :allowAdd="true"
-      :allowEdit="true"
+      :allowAdd="false"
+      :allowEdit="false"
       :allowDelete="false"
       title="User"
       :CustomActions="CustomActions"
       :changePageSize="false"
+       @onCustomAction="onCustomAction"
     ></BasicAdminFormVue>
   </Suspense>
+  <Create v-if="showDialogCustomCreate" :openDialog="showDialogCustomCreate" @onClose="showDialogCustomCreate = false" :isEdit="isEdit" :User="userSelect"></Create>
 </template>
 <script lang="ts" setup>
 import type { LoginResult } from "@/Models/LoginResult";
+import { UserModel } from "@/Models/UserModel";
 import BasicAdminFormVue from "@/components/maynghien/adminTable/BasicAdminForm.vue";
 import {
   ApiActionType,
   CustomAction,
   CustomActionDataType,
+  CustomActionResponse,
 } from "@/components/maynghien/adminTable/Models/CustomAction";
 import { TableColumn } from "@/components/maynghien/adminTable/Models/TableColumn";
 import Cookies from "js-cookie";
 import { ref } from "vue";
+import Create from "./Create.vue";
 
+
+const CustomActions: CustomAction[] = [
+  {
+    ActionName: "Create",
+    ActionLabel: "Create",
+    ApiActiontype: ApiActionType.PUT,
+    IsRowAction: false,
+    DataType: CustomActionDataType.Filters,
+  },
+  {
+    ActionName: "Edit",
+    ActionLabel: "Edit",
+    ApiActiontype: ApiActionType.PUT,
+    IsRowAction: true,
+    DataType: CustomActionDataType.Filters,
+  }
+];
 const tableColumns: TableColumn[] = [
 {
     key: "id",
@@ -39,34 +61,6 @@ const tableColumns: TableColumn[] = [
     inputType: "text",
     dropdownData: null,
     hiddenElement: true
-  },
-  {
-    key: "userName",
-    label: "Tên Người dùng",
-    width: 1000,
-    sortable: true,
-    enableEdit: true,
-
-    enableCreate: true,
-    required: false,
-    hidden: false,
-    showSearch: true,
-    inputType: "text",
-    dropdownData: null,
-  },
-  {
-    key: "password",
-    label: "Mật Khẩu",
-    width: 1000,
-    sortable: true,
-    enableEdit: false,
-
-    enableCreate: true,
-    required: false,
-    hidden: true,
-    showSearch: false,
-    inputType: "text",
-    dropdownData: null,
   },
   {
     key: "email",
@@ -121,10 +115,10 @@ const tableColumns: TableColumn[] = [
           role: "Teamleader",
           roleName: "Teamleader",
         },
-        {
-          role: "BranchManagement",
-          roleName: "Branch Management",
-        },
+        // {
+        //   role: "BranchManagement",
+        //   roleName: "Branch Management",
+        // },
         {
           role: "Employee",
           roleName: "Employee",
@@ -143,7 +137,7 @@ const tableColumns: TableColumn[] = [
     required: true,
     hidden: true,
     showSearch: true,
-    inputType: "tree",
+    inputType: "dropdown",
     dropdownData: {
       displayMember: "name",
       keyMember: "id",
@@ -165,8 +159,45 @@ const tableColumns: TableColumn[] = [
     dropdownData: null,
     hiddenElement: true
   },
-];
-const CustomActions: CustomAction[] = [
+  {
+    key: "managerName",
+    label: "Manager",
+    width: 1000,
+    sortable: false,
+    enableEdit: false,
 
+    enableCreate: false,
+    required: false,
+    hidden: false,
+    showSearch: false,
+    inputType: "text",
+    dropdownData: null,
+    hiddenElement: true
+  },
 ];
+const showDialogCustomCreate = ref(false);
+const isEdit = ref(false);
+const userSelect = ref<UserModel>({
+  userName: "",
+  password: "",
+  email: "",
+  role: "",
+  token: "",
+  refreshToken: "",
+  id: undefined,
+  departmentName: "",
+  departmentId: "",
+  managerName: "",
+});
+const onCustomAction = (item: CustomActionResponse) => {
+  if(item.Action.ActionName == "Create"){
+    isEdit.value = false;
+    showDialogCustomCreate.value = true;
+  }
+  if(item.Action.ActionName == "Edit"){
+    isEdit.value = true;
+    showDialogCustomCreate.value = true;
+    userSelect.value = item.Data;
+  }
+};
 </script>
