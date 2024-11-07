@@ -2,17 +2,17 @@
   <div class="progress-overview">
     <div class="overall-progress">
       <div class="progress-circle">
-        <el-progress :percentage="63" type="circle" color="#6366F1" />
+        <el-progress :percentage="OverallProgress" type="circle" color="#6366F1" />
       </div>
       <div class="status-info">
         <p class="title">Overall progress</p>
         <p class="subtitle">Set/edit goal weights</p>
         <div class="status-tags">
-          <el-tag>0 No status</el-tag>
-          <el-tag type="success">1 On track</el-tag>
-          <el-tag type="warning">1 At risk</el-tag>
-          <el-tag type="danger">0 Off track</el-tag>
-          <el-tag type="info">8 Closed</el-tag>
+          <el-tag>{{ statusStatistics.noStatus }} No status</el-tag>
+          <el-tag type="success">{{ statusStatistics.onTrack }} On track</el-tag>
+          <el-tag type="warning">{{ statusStatistics.atRisk }} At risk</el-tag>
+          <el-tag type="danger">{{ statusStatistics.offTrack }} Off track</el-tag>
+          <el-tag type="info">{{ statusStatistics.closed }} Closed</el-tag>
         </div>
         <div class="actions">
           <!-- <el-button-group class="view-options">
@@ -27,25 +27,26 @@
         </div>
       </div>
     </div>
-    <div class="btn-add-objectives">
+    <div class="btn-objectives">
+
       <el-button type="primary" @click="dialogCreate = true" :icon="Plus">Add new objective</el-button>
     </div>
     <div class="search">
-      <MnActionPane
+      <!-- <MnActionPane
           :allowAdd="false"
           :tableColumns="tableColumns"
           :isEdit="false"
           @onBtnSearchClicked="AddFilterAndSearch"
           :CustomActions="[]"
           :openDialog="() => {}"
-        />
+        /> -->
     </div>
   </div>
   <div class="ListView">
     <ListView ref="listViewRef" :searchRequest="searchRequest"></ListView>
   </div>
   <el-dialog v-model="dialogCreate">
-    <CreateEdit :objectives="objectives"></CreateEdit>
+    <CreateEdit :objectives="objectives" @updateData="onUpdateData"></CreateEdit>
   </el-dialog>
 
 
@@ -68,6 +69,7 @@ import { getDisplayString } from "@/Service/OKR/DisplayPeriod";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
+import type { StatusStatistics } from "@/Models/StatusStatistics";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -94,84 +96,95 @@ const objectives = ref<Objectives>({
 });
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
 const periods = ref<{value: string; label: string}[]>([]);
-const tableColumns = ref<TableColumn[]>([
-  {
-    key: "period",
-    label: "Period",
-    width: 1000,
-    sortable: true,
-    enableEdit: true,
-    enableCreate: true,
-    required: false,
-    hidden: false,
-    showSearch: true,
-    inputType: "dropdown",
-    dropdownData: {
-      displayMember: "label",
-      keyMember: "value",
-      data: periods.value
-    },
-  },
-  {
-    key: "status",
-    label: "Status",
-    width: 1000,
-    sortable: true,
-    enableEdit: true,
-    enableCreate: true,
-    required: false,
-    hidden: false,
-    showSearch: true,
-    inputType: "dropdown",
-    dropdownData: {
-      displayMember: "name",
-      keyMember: "value",
-      data: [{
-        value: "0",
-        name: "No Status",
-      },{
-        value: "1",
-        name: "On Track",
-      },{
-        value: "2",
-        name: "At Risk",
-      },{
-        value: "3",
-        name: "Off Track",
-      },{
-        value: "2",
-        name: "Closed",
-      }],
-    },
-  },{
-    key: "targetType",
-    label: "Type",
-    width: 1000,
-    sortable: true,
-    enableEdit: true,
-    enableCreate: true,
-    required: false,
-    hidden: false,
-    showSearch: true,
-    inputType: "dropdown",
-    dropdownData: {
-      displayMember: "label",
-      keyMember: "value",
-      data: [{
-        value: "0",
-        label: "Individual",
-      },{
-        value: "1",
-        label: "Department",
-      },{
-        value: "2",
-        label: "Company",
-      }
+const statusStatistics = ref<StatusStatistics>({
+  onTrack: 0,
+  atRisk: 0,
+  offTrack: 0,
+  closed: 0,
+  total: 0,
+  noStatus: 0
+});
+const OverallProgress = ref(0);
 
-      ],
-    },
-  },
-]);
+// const tableColumns = ref<TableColumn[]>([
+//   {
+//     key: "period",
+//     label: "Period",
+//     width: 1000,
+//     sortable: true,
+//     enableEdit: true,
+//     enableCreate: true,
+//     required: false,
+//     hidden: false,
+//     showSearch: true,
+//     inputType: "dropdown",
+//     dropdownData: {
+//       displayMember: "label",
+//       keyMember: "value",
+//       data: periods.value
+//     },
+//   },
+//   {
+//     key: "status",
+//     label: "Status",
+//     width: 1000,
+//     sortable: true,
+//     enableEdit: true,
+//     enableCreate: true,
+//     required: false,
+//     hidden: false,
+//     showSearch: true,
+//     inputType: "dropdown",
+//     dropdownData: {
+//       displayMember: "name",
+//       keyMember: "value",
+//       data: [{
+//         value: "0",
+//         name: "No Status",
+//       },{
+//         value: "1",
+//         name: "On Track",
+//       },{
+//         value: "2",
+//         name: "At Risk",
+//       },{
+//         value: "3",
+//         name: "Off Track",
+//       },{
+//         value: "2",
+//         name: "Closed",
+//       }],
+//     },
+//   },
+//   // {
+//   //   key: "targetType",
+//   //   label: "Type",
+//   //   width: 1000,
+//   //   sortable: true,
+//   //   enableEdit: true,
+//   //   enableCreate: true,
+//   //   required: false,
+//   //   hidden: false,
+//   //   showSearch: true,
+//   //   inputType: "dropdown",
+//   //   dropdownData: {
+//   //     displayMember: "label",
+//   //     keyMember: "value",
+//   //     data: [{
+//   //       value: "0",
+//   //       label: "Individual",
+//   //     },{
+//   //       value: "1",
+//   //       label: "Department",
+//   //     },{
+//   //       value: "2",
+//   //       label: "Company",
+//   //     }
+
+//   //     ],
+//   //   },
+//   // },
+// ]);
 const AddFilterAndSearch = (filters: Filter[]) => {
   listViewRef.value?.onAddFilterAndSearch(filters);
 }
@@ -181,7 +194,21 @@ const searchRequest = ref<SearchRequest>({
   filters: [],
   SortBy: undefined,
 })
-
+const getStatusStatistics = async () => {
+  await axiosInstance.post("Objectives/statusStatistics",searchRequest.value).then((res) => {
+    var result = res.data as AppResponse<StatusStatistics>;
+      if (result.data) {
+        statusStatistics.value = result.data;
+      }
+  })
+}
+const getOverallProgress = async () => {
+  var responeOverallProgress = await axiosInstance.post(
+    "Objectives/overal-progress",
+    searchRequest.value
+  );
+  OverallProgress.value = responeOverallProgress.data.data;
+}
 onBeforeMount(async () => {
   await axiosInstance.get("Objectives/periods").then((res) => {
     var result = res.data as AppResponse<string[]>;
@@ -189,7 +216,13 @@ onBeforeMount(async () => {
       periods.value.push({value: element, label: getDisplayString(element)})
     })
   })
+  getStatusStatistics()
+  getOverallProgress()
 })
+
+const onUpdateData = async () => {
+  listViewRef.value?.ReLoad();
+}
 </script>
 
 <style scoped>
@@ -260,7 +293,7 @@ onBeforeMount(async () => {
     box-shadow: 5px 5px 5px 5px #00000080;
     border-radius: 6px;
 }
-.btn-add-objectives{
+.btn-objectives{
   position: absolute;
   top: 0;
   right: 0;

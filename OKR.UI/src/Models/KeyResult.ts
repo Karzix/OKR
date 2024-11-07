@@ -21,5 +21,5 @@ export class KeyResult {
     startDay?: Date;
     endDay?: Date;
 
-  progressUpdates: ProgressUpdates[] = [];
+  progressUpdates: ProgressUpdates[] | undefined;
 }

@@ -24,8 +24,8 @@
               <!-- Progress Column -->
               <el-table-column :with="customCSS.withProgress">
                 <template #default="{ row }">
-                  <el-progress :percentage="(row.currentPoint/row.maximunPoint * 100).toFixed(2)" :status="getTagType(row.status)" />
-                  <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span>
+                  <el-progress :percentage="(row.currentPoint/row.maximunPoint * 100).toFixed(2)" :color="getStatusColor(row.status)" />
+                  <!-- <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span> -->
                 </template>
               </el-table-column>
 
@@ -62,8 +62,8 @@
 
       <el-table-column label="Progress"  :with="customCSS.withProgress">
         <template #default="{ row }">
-          <el-progress :percentage="row.point" :status="getTagType(row.status)" />
-          <span class="progress-percentage">{{ row.point }}%</span>
+          <el-progress :percentage="row.point" :color="getStatusColor(row.status)" />
+          <!-- <span class="progress-percentage">{{ row.point }}%</span> -->
         </template>
       </el-table-column>
 
@@ -96,7 +96,8 @@
     </el-table>
   </div>
   <el-dialog v-model="dialogDetail" width="900px">
-    <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit" @update:objectives="refreshObjectives"></DetailObjectives>
+    <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"
+     @update:objectives="refreshObjectives" @delete:objectives="onDelete"></DetailObjectives>
   </el-dialog>
 </template>
 
@@ -105,11 +106,11 @@ import { onMounted, ref } from "vue";
 import { EntityObjectives, StatusObjectives } from "@/Models/EntityObjectives";
 import { SearchResponse } from "../../components/maynghien/BaseModels/SearchResponse";
 import { formatDate } from "../../Service/formatDate";
-import { getStatusText, getTagType} from "@/Models/EntityObjectives"
+import { getStatusText, getTagType, getStatusColor} from "@/Models/EntityObjectives"
 import CustomIconTargetType from "../icons/CustomIconTargetType.vue";
 import { SearchRequest } from "../maynghien/BaseModels/SearchRequest";
 import { axiosInstance } from "@/Service/axiosConfig";
-import type { Objectives } from "@/Models/Objective";
+import { Objectives } from "@/Models/Objective";
 import type { AppResponse } from "../maynghien/BaseModels/AppResponse";
 import { getDisplayString } from "@/Service/OKR/DisplayPeriod";
 import { Filter } from "../maynghien/BaseModels/Filter";
@@ -204,14 +205,24 @@ const onShowDialogDetail = (objective : Objectives) =>{
 const refreshObjectives = (objective: Objectives) => {
   const index = listObjectivesDisplay.value.findIndex((item) => item.id === objective.id);
   if (index !== -1) {
-    listObjectivesDisplay.value.splice(index, 1, objective); // Replace the item at the found index
+    listObjectivesDisplay.value.splice(index, 1, objective); 
   }
 };
+const onDelete = (Objectives : Objectives) => {
+  const index = listObjectivesDisplay.value.findIndex((item) => item.id === Objectives.id);
+  if (index !== -1) {
+    listObjectivesDisplay.value.splice(index, 1); 
+  }
+}
 onMounted(() => {
   searchRequest.value = props.searchRequest;
   search();
 });
-defineExpose({ onAddFilterAndSearch });
+const ReLoad = () => {
+  searchRequest.value.PageIndex = 1;
+  search();
+}
+defineExpose({ onAddFilterAndSearch, ReLoad });
 </script>
 
 <style scoped>

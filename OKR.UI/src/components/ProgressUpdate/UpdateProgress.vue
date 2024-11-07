@@ -57,7 +57,19 @@ const Save = async () => {
     background: "rgba(0, 0, 0, 0.7)",
   });
   console.log(props.keyresults.createdBy);
-  await axiosInstance.put("KeyResults", props.keyresults).then((res) => {
+  try{
+    var k = new KeyResult();
+    k.id = props.keyresults.id;
+    k.addedPoints = props.keyresults.addedPoints;
+    k.objectivesId = props.keyresults.objectivesId;
+    k.currentPoint = props.keyresults.currentPoint;
+    k.maximunPoint = props.keyresults.maximunPoint;
+    k.note = props.keyresults.note;
+    k.progressUpdates = undefined;
+    k.description = props.keyresults.description;
+
+    console.log(k);
+    await axiosInstance.put("KeyResults", k).then((res) => {
     if (!res.data.isSuccess) {
       ElMessage.error(res.data.message);
     } else {
@@ -75,6 +87,10 @@ const Save = async () => {
       
     }
   });
+  }
+  catch(e){
+    console.error(e);
+  }
   loading.close();
 };
 watch(() => props.keyresults.addedPoints , () => {

@@ -38,17 +38,17 @@ namespace OKR.API.Controllers
         [HttpPost]
         [Route("search")]
         [AllowAnonymous]
-        public IActionResult Search(SearchRequest request)
+        public async Task<IActionResult> Search(SearchRequest request)
         {
-            var result = _objectiveService.Search(request);
+            var result = await _objectiveService.Search(request);
             return Ok(result);
         }
         [HttpPost]
         [Route("overal-progress")]
         [AllowAnonymous]
-        public IActionResult OverallProgress(SearchRequest request)
+        public async Task<IActionResult> OverallProgress(SearchRequest request)
         {
-            var result = _objectiveService.CaculateOveralProgress(request);
+            var result = await _objectiveService.CaculateOveralProgress(request);
             return Ok(result);
         }
         [HttpPut]
@@ -69,6 +69,13 @@ namespace OKR.API.Controllers
         public IActionResult GetPeriod()
         {
             var result= _objectiveService.GetPeriods();
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("statusStatistics")]
+        public async Task<IActionResult> GetStatusStatistics(SearchRequest request)
+        {
+            var result = await _objectiveService.StatusStatistics(request);
             return Ok(result);
         }
     }

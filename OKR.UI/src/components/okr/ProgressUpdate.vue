@@ -17,11 +17,11 @@
           </div>
         </el-card>
       </li>
+      <p v-if="loading" class="loading-av"><el-icon class="spinning-icon"><Loading /></el-icon></p>
+      <p v-if="noMore" class="no-more-text">No more items</p>
     </ul>
-    <div v-if="!noMore" class="load-more">
-      <el-button @click="searchProgressUpdate" :loading="loading" type="primary">Show more...</el-button>
-    </div>
-    <p v-if="noMore" class="no-more-text">No more items</p>
+    <el-button v-if="!noMore" @click="searchProgressUpdate" :loading="loading" type="primary" link>Show more...</el-button>
+    <!-- <p v-if="noMore" class="no-more-text">No more items</p> -->
   </div>
 </template>
 
@@ -36,6 +36,7 @@ import { Right } from "@element-plus/icons-vue";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
 import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
+import { Loading } from "@element-plus/icons-vue";
 
 const route = useRoute();
 const loading = ref(false);

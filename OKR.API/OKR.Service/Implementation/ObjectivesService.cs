@@ -127,12 +127,12 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<SearchResponse<ObjectiveDto>> Search(SearchRequest request)
+        public async Task<AppResponse<SearchResponse<ObjectiveDto>>> Search(SearchRequest request)
         {
             var result = new AppResponse<SearchResponse<ObjectiveDto>>();
             try
             {
-                var query =  BuildFilterExpression(request.Filters);
+                var query = await  BuildFilterExpression(request.Filters);
                 var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
                 var model = _objectiveRepository.FindByPredicate(query);
                 if (request.SortBy != null)
@@ -162,7 +162,7 @@ namespace OKR.Service.Implementation
                             Id = k.Id,
                             MaximunPoint = k.MaximunPoint,
                             Unit = k.Unit,
-                            Status = x.status
+                            Status = k.Status
                         }).ToList(),
                         //Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
                         ApplicationUserId = x.ApplicationUserId,
@@ -197,7 +197,7 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
-        private ExpressionStarter<Objectives> BuildFilterExpression(List<Filter> Filters)
+        private async Task<ExpressionStarter<Objectives>> BuildFilterExpression(List<Filter> Filters)
         {
             try
             {
@@ -255,6 +255,16 @@ namespace OKR.Service.Implementation
                                         (m.StartDay <= quarterEnd && m.EndDay >= quarterStart));
                                     break;
                                 }
+                            case "name":
+                                {
+                                    predicate = predicate.And(x=>x.Name.Contains(filter.Value));
+                                    break;
+                                }
+                            case "userName":
+                                {
+                                    predicate = await BuildFilterUserName(predicate, filter.Value);
+                                    break;
+                                }
                             default:
                                 break;
                         }
@@ -264,7 +274,7 @@ namespace OKR.Service.Implementation
                     var currentQuarterRange = GetCurrentQuarterDateRange();
                     predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
                 }
-                predicate = predicate.And(x => x.IsDeleted != true);
+                predicate = await AddDefaultConditions(predicate);
                 return predicate;
             }
             catch (Exception)
@@ -273,14 +283,14 @@ namespace OKR.Service.Implementation
             }
         }
 
-        public AppResponse<int> CaculateOveralProgress(SearchRequest request)
+        public async Task<AppResponse<int>> CaculateOveralProgress(SearchRequest request)
         {
             var result = new AppResponse<int>();
             try
             {
-                var filter = request.Filters.Where(x=>x.FieldName == "targetType").First();
-                TargetType targetType = (TargetType)int.Parse(filter.Value);
-                var query = BuildFilterExpression(request.Filters);
+                //var filter = request.Filters.Where(x=>x.FieldName == "targetType").First();
+                //TargetType targetType = (TargetType)int.Parse(filter.Value);
+                var query = await BuildFilterExpression(request.Filters);
                 var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
                 var model = _objectiveRepository.FindByPredicate(query);
                
@@ -303,8 +313,8 @@ namespace OKR.Service.Implementation
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
-                var objecticves = _objectiveRepository.FindBy(x=>x.Id == request.Id).Include(x=>x.KeyResults).First();
-                var keyresults = objecticves.KeyResults.ToList();
+                var objectives = _objectiveRepository.FindBy(x=>x.Id == request.Id).First();
+                var keyresults = _keyResultRepository.FindBy(x=>x.ObjectivesId == objectives.Id).ToList();
                 //edit
                 keyresults.ForEach(x =>
                 {
@@ -317,28 +327,39 @@ namespace OKR.Service.Implementation
                     else
                     {
                         var change = AreKeyResultsEqual(dto, x);
-                        if (change)
+                        if (!change)
                         {
-                            x.Deadline = dto.EndDay.Value;
+                            //x.Deadline = dto.EndDay.Value;
                             x.IsDeleted = false;
                             x.MaximunPoint = (int)dto.MaximunPoint;
                             x.Percentage = (int)dto.Percentage;
                             x.Modifiedby = userName;
                             x.ModifiedOn = DateTime.UtcNow;
+                            x.Status = dto.Status;
+                            x.Description = dto.Description;
                         }
                     }
                     
                 });
                 //create 
+                var listNewKeyresult = new List<KeyResults>();
                 var newKeyresults = request.KeyResults.Where(x=>x.Id == null).ToList();
                 newKeyresults.ForEach(x =>
                 {
                     var newkeyresult = _mapper.Map<KeyResults>(x);
                     newkeyresult.Id = Guid.NewGuid();
                     newkeyresult.CreatedBy = userName;
-                    keyresults.Add(newkeyresult);
+                    newkeyresult.ObjectivesId = objectives.Id;
+                    listNewKeyresult.Add(newkeyresult);
                 });
-                _objectiveRepository.Edit(objecticves, keyresults);
+                objectives.Name = request.Name;
+                objectives.TargetType = request.TargetType;
+                objectives.Period = request.Period;
+                var Day = GetDateRange(request.Period + ":" + request.Year);
+                objectives.StartDay = Day.StartDate;
+                objectives.EndDay = Day.EndDate;
+                objectives.status = request.status;
+                _objectiveRepository.Edit(objectives, keyresults, listNewKeyresult);
                 result.BuildResult(request);
 
             }
@@ -348,7 +369,30 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
-
+        public async Task<AppResponse<StatusStatistics>> StatusStatistics(SearchRequest request)
+        {
+            var result = new AppResponse<StatusStatistics>();
+            try
+            {
+                var expression = await BuildFilterExpression(request.Filters);
+                var query = _objectiveRepository.FindByPredicate(expression);
+                var data = new StatusStatistics
+                {
+                    atRisk = query.Where(x => x.status == StatusObjectives.atRisk).Count(),
+                    closed = query.Where(x=>x.status == StatusObjectives.closed).Count(),
+                    noStatus = query.Where(x=>x.status == StatusObjectives.noStatus).Count(),
+                    offTrack = query.Where(x=>x.status == StatusObjectives.offTrack).Count(),
+                    onTrack = query.Where(x=>x.status == StatusObjectives.onTrack).Count(),
+                    total = query.Count(),
+                };
+                result.BuildResult(data);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
+        }
         private ExpressionStarter<Objectives> BuildFilterTargetType(ExpressionStarter<Objectives> predicate, List<Filter> Filters)
         {
             var filter = Filters.Where(x => x.FieldName == "targetType").First();
@@ -450,20 +494,12 @@ namespace OKR.Service.Implementation
             return (startDate, endDate);
         }
 
-        private bool AreKeyResultsEqual(KeyResultDto dto, KeyResults entity)
+      
+        public async Task<ApplicationUser> CurrentUser()
         {
-            if (dto == null || entity == null)
-            {
-                return false;
-            }
-
-            return dto.Description == entity.Description &&
-                   dto.Active == entity.Active &&
-                   dto.EndDay == entity.Deadline &&
-                   dto.Unit == entity.Unit &&
-                   //dto.CurrentPoint == entity.CurrentPoint &&
-                   dto.MaximunPoint == entity.MaximunPoint &&
-                   dto.Percentage == entity.Percentage; 
+            var user = new ApplicationUser();
+            user = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
+            return user;
         }
         public AppResponse<List<string>> GetPeriods()
         {
@@ -479,7 +515,22 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
+        private bool AreKeyResultsEqual(KeyResultDto dto, KeyResults entity)
+        {
+            if (dto == null || entity == null)
+            {
+                return false;
+            }
 
+            return dto.Description == entity.Description &&
+                   dto.Active == entity.Active &&
+                   dto.EndDay == entity.Deadline &&
+                   dto.Unit == entity.Unit &&
+                   //dto.CurrentPoint == entity.CurrentPoint &&
+                   dto.MaximunPoint == entity.MaximunPoint &&
+                   dto.Percentage == entity.Percentage &&
+                   dto.Status == entity.Status;
+        }
         private (DateTime, DateTime) GetCurrentQuarterDateRange()
         {
             var currentDate = DateTime.Now;
@@ -487,6 +538,22 @@ namespace OKR.Service.Implementation
             DateTime quarterStart = new DateTime(currentDate.Year, (currentQuarter - 1) * 3 + 1, 1);
             DateTime quarterEnd = quarterStart.AddMonths(3).AddDays(-1);
             return (quarterStart, quarterEnd);
+        }
+
+        private async Task<ExpressionStarter<Objectives>> BuildFilterUserName(ExpressionStarter<Objectives> predicate, string userName)
+        {
+            var User = await _userManager.FindByNameAsync(userName);
+            predicate = predicate.And(x => x.ApplicationUserId == User.Id 
+                || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
+
+            return predicate;
+        }
+        private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate)
+        {
+            predicate = predicate.And(x=>x.IsDeleted != true);
+            var currentUser = await CurrentUser();
+            predicate = predicate.And(x => x.CreatedBy == currentUser.UserName || x.IsPublic == true);
+            return predicate;
         }
     }
 }

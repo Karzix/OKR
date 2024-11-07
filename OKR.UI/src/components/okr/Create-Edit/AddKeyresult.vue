@@ -31,6 +31,7 @@
                 v-model="keyresults.unit"
                 placeholder="Select"
                 class="form-input"
+                 @change="handleUnitChange"
             >
                 <el-option
                 v-for="item in [
@@ -56,11 +57,11 @@
 
   </div>
   <div class="btn-Save">
-    <el-button type="primary" @click="AddKeyresult">Save</el-button>
+    <el-button type="primary" @click="AddSave">Save</el-button>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onBeforeMount, onMounted, ref, watch } from "vue";
 import { Objectives } from "@/Models/Objective";
 import { TargetType } from "@/Models/Enum/TargetType";
 import {
@@ -81,12 +82,13 @@ const keyresults = ref<KeyResult>({
   currentPoint: 0,
   status: StatusObjectives.noStatus,
   maximunPoint: 100,
-  deadline: new Date(),
-  unit: 0,
+  endDay: new Date(),
+  unit: 1,
   active: true,
   note: "",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
+  progressUpdates:[]
 });
 const props = defineProps<{ 
     keyresults: KeyResult,
@@ -95,6 +97,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
+  (e: "onEditItem", item: KeyResult): void;
 }>();
 const statusOptions = Object.values(StatusObjectives)
   .filter(value => typeof value === 'number')
@@ -103,7 +106,7 @@ const statusOptions = Object.values(StatusObjectives)
     text: getStatusText(value as StatusObjectives),
   }));
 
-onMounted(() => {
+onBeforeMount(() => {
   if(!props.isEdit){
     keyresults.value = {
       id: undefined,
@@ -111,27 +114,40 @@ onMounted(() => {
       currentPoint: 0,
       status: StatusObjectives.noStatus,
       maximunPoint: 100,
-      deadline: new Date(),
+      endDay: new Date(),
       unit: 0,
       active: true,
       note: "",
       createdOn: new Date(),
       lastProgressUpdate: new Date(),
+      progressUpdates:[]
     }
   }
   else{
     keyresults.value = props.keyresults
   }
 });
-const AddKeyresult = () => {
-  emit("onAddItem", deepCopy(keyresults.value));
+const AddSave = () => {
+  if(props.isEdit){
+    emit("onEditItem", deepCopy(keyresults.value));
+  }
+  else{
+    emit("onAddItem", deepCopy(keyresults.value));
+  }
+  
 }
 
 watch(() => keyresults.value.unit, () => {
 //   console.log(keyresults.value);
+  if(keyresults.value.unit == 0 && !props.isEdit){
     keyresults.value.maximunPoint = 100;
     keyresults.value.currentPoint = 0;
-}, { immediate: true })
+  }
+})
+const handleUnitChange = () => {
+    keyresults.value.maximunPoint = 100;
+    keyresults.value.currentPoint = 0;
+}
 </script>
 <style scope>
 .form-item{

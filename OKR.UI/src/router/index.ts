@@ -67,7 +67,7 @@ const router = createRouter({
           meta: { requiresAuth: true},
         },
         {
-          path: "Objectives=:EntityObjectiveId&:targetTpye",
+          path: "Objectives=:ObjectiveId",
           component: SeeObjectives,
           meta: { requiresAuth: true},
         },

@@ -4,9 +4,9 @@
             <div class="left-header">
                 <p class="user-name">{{ objectives.createdBy }}</p>
                 <el-button-group class="ml-4">
-                    <el-button type="primary" :icon="Edit" v-if="isOwner"/>
-                    <el-button type="primary" :icon="Share" />
-                    <el-button type="primary" :icon="Delete" v-if="isOwner"/>
+                    <el-button type="primary" :icon="Edit" v-if="isOwner" @click="onEdit"/>
+                    <el-button type="primary" :icon="Share" @click="copyLinkShare" />
+                    <el-button type="primary" :icon="Delete" v-if="isOwner" @click="onDelete"/>
                 </el-button-group>
             </div>
             <div>
@@ -56,6 +56,9 @@
     <el-dialog v-model="showDialogDetailKeyresult">
         <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives"></DetailKeyresult>
     </el-dialog>
+    <el-dialog v-model="showDialogEdit">
+        <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
+    </el-dialog>   
 </template>
 <script setup lang="ts">
 import { Edit, Share, Delete } from "@element-plus/icons-vue";
@@ -67,13 +70,14 @@ import ProgressUpdate from "./ProgressUpdate.vue";
 import EvaluateTarget from "./EvaluateTarget/EvaluateTarget.vue";
 import type { Objectives } from "@/Models/Objective";
 import { TargetType } from "@/Models/Enum/TargetType";
-import { axiosInstance } from "@/Service/axiosConfig";
+import { axiosInstance, urlUI } from "@/Service/axiosConfig";
 import { getTagType,getStatusText } from "@/Models/EntityObjectives";
-import { formatDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
+import { formatDate, formatDate_dd_mm_yyyy_hh_mm, RecalculateTheDate } from "@/Service/formatDate";
 import { Filter } from "../maynghien/BaseModels/Filter";
 import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import DetailKeyresult from "./DetailKeyresult.vue";
+import CreateEditObjectives from "./Create-Edit/Create.vue";
 
 
 const props = defineProps<{
@@ -101,6 +105,7 @@ const keyresults = ref<KeyResult[]>([]);
 const tabs = ref("comment");
 const showDialogDetailKeyresult = ref(false);
 const keyresultIdSelect = ref("");
+const showDialogEdit = ref(false);
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
@@ -109,6 +114,7 @@ const searchRequest = ref<SearchRequest>({
 });
 const emit = defineEmits<{
     (e: "update:objectives" , objectives: Objectives): void;
+    (e: "delete:objectives" , objectives: Objectives): void;
 }>();
 const getObjectives = async () => {
     var filter = new Filter();
@@ -118,6 +124,10 @@ const getObjectives = async () => {
     var url = `Objectives/${props.objectives.id}`
     await axiosInstance.get(url).then((res) => {
         objectives.value = res.data.data
+        objectives.value.createdOn = RecalculateTheDate(objectives.value.createdOn);
+        objectives.value.lastProgressUpdate = RecalculateTheDate(objectives.value.lastProgressUpdate);
+        objectives.value.startDay = RecalculateTheDate(objectives.value.startDay);
+        objectives.value.endDay = RecalculateTheDate(objectives.value.endDay);
     })
 }
 const onSelectKeyResult = (item: KeyResult) => {
@@ -128,6 +138,18 @@ const refreshObjectives = async () => {
     await getObjectives(); // Làm mới dữ liệu objectives
     emit('update:objectives', objectives.value)
 };
+
+const copyLinkShare = () =>{
+    navigator.clipboard.writeText(urlUI + "Objectives=" + props.objectives.id);
+}
+const onDelete = () => {
+    axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
+        emit('delete:objectives', objectives.value)
+    })
+}
+const onEdit = () => {
+    showDialogEdit.value = true
+}
 onMounted(() => {
     getObjectives()
 })

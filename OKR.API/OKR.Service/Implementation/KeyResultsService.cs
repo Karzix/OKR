@@ -56,10 +56,10 @@ namespace OKR.Service.Implementation
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var now = DateTime.UtcNow;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
-                if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
-                {
-                    return result.BuildError("current point is invalid");
-                }
+                //if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
+                //{
+                //    return result.BuildError("current point is invalid");
+                //}
                 var objectivesAsQueryable = _objectivesRepository.AsQueryable().Where(x=>x.Id == request.ObjectivesId);
                 if(!objectivesAsQueryable.Any())
                 {
@@ -93,18 +93,18 @@ namespace OKR.Service.Implementation
         private string GetUpdateString(KeyResultDto NewKeyResult, KeyResults CurKeyResults)
         {
             string content = _contextAccessor.HttpContext.User.Identity.Name + " ";
-            if(NewKeyResult.Description != CurKeyResults.Description)
-            {
-                content += "update keyresults name from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
-            }
+            //if(NewKeyResult.Description != CurKeyResults.Description)
+            //{
+            //    content += "update keyresults name from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
+            //}
             if ((CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints) != CurKeyResults.CurrentPoint)
             {
                 content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + (CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints)+ "; ";
             }
-            if(NewKeyResult.EndDay != CurKeyResults.Deadline)
-            {
-                content += "update deadline from " + CurKeyResults.Deadline.ToString("dd/MM/yyyy") + " to " + NewKeyResult.EndDay.Value.ToString("dd/MM/yyyy") + "; ";
-            }
+            //if(NewKeyResult.EndDay != CurKeyResults.Deadline)
+            //{
+            //    content += "update deadline from " + CurKeyResults.Deadline.ToString("dd/MM/yyyy") + " to " + NewKeyResult.EndDay.Value.ToString("dd/MM/yyyy") + "; ";
+            //}
             return content;
         }
 

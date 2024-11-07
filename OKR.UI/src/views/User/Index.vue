@@ -12,7 +12,7 @@
        @onCustomAction="onCustomAction"
     ></BasicAdminFormVue>
   </Suspense>
-  <Create v-if="showDialogCustomCreate" :openDialog="showDialogCustomCreate" @onClose="showDialogCustomCreate = false" :isEdit="isEdit" :User="userSelect"></Create>
+  <Create v-if="showDialogCustomCreate" :openDialog="showDialogCustomCreate" @onClose="onClose()" :isEdit="isEdit" :User="userSelect"></Create>
 </template>
 <script lang="ts" setup>
 import type { LoginResult } from "@/Models/LoginResult";
@@ -189,6 +189,7 @@ const userSelect = ref<UserModel>({
   departmentId: "",
   managerName: "",
 });
+const basicAdminFormRef = ref<InstanceType<typeof BasicAdminFormVue> | null>(null);
 const onCustomAction = (item: CustomActionResponse) => {
   if(item.Action.ActionName == "Create"){
     isEdit.value = false;
@@ -200,4 +201,8 @@ const onCustomAction = (item: CustomActionResponse) => {
     userSelect.value = item.Data;
   }
 };
+const onClose = () => {
+  basicAdminFormRef.value?.Search();
+  showDialogCustomCreate.value = false;
+}
 </script>

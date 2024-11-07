@@ -1,22 +1,34 @@
 <template>
-    <div  v-for="item in props.keyresults" :key="item.description" class="keyresult-item" @click="emit('onSelectKeyResult', item)">
-        <div class="keyresult">
-            <el-input-number
-                v-model="item.percentage"
-                :controls="false"
-                style="width: 55px; min-width: 55px !important;"
-                :disabled="!props.isCreateOrEdit"
-            />
-            <p class="keyresult-title">{{ item.description }} </p>
-        </div>
-        
-        <el-progress :percentage="((item.currentPoint ?? 0) / (item.maximunPoint ?? 1) * 100).toFixed(2)" style="width: 150px;min-width: 150px;" class="keyresult-progress"/>
+  <div
+    v-for="item in props.keyresults"
+    :key="item.description"
+    class="keyresult-item"
+    @click="emit('onSelectKeyResult', item)"
+  >
+    <div class="keyresult">
+      <el-input-number
+        v-model="item.percentage"
+        :controls="false"
+        style="width: 55px; min-width: 55px !important"
+        :disabled="!props.isCreateOrEdit"
+      />
+      <p class="keyresult-title">{{ item.description }}</p>
     </div>
+
+    <el-progress
+      :percentage="
+        (((item.currentPoint ?? 0) / (item.maximunPoint ?? 1)) * 100).toFixed(2)
+      "
+      :color="getStatusColor(item.status)"
+      style="width: 150px; min-width: 150px"
+      class="keyresult-progress"
+    />
+  </div>
 </template>
 <script setup lang="ts">
-import type { KeyResult } from '@/Models/KeyResult';
-import { Objectives } from '@/Models/Objective';
-import { getTagType} from '@/Models/EntityObjectives';
+import type { KeyResult } from "@/Models/KeyResult";
+import { Objectives } from "@/Models/Objective";
+import { getTagType, StatusObjectives, getStatusColor } from "@/Models/EntityObjectives";
 
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
@@ -27,6 +39,8 @@ const props = defineProps<{
   keyresults: KeyResult[];
   isCreateOrEdit: boolean;
 }>();
+
+
 </script>
 
 <style scoped>
@@ -37,9 +51,8 @@ const props = defineProps<{
   /* width: calc(100% - 150px); */
 }
 
-.keyresult-item{
-    display: flex;
-    justify-content: space-between;
+.keyresult-item {
+  display: flex;
+  justify-content: space-between;
 }
-
 </style>

@@ -42,10 +42,11 @@ namespace OKR.Repository.Implementation
 
         public int caculateOveralProgress(IQueryable<Objectives> input)
         {
-            var result = input.Select(obj =>
-                   _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
-                       .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint))
-               ).Sum();
+            var result = Math.Round(input.Select(obj =>
+                 _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
+                     .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint))
+             ).Sum() * 100, 2);
+
 
             return (int)result;
         }
@@ -74,7 +75,7 @@ namespace OKR.Repository.Implementation
             return (int)Math.Round(point);
         }
 
-        public void Edit(Objectives updatedObj, List<KeyResults> updatedKeyResults)
+        public void Edit(Objectives updatedObj, List<KeyResults> updatedKeyResults, List<KeyResults> createKeyresult)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -82,6 +83,7 @@ namespace OKR.Repository.Implementation
                 {
                     _context.Objectives.Update(updatedObj);
                     _context.KeyResults.UpdateRange(updatedKeyResults);
+                    _context.KeyResults.AddRange(createKeyresult);
                     _context.SaveChanges();
                     transaction.Commit();
                 }

@@ -29,7 +29,7 @@
             </el-icon>
             <span>Branch</span>
           </el-col> -->
-          <el-col :span="6" class="layout2-search">
+          <!-- <el-col :span="6" class="layout2-search">
             <el-select
               v-model="searchUsername"
               clearable
@@ -47,7 +47,7 @@
               />
             </el-select>
             <el-icon><Search /></el-icon>
-          </el-col>
+          </el-col> -->
         </el-row>
       </el-header>
       <el-header class="mobile-header" v-if="isMobile">
@@ -86,7 +86,7 @@
             <el-icon><OfficeBuilding /></el-icon>
             <span>Branch</span>
           </el-menu-item> -->
-          <el-menu-item index="5" >
+          <!-- <el-menu-item index="5" >
             <el-select
               v-model="searchUsername"
               clearable
@@ -104,7 +104,7 @@
               />
             </el-select>
             <el-icon><Search /></el-icon>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </el-col>
 

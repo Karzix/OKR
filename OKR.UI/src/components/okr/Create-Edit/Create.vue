@@ -33,12 +33,27 @@
           </el-radio-button>
         </el-radio-group>
       </div>
+      <div class="form-item">
+        <p>Status:</p>
+        <el-radio-group v-model="objectives.status" size="medium">
+            <el-radio
+            v-for="status in statusOptions"
+            :key="status.value"
+            :label="status.value"
+            :border="true"
+            >
+            <el-tag :type="getTagType(status.value)" effect="dark">
+                {{ status.text }}
+            </el-tag>
+            </el-radio>
+        </el-radio-group>
+      </div>
       <div class="btn-add-keyresult form-item">
        <p>Keyresults</p>
         <el-button :icon="Plus" @click="onShowDialogCreateKeyResult">Add new</el-button> 
       </div>
       <div class="keyresults">
-        <ListKeyresult :keyresults="objectives.keyResults" :is-create-or-edit="true"></ListKeyresult>
+        <ListKeyresult :keyresults="objectives.keyResults" :is-create-or-edit="true" @on-select-key-result="onSelectKeyResult"></ListKeyresult>
       </div>
     </div>
     <div class="right">
@@ -92,9 +107,11 @@
     class="createDialog"
   >
     <AddKeyresult
+      v-if="dialogAddKeyResult"
       :keyresults="keyresults"
       :isEdit="isEdit"
       @onAddItem="onAddKeyresult"
+      @onEditItem="onEditKeyresult"
     />
   </el-dialog>
 </template>
@@ -114,10 +131,11 @@ import {
 //@ts-ignore
 import AddKeyresult from "./AddKeyresult.vue";
 import type { KeyResult } from "@/Models/KeyResult";
-import { StatusObjectives } from "@/Models/EntityObjectives";
+import { getStatusText, StatusObjectives,getTagType } from "@/Models/EntityObjectives";
 import ListKeyresult from "./ListKeyresult.vue";
 import { ElLoading, ElMessage } from "element-plus";
 import { axiosInstance } from "@/Service/axiosConfig";
+import { deepCopy } from "@/Service/deepCopy";
 
 const objectives = ref<Objectives>({
   id: undefined,
@@ -140,19 +158,28 @@ const props = defineProps<{
   objectives: Objectives;
   isEdit?: boolean;
 }>();
-
+const emit = defineEmits<{
+    (e: "updateData"): void;
+}>();
+const statusOptions = Object.values(StatusObjectives)
+  .filter(value => typeof value === 'number')
+  .map(value => ({
+    value: value as StatusObjectives,
+    text: getStatusText(value as StatusObjectives),
+  }));
 const keyresults = ref<KeyResult>({
   id: undefined,
   description: "",
   currentPoint: 0,
   status: StatusObjectives.noStatus,
   maximunPoint: 100,
-  deadline: new Date(),
+  endDay: new Date(),
   unit: 0,
   active: true,
   note: "",
   lastProgressUpdate: new Date(),
   createdOn: new Date(),
+  progressUpdates: [],
 });
 const dialogAddKeyResult = ref(false);
 const isEdit = ref(false);
@@ -211,6 +238,13 @@ const onAddKeyresult = (keyresult : KeyResult) => {
     caculateWeightKeyresult();
     dialogAddKeyResult.value = false;
 }
+const onEditKeyresult = (keyresult : KeyResult) => {
+
+    const index = objectives.value.keyResults.findIndex(kr => kr.id == keyresult.id);
+    objectives.value.keyResults[index] = keyresult;
+    caculateWeightKeyresult();
+    dialogAddKeyResult.value = false;
+}
 const caculateWeightKeyresult = () => {
   const keyResults = objectives.value.keyResults;
   const count = keyResults.length;
@@ -233,11 +267,12 @@ const onShowDialogCreateKeyResult = () => {
         currentPoint: 0,
         status: StatusObjectives.noStatus,
         maximunPoint: 100,
-        deadline: new Date(),
+        endDay: new Date(),
         unit: 0,
         active: true,
         note: "",
         lastProgressUpdate: new Date(),
+        progressUpdates: [],
   createdOn: new Date(),
     };
     isEdit.value = false;
@@ -254,6 +289,22 @@ const onSave = async () => {
     });
 
     try {
+      if(props.isEdit){
+        const res = await axiosInstance.put("Objectives", objectives.value);
+        if (res.data.isSuccess) {
+            ElMessage({
+                message: "Update success",
+                type: "success",
+            });
+            dialogAddKeyResult.value = false;
+        } else {
+            ElMessage({
+                message: res.data.message,
+                type: "error",
+            });
+        }
+      }
+      else{
         const res = await axiosInstance.post("Objectives", objectives.value);
         if (res.data.isSuccess) {
             ElMessage({
@@ -284,6 +335,8 @@ const onSave = async () => {
                 type: "error",
             });
         }
+      }
+     
     } catch (error) {
         ElMessage({
             message: "An error occurred. Please try again.",
@@ -291,6 +344,7 @@ const onSave = async () => {
         });
     } finally {
         loadingInstance.close();
+        emit("updateData");
     }
 };
 watch(()=>objectives.value.targetType, () => {
@@ -313,9 +367,10 @@ const validateForm = () => {
         })
         return false;
     }
+    return true;
 }
 onMounted(() => {
-  if(isEdit.value){
+  if(props.isEdit){
     objectives.value = props.objectives;
   }
   else{
@@ -338,6 +393,11 @@ onMounted(() => {
     }
   }
 })
+const onSelectKeyResult = (item: KeyResult) => {
+  keyresults.value = deepCopy(item);
+  isEdit.value = true;
+  dialogAddKeyResult.value = true;
+}
 </script>
 <style scoped>
 .header {
