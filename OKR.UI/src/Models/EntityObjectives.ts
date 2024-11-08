@@ -61,3 +61,19 @@ export function getTagType(status: StatusObjectives): string | undefined {
             return undefined;
     }
 }
+export function getStatusColor(status: StatusObjectives): string | undefined {
+    switch (status) {
+        case StatusObjectives.noStatus:
+            return '#5a9cf8';
+        case StatusObjectives.onTrack:
+            return '#7ec050';
+        case StatusObjectives.atRisk:
+            return '#dca550';
+        case StatusObjectives.offTrack:
+            return '#e47470';
+        case StatusObjectives.closed:
+            return '#919398';
+        default:
+            return undefined;
+    }
+}

@@ -4,7 +4,7 @@ import { RecalculateTheDate } from "../formatDate";
 export const DisplayOKR = (okr: EntityObjectives) =>{
     okr.quarterText = convertValueToLabel(okr);
     okr.keyResults.forEach((keyResult) => {
-        keyResult.deadline = RecalculateTheDate(keyResult.deadline);
+        keyResult.endDay = RecalculateTheDate(keyResult.endDay);
     });
 }
 const convertValueToLabel = (okr:EntityObjectives) : string => {

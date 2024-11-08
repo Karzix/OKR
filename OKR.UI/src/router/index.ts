@@ -10,7 +10,6 @@ import UserVue from '@/views/User/Index.vue'
 import BranchVue from '@/views/Department/Branch.vue'
 import Department from '@/views/Department/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
-import UserInfor from '@/views/OKR/UserInfor.vue'
 import SeeObjectives from '@/views/OKR/SeeObjectives.vue';
 import layout2 from '@/components/Layout/layout2.vue';
 import Layout2 from '@/components/Layout/layout2.vue';
@@ -61,11 +60,6 @@ const router = createRouter({
       component: Layout2,
       meta: { requiresAuth: false },
       children: [
-        {
-          path: "UserName=:UserName",
-          component: UserInfor,
-          meta: { requiresAuth: true},
-        },
         {
           path: "Objectives=:ObjectiveId",
           component: SeeObjectives,

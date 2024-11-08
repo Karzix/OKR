@@ -25,7 +25,7 @@ const props = defineProps<{
 }>();
 const config = ref();
 const build = () => {
-  const n = props.keyResult?.progressUpdates.length ?? 0;
+  const n = props.keyResult?.progressUpdates?.length ?? 0;
   labels.value = [];
   customLabels.value = [];
   point.value = [];
