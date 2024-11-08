@@ -10,6 +10,5 @@ namespace OKR.Infrastructure.Enum
     {
         Percent,
         Value,
-        Checked
     }
 }
