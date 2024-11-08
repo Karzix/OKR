@@ -42,13 +42,14 @@ namespace OKR.Repository.Implementation
 
         public int caculateOveralProgress(IQueryable<Objectives> input)
         {
-            var result = Math.Round(input.Select(obj =>
+            var totalProgress = Math.Round(input.Select(obj =>
                  _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
                      .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint))
-             ).Sum() * 100, 2);
+             ).Sum(), 2);
+            var objectiveCount = input.Count();
+            var averageProgress = objectiveCount > 0 ? (totalProgress / objectiveCount) * 100 : 0;
 
-
-            return (int)result;
+            return (int)Math.Round(averageProgress, 2);
         }
 
         public Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input)

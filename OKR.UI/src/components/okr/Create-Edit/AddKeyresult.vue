@@ -11,8 +11,8 @@
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="keyresults.status" size="medium">
-            <el-radio
+        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus">
+            <el-radio-button 
             v-for="status in statusOptions"
             :key="status.value"
             :label="status.value"
@@ -21,7 +21,7 @@
             <el-tag :type="getTagType(status.value)" effect="dark">
                 {{ status.text }}
             </el-tag>
-            </el-radio>
+            </el-radio-button>
         </el-radio-group>
       </div>
       <div class="form-item-2">
@@ -73,7 +73,7 @@ import {
   Hide,
 } from "@element-plus/icons-vue";
 import type { KeyResult } from "@/Models/KeyResult";
-import { getStatusText, StatusObjectives,getTagType } from "@/Models/EntityObjectives";
+import { getStatusText, StatusObjectives,getTagType, getStatusColor } from "@/Models/EntityObjectives";
 import { deepCopy } from "@/Service/deepCopy";
 
 const keyresults = ref<KeyResult>({
@@ -148,6 +148,13 @@ const handleUnitChange = () => {
     keyresults.value.maximunPoint = 100;
     keyresults.value.currentPoint = 0;
 }
+const customFillStatus = ref(getStatusColor(keyresults.value.status));
+watch(
+  () => keyresults.value.status,
+  (newValue: StatusObjectives) => {
+    customFillStatus.value = getStatusColor(keyresults.value.status);
+  }
+)
 </script>
 <style scope>
 .form-item{

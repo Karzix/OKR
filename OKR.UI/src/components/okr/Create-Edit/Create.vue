@@ -25,18 +25,21 @@
           <el-radio-button
             :value="TargetType.Department"
             class="department-button"
+            :disabled="!(handleRole.IdentifyRoles([ 'Teamleader']))" 
           >
-            <el-icon><Flag /></el-icon> Department
+            <el-icon><Flag /></el-icon> Team
           </el-radio-button>
-          <el-radio-button :value="TargetType.Company" class="company-button">
+          <el-radio-button :value="TargetType.Company" class="company-button"
+          :disabled="!(handleRole.IdentifyRoles([ 'Admin']))" 
+          >
             <el-icon><OfficeBuilding /></el-icon> Company
           </el-radio-button>
         </el-radio-group>
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="objectives.status" size="medium">
-            <el-radio
+        <el-radio-group v-model="objectives.status" size="medium" :fill="customFillStatus">
+            <el-radio-button
             v-for="status in statusOptions"
             :key="status.value"
             :label="status.value"
@@ -45,7 +48,7 @@
             <el-tag :type="getTagType(status.value)" effect="dark">
                 {{ status.text }}
             </el-tag>
-            </el-radio>
+            </el-radio-button>
         </el-radio-group>
       </div>
       <div class="btn-add-keyresult form-item">
@@ -87,7 +90,7 @@
           v-model="objectives.isPublic"
           size="large"
         >
-          <el-radio-button :value="false" class="individual-button">
+          <el-radio-button :value="false" class="individual-button" :disabled="objectives.targetType == TargetType.Department || objectives.targetType == TargetType.Company  ">
             <el-icon><Hide /></el-icon> Private
           </el-radio-button>
           <el-radio-button :value="true" class="department-button">
@@ -131,11 +134,12 @@ import {
 //@ts-ignore
 import AddKeyresult from "./AddKeyresult.vue";
 import type { KeyResult } from "@/Models/KeyResult";
-import { getStatusText, StatusObjectives,getTagType } from "@/Models/EntityObjectives";
+import { getStatusText, StatusObjectives,getTagType, getStatusColor } from "@/Models/EntityObjectives";
 import ListKeyresult from "./ListKeyresult.vue";
 import { ElLoading, ElMessage } from "element-plus";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { deepCopy } from "@/Service/deepCopy";
+import * as handleRole from "@/components/maynghien/Common/handleRole";
 
 const objectives = ref<Objectives>({
   id: undefined,
@@ -231,6 +235,13 @@ watch(
     }
   }
 );
+const customFillStatus = ref(getStatusColor(objectives.value.status));
+watch(
+  () => objectives.value.status,
+  (newValue: StatusObjectives) => {
+    customFillStatus.value = getStatusColor(newValue);
+  }
+)
 
 const onAddKeyresult = (keyresult : KeyResult) => {
 

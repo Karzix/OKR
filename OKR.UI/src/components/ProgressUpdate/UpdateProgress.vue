@@ -19,7 +19,7 @@
         v-model="props.keyresults.addedPoints"
         class="current-point"
         :min="(-1 * (props.keyresults.currentPoint ?? 0))"
-        :max="props.keyresults.maximunPoint"
+        :max="(props.keyresults.maximunPoint! - (props.keyresults.currentPoint ?? 0))"
         controls-position="right"
       />
     </div>

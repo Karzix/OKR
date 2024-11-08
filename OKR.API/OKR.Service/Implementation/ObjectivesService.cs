@@ -133,7 +133,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var query = await  BuildFilterExpression(request.Filters);
-                var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
+                    var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
                 var model = _objectiveRepository.FindByPredicate(query);
                 if (request.SortBy != null)
                 {
@@ -279,7 +279,7 @@ namespace OKR.Service.Implementation
                     var currentQuarterRange = GetCurrentQuarterDateRange();
                     predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
                 }
-                //predicate = await AddDefaultConditions(predicate);
+                predicate = await AddDefaultConditions(predicate, Filters);
                 return predicate;
             }
             catch (Exception)
@@ -550,14 +550,30 @@ namespace OKR.Service.Implementation
             var User = await _userManager.FindByNameAsync(userName);
             predicate = predicate.And(x => x.ApplicationUserId == User.Id 
                 || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
-            var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
+            //var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
+            predicate = predicate.And(x=>x.IsPublic == true);
             return predicate;
         }
-        private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate)
+        private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate, List<Filter> filters)
         {
             predicate = predicate.And(x=>x.IsDeleted != true);
             var currentUser = await CurrentUser();
-            predicate = predicate.And(x => x.CreatedBy == currentUser.UserName || x.IsPublic == true);
+            //predicate = predicate.And(x => x.CreatedBy == currentUser.UserName || x.IsPublic == true);
+            var filUseName = filters.Where(x=>x.FieldName == "userName").FirstOrDefault();
+            if(filUseName == null || 
+                (filUseName != null && filUseName.Value == currentUser.UserName)
+                )
+            {
+                predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
+               || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+            }
+            else if(filUseName != null && filUseName.Value != currentUser.UserName)
+            {
+                var User = await _userManager.FindByNameAsync(filUseName.Value);
+                predicate = predicate.And(x => x.ApplicationUserId == User.Id
+              || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
+                predicate = predicate.And(x=>x.IsPublic == true);
+            }
             return predicate;
         }
     }

@@ -56,6 +56,7 @@
           <div class="title-cell">
             <CustomIconTargetType :targetType="row.targetType"></CustomIconTargetType>
             <span>{{ row.name }}</span>
+            <el-icon v-if="!row.isPublic"><Hide /></el-icon>
           </div>
         </template>
       </el-table-column>
@@ -97,7 +98,7 @@
   </div>
   <el-dialog v-model="dialogDetail" width="900px">
     <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"
-     @update:objectives="refreshObjectives" @delete:objectives="onDelete"></DetailObjectives>
+     @update:objectives="refreshObjectives" @delete:objectives="onDelete" :allow-update-weight="props.allowUpdateWeight"></DetailObjectives>
   </el-dialog>
 </template>
 
@@ -122,6 +123,7 @@ import DetailObjectives from "./DetailObjectives.vue";
 import { id } from "element-plus/es/locales.mjs";
 import Cookies from "js-cookie";
 import type { KeyResult } from "@/Models/KeyResult";
+import {Hide} from '@element-plus/icons-vue'
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -146,6 +148,7 @@ const customCSS = {
 }
 const props = defineProps<{
   searchRequest: SearchRequest;
+  allowUpdateWeight?: boolean
 }>();
 
 
@@ -154,6 +157,7 @@ const loadingTable = ref(false);
 const dialogDetail = ref(false);
 const ObjectivesSelect = ref<Objectives>({} as Objectives);
 const allowEdit = ref(false);
+
 const search = async () => {
   try{
     loadingTable.value = true;
@@ -219,6 +223,7 @@ onMounted(() => {
   search();
 });
 const ReLoad = () => {
+  listObjectivesDisplay.value = [];
   searchRequest.value.PageIndex = 1;
   search();
 }
