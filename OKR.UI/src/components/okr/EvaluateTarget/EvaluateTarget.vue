@@ -61,7 +61,6 @@ const searchResponse = ref<SearchResponse<EvaluateTarget>>({
 });
 const props = defineProps<{
   searchRequest: SearchRequest;
-  targetType: string;
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -233,6 +232,9 @@ const Edit = (item: EvaluateTarget) => {
       
     )
 }
+onMounted(() => {
+  search();
+});
 </script>
 <style scoped>
 .infinite-list-wrapper {

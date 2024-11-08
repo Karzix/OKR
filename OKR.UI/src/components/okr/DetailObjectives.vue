@@ -49,12 +49,13 @@
     </div>
     <div class="comment-progress">
         <el-tabs v-model="tabs" class="demo-tabs">
-            <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest" :targetType="'0'"></EvaluateTarget></el-tab-pane>
+            <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest"></EvaluateTarget></el-tab-pane>
             <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
         </el-tabs>
     </div>
     <el-dialog v-model="showDialogDetailKeyresult">
-        <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives"></DetailKeyresult>
+        <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives" 
+        :allow-update-weight="props.allowUpdateWeight"></DetailKeyresult>
     </el-dialog>
     <el-dialog v-model="showDialogEdit">
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
@@ -78,11 +79,13 @@ import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import DetailKeyresult from "./DetailKeyresult.vue";
 import CreateEditObjectives from "./Create-Edit/Create.vue";
+import { ElMessage } from "element-plus";
 
 
 const props = defineProps<{
     isOwner?: boolean;
-    objectives: Objectives
+    objectives: Objectives;
+    allowUpdateWeight?: boolean
 }>()
 const objectives = ref<Objectives>({
   id: undefined,
@@ -117,10 +120,7 @@ const emit = defineEmits<{
     (e: "delete:objectives" , objectives: Objectives): void;
 }>();
 const getObjectives = async () => {
-    var filter = new Filter();
-    filter.FieldName = "objectivesId";
-    filter.Value = props.objectives.id;
-    addFilter(searchRequest.value.filters as [],deepCopy(filter));
+    
     var url = `Objectives/${props.objectives.id}`
     await axiosInstance.get(url).then((res) => {
         objectives.value = res.data.data
@@ -141,6 +141,10 @@ const refreshObjectives = async () => {
 
 const copyLinkShare = () =>{
     navigator.clipboard.writeText(urlUI + "Objectives=" + props.objectives.id);
+    ElMessage({
+    message: 'Copy url success ',
+    type: 'success',
+  })
 }
 const onDelete = () => {
     axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
@@ -152,6 +156,12 @@ const onEdit = () => {
 }
 onMounted(() => {
     getObjectives()
+})
+onBeforeMount(() => {
+    var filter = new Filter();
+    filter.FieldName = "objectivesId";
+    filter.Value = props.objectives.id;
+    addFilter(searchRequest.value.filters as [],deepCopy(filter));
 })
 </script>
 

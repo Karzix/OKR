@@ -9,7 +9,7 @@
       </div>
       <div class="status-info">
         <p class="title">Overall progress</p>
-        <p class="subtitle">Set/edit goal weights</p>
+        <p class="subtitle">Overall progress is based on the progress of the target objectives.</p>
         <div class="status-tags">
           <el-tag>{{ statusStatistics.noStatus }} No status</el-tag>
           <el-tag type="success">{{ statusStatistics.onTrack }} On track</el-tag>
@@ -29,7 +29,7 @@
     
   </div>
   <div class="ListView">
-    <ListView ref="listViewRef" :searchRequest="searchRequest"></ListView>
+    <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true"></ListView>
   </div>
   <el-dialog v-model="dialogCreate">
     <CreateEdit :objectives="objectives" @updateData="onUpdateData"></CreateEdit>
@@ -92,86 +92,6 @@ const statusStatistics = ref<StatusStatistics>({
   noStatus: 0
 });
 const OverallProgress = ref(0);
-
-// const tableColumns = ref<TableColumn[]>([
-//   {
-//     key: "period",
-//     label: "Period",
-//     width: 1000,
-//     sortable: true,
-//     enableEdit: true,
-//     enableCreate: true,
-//     required: false,
-//     hidden: false,
-//     showSearch: true,
-//     inputType: "dropdown",
-//     dropdownData: {
-//       displayMember: "label",
-//       keyMember: "value",
-//       data: periods.value
-//     },
-//   },
-//   {
-//     key: "status",
-//     label: "Status",
-//     width: 1000,
-//     sortable: true,
-//     enableEdit: true,
-//     enableCreate: true,
-//     required: false,
-//     hidden: false,
-//     showSearch: true,
-//     inputType: "dropdown",
-//     dropdownData: {
-//       displayMember: "name",
-//       keyMember: "value",
-//       data: [{
-//         value: "0",
-//         name: "No Status",
-//       },{
-//         value: "1",
-//         name: "On Track",
-//       },{
-//         value: "2",
-//         name: "At Risk",
-//       },{
-//         value: "3",
-//         name: "Off Track",
-//       },{
-//         value: "2",
-//         name: "Closed",
-//       }],
-//     },
-//   },
-//   // {
-//   //   key: "targetType",
-//   //   label: "Type",
-//   //   width: 1000,
-//   //   sortable: true,
-//   //   enableEdit: true,
-//   //   enableCreate: true,
-//   //   required: false,
-//   //   hidden: false,
-//   //   showSearch: true,
-//   //   inputType: "dropdown",
-//   //   dropdownData: {
-//   //     displayMember: "label",
-//   //     keyMember: "value",
-//   //     data: [{
-//   //       value: "0",
-//   //       label: "Individual",
-//   //     },{
-//   //       value: "1",
-//   //       label: "Department",
-//   //     },{
-//   //       value: "2",
-//   //       label: "Company",
-//   //     }
-
-//   //     ],
-//   //   },
-//   // },
-// ]);
 const AddFilterAndSearch = (filters: Filter[]) => {
   listViewRef.value?.onAddFilterAndSearch(filters);
   searchRequest.value.filters = filters;
