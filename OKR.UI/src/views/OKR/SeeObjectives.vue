@@ -1,5 +1,8 @@
 <template>
-  <DeatailObjectives :is-owner="false" :objectives="objectives"></DeatailObjectives>
+  <div class="body">
+    <DeatailObjectives :is-owner="false" :objectives="objectives" ></DeatailObjectives>
+  </div>
+  
 </template>
 
 <script setup lang="ts">
@@ -11,31 +14,34 @@ import { onBeforeMount, onMounted, ref } from 'vue';
 import { useRoute } from "vue-router";
 import DetailObjectives from '@/components/okr/DetailObjectives.vue';
 import { ElLoading } from 'element-plus';
+import { TargetType } from '@/Models/Enum/TargetType';
 
 const route = useRoute();
 const isLoading = ref(true); 
 // const props = defineProps<{
 //   objective: Objective
 // }>();
-const objectives = ref<Objectives>({} as Objectives);
+const objectives = ref<Objectives>({
+  id: undefined,
+  name: "",
+  startDay: undefined,
+  endDay: undefined,
+  keyResults: [],
+  targetType: TargetType.Individual,
+  targetTypeName: "",
+  point: 0,
+  status: 0,
+  isPublic: true,
+  isUserObjectives: true,
+  year: new Date().getFullYear(),
+  period: "Q1",
+  createdOn: new Date(),
+  lastProgressUpdate: new Date(),
+});
 // const targetType = ref<string>("");
 const search = async () => {
-  ElLoading.service({
-    lock: true,
-    text: 'Loading',
-    background: 'rgba(0, 0, 0, 0.7)',
-  })
   const id = route.params.ObjectiveId.toString();
-  await axiosInstance
-    .get(`Objectives/${id}`)
-    .then((res) => {
-      objectives.value = res.data;
-      isLoading.value = false;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  
+  objectives.value.id = id;
 };
 
 onBeforeMount(() => {
@@ -45,4 +51,14 @@ onBeforeMount(() => {
 </script>
 
 <style scoped>
+.body{
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #ffffffcc;
+  border-radius: 1px;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0px 5px 5px 5px rgba(0, 0, 0, 0.3);
+}
 </style>
