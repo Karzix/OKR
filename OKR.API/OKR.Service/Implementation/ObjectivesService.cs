@@ -551,7 +551,7 @@ namespace OKR.Service.Implementation
             predicate = predicate.And(x => x.ApplicationUserId == User.Id 
                 || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
             //var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
-            predicate = predicate.And(x=>x.IsPublic == true);
+            //predicate = predicate.And(x=>x.IsPublic == true);
             return predicate;
         }
         private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate, List<Filter> filters)
@@ -566,6 +566,7 @@ namespace OKR.Service.Implementation
             {
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
                || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+                //predicate = predicate.And(x => x.IsPublic == true || x.IsPublic == false);
             }
             else if(filUseName != null && filUseName.Value != currentUser.UserName)
             {
