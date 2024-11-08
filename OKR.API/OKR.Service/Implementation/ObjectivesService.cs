@@ -265,6 +265,11 @@ namespace OKR.Service.Implementation
                                     predicate = await BuildFilterUserName(predicate, filter.Value);
                                     break;
                                 }
+                            case "departmentId":
+                                {
+                                    predicate = predicate.And(x=>x.DepartmentId == Guid.Parse(filter.Value));
+                                    break;
+                                }
                             default:
                                 break;
                         }
@@ -274,7 +279,7 @@ namespace OKR.Service.Implementation
                     var currentQuarterRange = GetCurrentQuarterDateRange();
                     predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
                 }
-                predicate = await AddDefaultConditions(predicate);
+                //predicate = await AddDefaultConditions(predicate);
                 return predicate;
             }
             catch (Exception)
@@ -545,7 +550,7 @@ namespace OKR.Service.Implementation
             var User = await _userManager.FindByNameAsync(userName);
             predicate = predicate.And(x => x.ApplicationUserId == User.Id 
                 || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
-
+            var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
             return predicate;
         }
         private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate)

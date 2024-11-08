@@ -3,11 +3,11 @@
         <div class="left">
             <div class="left-header">
                 <p class="user-name">{{ keyresult.createdBy }}</p>
-                <el-button-group class="ml-4">
+                <!-- <el-button-group class="ml-4">
                     <el-button type="primary" :icon="Edit" />
                     <el-button type="primary" :icon="Share" />
                     <el-button type="primary" :icon="Delete" />
-                </el-button-group>
+                </el-button-group> -->
             </div>
             <div>
             <p class="title">{{ keyresult.description }}</p>
@@ -121,9 +121,12 @@ onBeforeMount(async () => {
     addFilter(searchRequest.value.filters as [],deepCopy(filter));
     await getKeyresult();
 })
-const onUpdatedSuccessfully = (point : number) => {
+const onUpdatedSuccessfully = async (point : number) => {
     keyresult.value.currentPoint = point;
     showDialogUpdateProgress.value = false;
+    await getKeyresult();
+    var temp = keyresult.value.id;
+    keyresult.value.id = "";
     emit("updateData");
 }
 </script>

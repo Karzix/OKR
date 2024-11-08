@@ -1,5 +1,8 @@
 <template>
   <div class="progress-overview">
+    <div class="search">
+      <ActionSearch @onSearch="AddFilterAndSearch" />
+    </div>
     <div class="overall-progress">
       <div class="progress-circle">
         <el-progress :percentage="OverallProgress" type="circle" color="#6366F1" />
@@ -15,15 +18,7 @@
           <el-tag type="info">{{ statusStatistics.closed }} Closed</el-tag>
         </div>
         <div class="actions">
-          <!-- <el-button-group class="view-options">
-            <el-button type="primary" size="small" @click="setView('list')"
-              >List view</el-button
-            >
-            <el-button size="small" @click="setView('feed')"
-              >Feed view</el-button
-            >
-            
-          </el-button-group> -->
+          
         </div>
       </div>
     </div>
@@ -31,16 +26,7 @@
 
       <el-button type="primary" @click="dialogCreate = true" :icon="Plus">Add new objective</el-button>
     </div>
-    <div class="search">
-      <!-- <MnActionPane
-          :allowAdd="false"
-          :tableColumns="tableColumns"
-          :isEdit="false"
-          @onBtnSearchClicked="AddFilterAndSearch"
-          :CustomActions="[]"
-          :openDialog="() => {}"
-        /> -->
-    </div>
+    
   </div>
   <div class="ListView">
     <ListView ref="listViewRef" :searchRequest="searchRequest"></ListView>
@@ -70,6 +56,7 @@ import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse"
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 import type { StatusStatistics } from "@/Models/StatusStatistics";
+import ActionSearch from "@/components/okr/ActionSearch.vue";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -187,6 +174,9 @@ const OverallProgress = ref(0);
 // ]);
 const AddFilterAndSearch = (filters: Filter[]) => {
   listViewRef.value?.onAddFilterAndSearch(filters);
+  searchRequest.value.filters = filters;
+  getStatusStatistics()
+  getOverallProgress()
 }
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -222,6 +212,11 @@ onBeforeMount(async () => {
 
 const onUpdateData = async () => {
   listViewRef.value?.ReLoad();
+}
+
+const onClickButtonSearch = (filters: Filter[]) => {
+  searchRequest.value.filters = filters;
+  onUpdateData();
 }
 </script>
 
@@ -297,6 +292,9 @@ const onUpdateData = async () => {
   position: absolute;
   top: 0;
   right: 0;
+}
+.search{
+  margin-bottom: 20px;
 }
 </style>
 <style>

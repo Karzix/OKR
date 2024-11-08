@@ -3,9 +3,11 @@ using LinqKit;
 using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using OKR.DTO;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
+using OKR.Repository.Implementation;
 using OKR.Service.Contract;
 using System.Linq;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
@@ -17,12 +19,16 @@ namespace OKR.Service.Implementation
         private IDepartmentRepository _departmentRepository;
         private IHttpContextAccessor _contextAccessor;
         private IMapper _mapper;
+        private readonly IMemoryCache _memoryCache;
+        private readonly string cacheDepartmentKey = "department_list";
 
-        public DepartmentService(IDepartmentRepository departmentRepository, IHttpContextAccessor contextAccessor, IMapper mapper)
+        public DepartmentService(IDepartmentRepository departmentRepository, IHttpContextAccessor contextAccessor,
+            IMapper mapper, IMemoryCache memoryCache)
         {
             _departmentRepository = departmentRepository;
             _contextAccessor = contextAccessor;
             _mapper = mapper;
+            _memoryCache = memoryCache;
         }
 
         public AppResponse<DepartmentDto> Create(DepartmentDto request)
@@ -311,6 +317,52 @@ namespace OKR.Service.Implementation
             catch(Exception ex)
             {
                 result.BuildError(ex.Message + ex.StackTrace);
+            }
+            return result;
+        }
+
+        public AppResponse<List<DepartmentDto>> GetDepartByKeyword(string keyword)
+        {
+            var result = new AppResponse<List<DepartmentDto>>();
+            try
+            {
+                if (!_memoryCache.TryGetValue(cacheDepartmentKey, out List<DepartmentDto> departments))
+                {
+                    int page = 0;
+                    departments = new List<DepartmentDto>();
+                    while (true)
+                    {
+                        var list = _departmentRepository.AsQueryable().Skip(page * 500).Take(500).Select(x => new DepartmentDto
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                        }).ToList();
+                        if (list.Count() == 0)
+                        {
+                            break;
+                        }
+                        departments.AddRange(list);
+                        list.Clear();
+                        page++;
+                    }
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions
+                    {
+                        Priority = CacheItemPriority.NeverRemove
+                    };
+
+                    // Lưu vào bộ nhớ cache
+                    _memoryCache.Set(cacheDepartmentKey, departments, cacheEntryOptions);
+                    result.BuildResult(departments.Where(x => x.Name.Contains(keyword)).Take(10).ToList());
+                }
+                else
+                {
+                    result.BuildResult(departments.Where(x => x.Name.Contains(keyword)).Take(10).ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
             }
             return result;
         }

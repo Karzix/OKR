@@ -1,51 +1,46 @@
 <template>
-  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true" :target-type="targetType" :entity-objectives-id="route.params.EntityObjectiveId.toString()"></DeatailObjectives>
+  <DeatailObjectives :is-owner="false" :objectives="objectives"></DeatailObjectives>
 </template>
 
 <script setup lang="ts">
-import DeatailObjectives from '@/components/okr/DeatailObjectives.vue';
+import DeatailObjectives from '@/components/okr/DetailObjectives.vue';
 import { EntityObjectives } from '@/Models/EntityObjectives';
-import type { Objective } from '@/Models/Objective';
+import type { Objectives } from '@/Models/Objective';
 import { axiosInstance } from '@/Service/axiosConfig';
-import { onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import { useRoute } from "vue-router";
+import DetailObjectives from '@/components/okr/DetailObjectives.vue';
+import { ElLoading } from 'element-plus';
 
 const route = useRoute();
 const isLoading = ref(true); 
 // const props = defineProps<{
 //   objective: Objective
 // }>();
-const objectives = ref<EntityObjectives>({
-  id: undefined,
-  name: "",
-  startDay: undefined,
-  deadline: undefined,
-  listKeyResults: [],
-  targetType: undefined,
-  targetTypeName: "",
-  point: 0,
-  objectivesId: undefined,
-  status: 0,
-  numberOfPendingUpdates: 0
-});
-const targetType = ref<string>("");
+const objectives = ref<Objectives>({} as Objectives);
+// const targetType = ref<string>("");
 const search = async () => {
-  const id = route.params.EntityObjectiveId.toString();
-  var entityObjectives = new EntityObjectives();
-  await axiosInstance.get(`EntityObjectives/${id}`).then((res) => {
-    if (res.data.isSuccess) {
-      entityObjectives = res.data.data;
-      objectives.value = entityObjectives;
-    } else {
-      console.log(res.data.message);
-    }
-    isLoading.value = false; // Đặt cờ thành false khi dữ liệu đã được tải xong
-  });
+  ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  const id = route.params.ObjectiveId.toString();
+  await axiosInstance
+    .get(`Objectives/${id}`)
+    .then((res) => {
+      objectives.value = res.data;
+      isLoading.value = false;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  
 };
 
-onMounted(() => {
+onBeforeMount(() => {
   search();
-  targetType.value = route.params.targetTpye.toString();
+  // targetType.value = route.params.targetTpye.toString();
 });
 </script>
 
