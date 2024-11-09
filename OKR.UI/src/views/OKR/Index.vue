@@ -80,6 +80,7 @@ const objectives = ref<Objectives>({
   period: "Q1",
   lastProgressUpdate: new Date(),
   createdOn: new Date(),
+  numberOfPendingUpdates: 0
 });
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
 const periods = ref<{value: string; label: string}[]>([]);

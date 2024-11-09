@@ -37,6 +37,7 @@ const objectives = ref<Objectives>({
   period: "Q1",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
+  numberOfPendingUpdates: 0
 });
 // const targetType = ref<string>("");
 const search = async () => {
