@@ -8,6 +8,7 @@ using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Repository.Implementation;
 using OKR.Service.Contract;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Security.Claims;
 using static Maynghien.Infrastructure.Helpers.SearchHelper;
 
@@ -19,7 +20,6 @@ namespace OKR.Service.Implementation
         private IMapper _mapper;
         private IHttpContextAccessor _contextAccessor;
         private IDepartmentRepository _departmentRepository;
-        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         private IUserRepository _userRepository;
         private IKeyResultRepository _keyResultRepository;
         private IProgressUpdatesRepository _progressUpdatesRepository;
@@ -27,14 +27,13 @@ namespace OKR.Service.Implementation
 
         public DepartmentProgressApprovalService(IDepartmentProgressApprovalRepository departmentProgressApprovalRepository,
             IMapper mapper, IHttpContextAccessor httpContextAccessor, IDepartmentRepository departmentRepository,
-            IDepartmentObjectivesRepository departmentObjectivesRepository, IUserRepository userRepository,
+           IUserRepository userRepository,
             IKeyResultRepository keyResultRepository, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository)
         {
             _departmentProgressApprovalRepository = departmentProgressApprovalRepository;
             _mapper = mapper;
             _contextAccessor = httpContextAccessor;
             _departmentRepository = departmentRepository;
-            _departmentObjectivesRepository = departmentObjectivesRepository;
             _userRepository = userRepository;
             _keyResultRepository = keyResultRepository;
             _progressUpdatesRepository = progressUpdatesRepository;
@@ -96,14 +95,14 @@ namespace OKR.Service.Implementation
                                     predicate = predicate.And(x => x.KeyResultsId == Guid.Parse(filter.Value));
                                     break;
                                 }
-                            case "entityObjectivesId":
+                            case "objectivesId":
                                 {
-                                    predicate = BuildFilterEntityObjectives(predicate,Filters);
+                                    predicate = predicate.And(x=>x.KeyResults.ObjectivesId == Guid.Parse(filter.Value));
                                     break;
                                 }
                             case "user":
                                 {
-                                    predicate = BuildFilterUser(predicate, Filters);
+                                    //predicate = BuildFilterUser(predicate, Filters);
                                     break;
                                 }
                             default:
@@ -120,34 +119,7 @@ namespace OKR.Service.Implementation
             }
         }
 
-        private ExpressionStarter<DepartmentProgressApproval> BuildFilterEntityObjectives(ExpressionStarter<DepartmentProgressApproval> predicate, List<Filter> Filters)
-        {
-            var filter = Filters.Where(x=>x.FieldName == "entityObjectivesId").First();
-            var entityObjectivesId = Guid.Parse(filter.Value);
-            predicate = predicate.And(dpa =>
-                   dpa.KeyResults.Objectives.UserObjectives.Any(uo => uo.Id == entityObjectivesId) 
-                   || dpa.KeyResults.Objectives.DepartmentObjectives.Any(dpo => dpo.Id == entityObjectivesId));
-
-            return predicate;
-        }
-        private ExpressionStarter<DepartmentProgressApproval> BuildFilterUser(ExpressionStarter<DepartmentProgressApproval> predicate, List<Filter> Filters)
-        {
-            var userRole = GetCurrentUserRole();
-            var managerId = GetCurrentUserId();
-            if (userRole == "TeamLead" || userRole == "BranchManagement")
-            {
-                var managedDepartments = _userRepository.AsQueryable()
-                    .Where(user => user.Id == managerId.ToString()) 
-                    .Select(user => user.DepartmentId) 
-                    .ToList();
-                var objectivesIds = _departmentObjectivesRepository.AsQueryable()
-                    .Where(deptObj => managedDepartments.Contains(deptObj.DepartmentId))
-                    .Select(deptObj => deptObj.ObjectivesId)
-                    .ToList();
-                predicate = predicate.And(dpa => objectivesIds.Contains(dpa.KeyResults.ObjectivesId));
-            }
-            return predicate;
-        }
+   
         private string GetCurrentUserRole()
         {
             var user = _contextAccessor.HttpContext.User;
@@ -188,20 +160,20 @@ namespace OKR.Service.Implementation
                 if (dept.IsApproved)
                 {
                     var keyresult = _keyResultRepository.Get(departmentProgressApproval.KeyResultsId);
-                    var progressUpdates = new ProgressUpdates();
-                    progressUpdates.CreatedBy = userName;
-                    progressUpdates.CreatedOn = DateTime.UtcNow;
-                    progressUpdates.Note = departmentProgressApproval.Note;
-                    progressUpdates.KeyResultId = departmentProgressApproval.KeyResultsId;
-                    progressUpdates.OldPoint = keyresult.CurrentPoint;
-                    progressUpdates.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
+                    var progress = new ProgressUpdates();
+                    progress.Id = Guid.NewGuid();
+                    progress.CreatedOn = DateTime.UtcNow;
+                    progress.CreatedBy = userName;
+                    progress.Note = departmentProgressApproval.Note;
+                    progress.KeyResultId = departmentProgressApproval.Id;
+                    progress.OldPoint = keyresult.CurrentPoint;
+                    progress.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
+                    progress.KeyResultId = departmentProgressApproval.KeyResultsId;
 
-                    keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + departmentProgressApproval.AddedPoints);
+                    keyresult.CurrentPoint += (int)departmentProgressApproval.AddedPoints!;
                     _keyResultRepository.Edit(keyresult);
-                    progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
-                    Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
-                    progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
-                    _progressUpdatesRepository.Add(progressUpdates);
+                    progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                    _progressUpdatesRepository.Add(progress);
                 }
                 departmentProgressApproval.IsDeleted = true;
                 _departmentProgressApprovalRepository.Edit(departmentProgressApproval);

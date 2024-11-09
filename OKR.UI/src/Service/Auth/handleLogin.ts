@@ -25,6 +25,8 @@ export const handleLogin = async (model: LoginModel): Promise<boolean> => {
       if (inforData.isSuccess) {
         Cookies.set("userName", inforData.data.userName ?? "", { expires: undefined });
         Cookies.set("Roles", JSON.stringify(inforData.data.roles) ?? "", {expires: undefined,});
+        Cookies.set("UserId", inforData.data.id ?? "", { expires: undefined });
+        Cookies.set("DepartmentId", inforData.data.departmentId ?? "", { expires: undefined });
         return true;
       }
     }

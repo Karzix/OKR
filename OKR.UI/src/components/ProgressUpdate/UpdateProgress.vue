@@ -40,10 +40,13 @@ import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage, ElLoading } from "element-plus";
 import { ref, watch } from "vue";
 import Cookies from "js-cookie";
+import type { Objectives } from "@/Models/Objective";
+import { hasPermission } from "@/components/maynghien/Common/handleRole";
 
 const props = defineProps<{
   keyresults: KeyResult;
   // UserCreateObjectives: string
+  objectives: Objectives
 }>();
 const emit = defineEmits<{
   (e: "close"): void;
@@ -73,7 +76,7 @@ const Save = async () => {
     if (!res.data.isSuccess) {
       ElMessage.error(res.data.message);
     } else {
-      if(!isTheCreator()){
+      if(!isTeamleadOrOwner()){
         ElMessage.success("Your request will be processed when the owner accepts it.");
       }
       else{
@@ -99,9 +102,21 @@ watch(() => props.keyresults.addedPoints , () => {
   caculateCrrentPoint.value = cur + add;
 },{immediate: true})
 
-const isTheCreator = () : boolean => {
+const isTeamleadOrOwner = () : boolean => {
   var userLogin = Cookies.get("userName")?.toString();
-  return userLogin == props.keyresults.createdBy;
+  var userIdOfCurrentUser = Cookies.get("UserId")?.toString();
+  var departmentIdOfCurrentUser = Cookies.get("DepartmentId")?.toString();
+  var jsonString = Cookies.get('Roles')?.toString() ?? '';
+  var jsonObject = JSON.parse(jsonString);
+  var arrayFromString = Object.values(jsonObject);
+  var userRoles = arrayFromString as string[];
+  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+    return true;
+  }
+  else if(props.objectives.applicationUserId == userIdOfCurrentUser){
+    return true;
+  }
+  return false
 }
 </script>
 <style scoped>

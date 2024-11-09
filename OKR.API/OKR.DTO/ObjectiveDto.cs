@@ -29,5 +29,6 @@ namespace OKR.DTO
         public DateTime? CreatedOn { get; set; }
         public DateTime? LastProgressUpdate { get; set; }
         public int Point {  get; set; }
+        public int NumberOfPendingUpdates { get; set; }
     }
 }

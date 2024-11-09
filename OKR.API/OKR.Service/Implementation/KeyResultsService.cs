@@ -24,7 +24,6 @@ namespace OKR.Service.Implementation
         //private readonly IModel _channel;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDepartmentRepository _departmentRepository;
-
         private IDepartmentProgressApprovalRepository _progressApprovalRepository;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
             IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository,
@@ -56,30 +55,41 @@ namespace OKR.Service.Implementation
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var now = DateTime.UtcNow;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
-                //if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
-                //{
-                //    return result.BuildError("current point is invalid");
-                //}
                 var objectivesAsQueryable = _objectivesRepository.AsQueryable().Where(x=>x.Id == request.ObjectivesId);
                 if(!objectivesAsQueryable.Any())
                 {
                     return result.BuildError("Cannot find objectives");
                 }
-                
-                var progress = new ProgressUpdates();
-                progress.Id = Guid.NewGuid();
-                progress.CreatedOn = now;
-                progress.CreatedBy = userName;
-                progress.Note = GetUpdateString(request, keyresult);
-                progress.KeyResultId = keyresult.Id;
-                progress.OldPoint =keyresult.CurrentPoint;
-                progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
-               
-                keyresult.CurrentPoint += (int)request.AddedPoints!;
-                _keyResultRepository.Edit(keyresult);
-                //Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
-                progress.ObjectivesCompletionRate =_objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
-                _progressUpdatesRepository.Add(progress);
+                var objectives = objectivesAsQueryable.First();
+                var currentUser = await _userManager.FindByNameAsync(userName);
+                if (GetCurrentUserRole() == "Teamleader" || currentUser.Id == objectives.ApplicationUserId)
+                {
+                    var progress = new ProgressUpdates();
+                    progress.Id = Guid.NewGuid();
+                    progress.CreatedOn = now;
+                    progress.CreatedBy = userName;
+                    progress.Note = GetUpdateString(request, keyresult);
+                    progress.KeyResultId = keyresult.Id;
+                    progress.OldPoint = keyresult.CurrentPoint;
+                    progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
+
+                    keyresult.CurrentPoint += (int)request.AddedPoints!;
+                    _keyResultRepository.Edit(keyresult);
+                    progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                    _progressUpdatesRepository.Add(progress);
+                }
+                else
+                {
+                    var departmentProgressApproval = new DepartmentProgressApproval();
+                    departmentProgressApproval.Id = Guid.NewGuid();
+                    departmentProgressApproval.CreatedOn = now;
+                    departmentProgressApproval.CreatedBy = userName;
+                    departmentProgressApproval.Note = GetUpdateString(request, keyresult);
+                    departmentProgressApproval.AddedPoints = (int)request.AddedPoints;
+                    departmentProgressApproval.KeyResultsId = keyresult.Id;
+                    departmentProgressApproval.Note = GetUpdateString(request, keyresult);
+                    _progressApprovalRepository.Add(departmentProgressApproval);
+                }
 
                 result.BuildResult(request);
             }
@@ -92,19 +102,15 @@ namespace OKR.Service.Implementation
 
         private string GetUpdateString(KeyResultDto NewKeyResult, KeyResults CurKeyResults)
         {
+            if(!string.IsNullOrEmpty(NewKeyResult.Note))
+            {
+                return NewKeyResult.Note;
+            }
             string content = _contextAccessor.HttpContext.User.Identity.Name + " ";
-            //if(NewKeyResult.Description != CurKeyResults.Description)
-            //{
-            //    content += "update keyresults name from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
-            //}
             if ((CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints) != CurKeyResults.CurrentPoint)
             {
                 content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + (CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints)+ "; ";
             }
-            //if(NewKeyResult.EndDay != CurKeyResults.Deadline)
-            //{
-            //    content += "update deadline from " + CurKeyResults.Deadline.ToString("dd/MM/yyyy") + " to " + NewKeyResult.EndDay.Value.ToString("dd/MM/yyyy") + "; ";
-            //}
             return content;
         }
 

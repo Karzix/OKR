@@ -22,7 +22,7 @@
                 <p class="label">Status: </p>
                 <el-tag :type="getTagType(keyresult.status)">{{ getStatusText(keyresult.status) }}</el-tag>
             </div>
-            <lineChartKeyresult :keyResult="keyresult" :key="keyresult.id"></lineChartKeyresult>
+            <lineChartKeyresult :keyResult="keyresult" :key="keyresult.currentPoint"></lineChartKeyresult>
         </div>
         <div class="right">
             <div class="right-item">
@@ -51,7 +51,7 @@
     </div>  
 
     <el-dialog v-model="showDialogUpdateProgress">
-        <UpdateProgress :keyresults="keyresult" @on-updated-successfully="onUpdatedSuccessfully"></UpdateProgress>
+        <UpdateProgress :keyresults="keyresult" @on-updated-successfully="onUpdatedSuccessfully" :objectives="props.objectives"></UpdateProgress>
     </el-dialog>
 </template>
 <script setup lang="ts">
@@ -93,6 +93,7 @@ const tabs = ref('progress');
 const props = defineProps<{
     keyresultId : string;
     allowUpdateWeight?: boolean
+    objectives: Objectives
 }>()
 const showDialogUpdateProgress = ref(false);
 const emit = defineEmits<{
@@ -126,8 +127,8 @@ const onUpdatedSuccessfully = async (point : number) => {
     keyresult.value.currentPoint = point;
     showDialogUpdateProgress.value = false;
     await getKeyresult();
-    var temp = keyresult.value.id;
-    keyresult.value.id = "";
+    // var temp = keyresult.value.id;
+    // keyresult.value.id = "";
     emit("updateData");
 }
 </script>

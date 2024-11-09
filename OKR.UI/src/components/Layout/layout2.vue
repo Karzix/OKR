@@ -5,6 +5,9 @@
     </div>
     <el-container>
       <el-header class="layout2_header" v-if="!isMobile">
+        <div class="layout2-logo" @click="handleAsideClick('')">
+          <img src="@/assets/logo2.png" alt="" >
+        </div>
         <el-row :gutter="20" class="w-100 layout2-row-header">
           <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
@@ -290,5 +293,11 @@ watch(() => searchUsername.value, () => {
 }
 .layout2-search-mobile{
 
+}
+.layout2-logo :hover {
+  cursor: pointer;
+}
+.layout2-logo > img{
+  height: 60px;
 }
 </style>

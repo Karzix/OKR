@@ -101,7 +101,7 @@ const loadDepartment = async () => {
     })
 }
 const seachUser = async (query: string) => {
-  const url = "User/list-by-keyworld/" + query;
+  const url = "User/list-by-keyword/" + query;
   await axiosInstance.get(url).then((res) => {
     listUser.value = res.data.data
   })

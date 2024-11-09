@@ -26,10 +26,12 @@ namespace OKR.Service.Implementation
         private UserManager<ApplicationUser> _userManager;
         private IDepartmentRepository _departmentRepository;
         private IProgressUpdatesRepository _progressUpdatesRepository;
+        private IDepartmentProgressApprovalRepository _progressApprovalRepository;
 
         public ObjectiveService(IHttpContextAccessor contextAccessor, IObjectivesRepository objectiveRepository, IMapper mapper,
             IKeyResultRepository keyResultRepository, UserManager<ApplicationUser> userManager,
-            IDepartmentRepository departmentRepository, IProgressUpdatesRepository progressUpdatesRepository)
+            IDepartmentRepository departmentRepository, IProgressUpdatesRepository progressUpdatesRepository, 
+            IDepartmentProgressApprovalRepository departmentProgressApprovalRepository)
         {
             _contextAccessor = contextAccessor;
             _objectiveRepository = objectiveRepository;
@@ -38,6 +40,7 @@ namespace OKR.Service.Implementation
             _userManager = userManager;
             _departmentRepository = departmentRepository;
             _progressUpdatesRepository = progressUpdatesRepository;
+            _progressApprovalRepository = departmentProgressApprovalRepository;
         }
 
         public async Task<AppResponse<ObjectiveDto>> Create(ObjectiveDto request)
@@ -175,7 +178,9 @@ namespace OKR.Service.Implementation
                         Period = x.Period,
                         Year = x.Year,
                         CreatedBy = x.CreatedBy,
-                        CreatedOn = x.CreatedOn
+                        CreatedOn = x.CreatedOn,
+                        NumberOfPendingUpdates = _progressApprovalRepository.AsQueryable().Where(da=>da.KeyResults.ObjectivesId == x.Id 
+                            && da.IsDeleted != true).Count()
                     })
                     .ToList();
                 foreach (var item in List)

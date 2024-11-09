@@ -24,7 +24,7 @@
               <!-- Progress Column -->
               <el-table-column :with="customCSS.withProgress">
                 <template #default="{ row }">
-                  <el-progress :percentage="(row.currentPoint/row.maximunPoint * 100).toFixed(2)" :color="getStatusColor(row.status)" />
+                  <el-progress :percentage="Math.round(row.currentPoint / row.maximunPoint * 100)" :color="getStatusColor(row.status)" />
                   <!-- <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span> -->
                 </template>
               </el-table-column>
@@ -32,7 +32,7 @@
               <!-- Status Column -->
               <el-table-column label="Status" :with="customCSS.withStatus">
                 <template #default="{ row }">
-                  <el-tag :status="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
+                  <el-tag :type="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
                 </template>
               </el-table-column>
 
@@ -57,6 +57,26 @@
             <CustomIconTargetType :targetType="row.targetType"></CustomIconTargetType>
             <span>{{ row.name }}</span>
             <el-icon v-if="!row.isPublic"><Hide /></el-icon>
+            <el-popover 
+                placement="top"
+                trigger="click"
+                width="100%"
+                
+              >
+                <template #reference>
+                  <el-badge class="item" 
+                    :value="row.numberOfPendingUpdates" 
+                    v-if="row.numberOfPendingUpdates != 0 && isTeamleadOrOwner(row)" 
+                  >
+                    <el-icon class="icon-Notification"><BellFilled /></el-icon>
+                  </el-badge>
+                </template>
+                <DepartmentProgressQueue :objectivesId="row.id ?? ''" 
+                @close="DialogDepartmentProgressQueueVisible = false"
+                @onSuccess="(request) => {recaculateObjectivesAfterProgressApproval(row, request)}"
+                />
+            </el-popover>
+              
           </div>
         </template>
       </el-table-column>
@@ -70,7 +90,7 @@
 
       <el-table-column label="Status" :with="customCSS.withStatus">
         <template #default="{ row }">
-          <el-tag :status="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
+          <el-tag :type="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
         </template>
       </el-table-column>
 
@@ -98,7 +118,7 @@
   </div>
   <el-dialog v-model="dialogDetail" width="900px">
     <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"
-     @update:objectives="refreshObjectives" @delete:objectives="onDelete" :allow-update-weight="props.allowUpdateWeight"></DetailObjectives>
+     @update:objectives="refreshObjectives" @delete:objectives="onDelete" ></DetailObjectives>
   </el-dialog>
 </template>
 
@@ -111,7 +131,7 @@ import { getStatusText, getTagType, getStatusColor} from "@/Models/EntityObjecti
 import CustomIconTargetType from "../icons/CustomIconTargetType.vue";
 import { SearchRequest } from "../maynghien/BaseModels/SearchRequest";
 import { axiosInstance } from "@/Service/axiosConfig";
-import { Objectives } from "@/Models/Objective";
+import { Objectives, recaculateObjectivesAfterProgressApproval } from "@/Models/Objective";
 import type { AppResponse } from "../maynghien/BaseModels/AppResponse";
 import { getDisplayString } from "@/Service/OKR/DisplayPeriod";
 import { Filter } from "../maynghien/BaseModels/Filter";
@@ -124,6 +144,8 @@ import { id } from "element-plus/es/locales.mjs";
 import Cookies from "js-cookie";
 import type { KeyResult } from "@/Models/KeyResult";
 import {Hide} from '@element-plus/icons-vue'
+import DepartmentProgressQueue from "@/components/DepartmentProgressApproval/DepartmentProgressQueue.vue";
+import { hasPermission } from "../maynghien/Common/handleRole";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -148,7 +170,6 @@ const customCSS = {
 }
 const props = defineProps<{
   searchRequest: SearchRequest;
-  allowUpdateWeight?: boolean
 }>();
 
 
@@ -157,6 +178,7 @@ const loadingTable = ref(false);
 const dialogDetail = ref(false);
 const ObjectivesSelect = ref<Objectives>({} as Objectives);
 const allowEdit = ref(false);
+const DialogDepartmentProgressQueueVisible = ref(false);
 
 const search = async () => {
   try{
@@ -218,6 +240,10 @@ const onDelete = (Objectives : Objectives) => {
     listObjectivesDisplay.value.splice(index, 1); 
   }
 }
+const showDialogDepartmentProgressQueue = () => {
+  DialogDepartmentProgressQueueVisible.value = true;
+  console.log("showDialogDepartmentProgressQueue");
+}
 onMounted(() => {
   searchRequest.value = props.searchRequest;
   search();
@@ -226,6 +252,22 @@ const ReLoad = () => {
   listObjectivesDisplay.value = [];
   searchRequest.value.PageIndex = 1;
   search();
+}
+const isTeamleadOrOwner = (objectives : Objectives) : boolean => {
+  var userLogin = Cookies.get("userName")?.toString();
+  var userIdOfCurrentUser = Cookies.get("UserId")?.toString();
+  var departmentIdOfCurrentUser = Cookies.get("DepartmentId")?.toString();
+  var jsonString = Cookies.get('Roles')?.toString() ?? '';
+  var jsonObject = JSON.parse(jsonString);
+  var arrayFromString = Object.values(jsonObject);
+  var userRoles = arrayFromString as string[];
+  if(objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+    return true;
+  }
+  else if(objectives.applicationUserId == userIdOfCurrentUser){
+    return true;
+  }
+  return false
 }
 defineExpose({ onAddFilterAndSearch, ReLoad });
 </script>
@@ -260,5 +302,50 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
 }
 .expand-table{
  margin-left: 40px;
+}
+.okr-table {
+  font-size: 14px; /* Tăng kích thước font */
+}
+
+.el-table .el-table__row,
+.el-table .el-table__header th {
+  height: 50px; /* Tăng chiều cao hàng */
+}
+
+.el-table .title-cell {
+  font-size: 16px; /* Tăng kích thước font của ô tiêu đề */
+  padding: 10px; /* Thêm khoảng cách padding */
+}
+
+.el-progress {
+  height: 12px; /* Tăng chiều cao thanh tiến độ */
+}
+
+.el-tag {
+  font-size: 18px; /* Tăng kích thước font của tag */
+  padding: 8px 12px; /* Thêm padding cho tag */
+}
+
+.date-warning {
+  font-weight: bold;
+  font-size: 14px; /* Tăng kích thước font của ngày cảnh báo */
+  color: red;
+}
+
+.expand-table .el-table .el-table__row,
+.expand-table .el-table .el-table__header th {
+  height: 50px; /* Tăng chiều cao hàng trong bảng mở rộng */
+}
+
+.el-dialog__body {
+  font-size: 18px; /* Tăng kích thước font trong dialog */
+}
+
+.el-button {
+  font-size: 14px; /* Tăng kích thước font của button */
+}
+
+.btn-add-item {
+  font-size: 14px; /* Tăng kích thước font cho nút "see more..." */
 }
 </style>

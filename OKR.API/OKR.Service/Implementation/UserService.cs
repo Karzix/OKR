@@ -131,7 +131,7 @@ namespace OKR.Service.Implementation
                     {
                         Email = x.Email,
                         UserName = x.UserName,
-                        Id = Guid.Parse(x.Id),
+                        Id = (x.Id),
                         DepartmentName = x.DepartmentId != null ? x.Department.Name : "",
                         DepartmentId = x.DepartmentId,
                         ManagerName = x.ManagerName
@@ -261,7 +261,7 @@ namespace OKR.Service.Implementation
                     DepartmentId = x.DepartmentId,
                     DepartmentName = x.Department.Name,
                     Email = x.Email,
-                    Id = Guid.Parse(x.Id),
+                    Id = (x.Id),
                     UserName = x.UserName,
                 }).ToList();
                 result.BuildResult(data);
@@ -308,7 +308,7 @@ namespace OKR.Service.Implementation
                         {
                             DepartmentId = x.DepartmentId,
                             Email = x.Email,
-                            Id = Guid.Parse(x.Id),
+                            Id = (x.Id),
                             UserName = x.UserName,
                         }).ToList();
                         if(list.Count() == 0)

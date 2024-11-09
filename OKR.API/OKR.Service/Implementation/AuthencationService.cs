@@ -229,7 +229,9 @@ namespace OKR.Service.Implementation
                 {
                     UserName = user.UserName,
                     Roles = roles.ToArray(),
-                    Email = user.Email
+                    Email = user.Email,
+                    Id = user.Id,
+                    DepartmentId = user.DepartmentId,
                 };
                 Log.Information(user.UserName + " login");
                 result.BuildResult(userDto);

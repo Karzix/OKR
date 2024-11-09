@@ -55,7 +55,7 @@
     </div>
     <el-dialog v-model="showDialogDetailKeyresult">
         <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives" 
-        :allow-update-weight="props.allowUpdateWeight"></DetailKeyresult>
+        :allow-update-weight="allowUpdateWeight" :objectives="objectives"></DetailKeyresult>
     </el-dialog>
     <el-dialog v-model="showDialogEdit">
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
@@ -80,12 +80,13 @@ import { deepCopy } from "@/Service/deepCopy";
 import DetailKeyresult from "./DetailKeyresult.vue";
 import CreateEditObjectives from "./Create-Edit/Create.vue";
 import { ElMessage } from "element-plus";
+import Cookies from "js-cookie";
 
 
 const props = defineProps<{
     isOwner?: boolean;
     objectives: Objectives;
-    allowUpdateWeight?: boolean
+    // allowUpdateWeight?: boolean
 }>()
 const objectives = ref<Objectives>({
   id: undefined,
@@ -103,12 +104,14 @@ const objectives = ref<Objectives>({
   period: "Q1",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
+  numberOfPendingUpdates: 0
 });
 const keyresults = ref<KeyResult[]>([]);
 const tabs = ref("comment");
 const showDialogDetailKeyresult = ref(false);
 const keyresultIdSelect = ref("");
 const showDialogEdit = ref(false);
+const allowUpdateWeight = ref(false);
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
@@ -125,7 +128,7 @@ const getObjectives = async () => {
     await axiosInstance.get(url).then((res) => {
         objectives.value = res.data.data
         objectives.value.createdOn = RecalculateTheDate(objectives.value.createdOn);
-        objectives.value.lastProgressUpdate = RecalculateTheDate(objectives.value.lastProgressUpdate);
+        objectives.value.lastProgressUpdate = objectives.value.lastProgressUpdate? RecalculateTheDate(objectives.value.lastProgressUpdate) :undefined;
         objectives.value.startDay = RecalculateTheDate(objectives.value.startDay);
         objectives.value.endDay = RecalculateTheDate(objectives.value.endDay);
     })
@@ -154,8 +157,22 @@ const onDelete = () => {
 const onEdit = () => {
     showDialogEdit.value = true
 }
+
+const CheckPermissions = () =>{
+    var departmentId = Cookies.get("DepartmentId")?.toString() ?? "";
+    var userid = Cookies.get("UserId")?.toString() ?? "";
+    if(objectives.value.departmentId == departmentId || objectives.value.applicationUserId == userid){
+        allowUpdateWeight.value = true
+    }
+    else{
+        allowUpdateWeight.value = false
+    }
+    
+}
 onMounted(() => {
-    getObjectives()
+    getObjectives().then(() => {
+        CheckPermissions()
+    })
 })
 onBeforeMount(() => {
     var filter = new Filter();
