@@ -5,6 +5,9 @@
     </div>
     <el-container>
       <el-header class="layout2_header" v-if="!isMobile">
+        <div class="layout2-logo" @click="handleAsideClick('')">
+          <img src="@/assets/logo2.png" alt="" >
+        </div>
         <el-row :gutter="20" class="w-100 layout2-row-header">
           <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
@@ -12,14 +15,13 @@
             </el-icon>
             <span>User</span>
           </el-col>
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
+          <el-col :span="6" class="item-menu" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
             <el-icon>
-              <UserFilled />
-              <UserFilled />
+              <Flag />
             </el-icon>
-            <span>Team</span>
+            <span>Department</span>
           </el-col>
-          <el-col
+          <!-- <el-col
             v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])"
             :span="6"
             class="item-menu"
@@ -29,8 +31,8 @@
               <OfficeBuilding />
             </el-icon>
             <span>Branch</span>
-          </el-col>
-          <el-col :span="6" class="layout2-search">
+          </el-col> -->
+          <!-- <el-col :span="6" class="layout2-search">
             <el-select
               v-model="searchUsername"
               clearable
@@ -48,7 +50,7 @@
               />
             </el-select>
             <el-icon><Search /></el-icon>
-          </el-col>
+          </el-col> -->
         </el-row>
       </el-header>
       <el-header class="mobile-header" v-if="isMobile">
@@ -77,18 +79,17 @@
             </el-icon>
             <span>User</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="handleAsideClick('Team')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
+          <el-menu-item index="3" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon>
-              <UserFilled />
-              <UserFilled />
+              <Flag />
             </el-icon>
             <span>Team</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
+          <!-- <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
             <el-icon><OfficeBuilding /></el-icon>
             <span>Branch</span>
-          </el-menu-item>
-          <el-menu-item index="5" >
+          </el-menu-item> -->
+          <!-- <el-menu-item index="5" >
             <el-select
               v-model="searchUsername"
               clearable
@@ -106,7 +107,7 @@
               />
             </el-select>
             <el-icon><Search /></el-icon>
-          </el-menu-item>
+          </el-menu-item> -->
         </el-menu>
       </el-col>
 
@@ -122,6 +123,7 @@ import {
   OfficeBuilding,
   UserFilled,
   Search,
+  Flag,
 } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import Cookies from "js-cookie";
@@ -291,5 +293,11 @@ watch(() => searchUsername.value, () => {
 }
 .layout2-search-mobile{
 
+}
+.layout2-logo :hover {
+  cursor: pointer;
+}
+.layout2-logo > img{
+  height: 60px;
 }
 </style>

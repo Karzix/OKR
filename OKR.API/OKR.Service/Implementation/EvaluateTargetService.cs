@@ -14,20 +14,19 @@ namespace OKR.Service.Implementation
     public class EvaluateTargetService : IEvaluateTargetService
     {
         private IEvaluateTargetRepository _evaluateTargetRepository;
-        private IDepartmentObjectivesRepository _departmentObjectivesRepository;
         private IUserRepository _userRepository;
         private IHttpContextAccessor _contextAccessor;
         private IMapper _mapper;
-        private IUserObjectivesRepository _userObjectivesRepository;
-        public EvaluateTargetService(IEvaluateTargetRepository evaluateTargetRepository, IDepartmentObjectivesRepository departmentObjectivesRepository,
-            IUserRepository userRepository, IHttpContextAccessor contextAccessor, IMapper mapper, IUserObjectivesRepository userObjectivesRepository)
+        private IObjectivesRepository _objectivesRepository;
+        public EvaluateTargetService(IEvaluateTargetRepository evaluateTargetRepository, 
+            IUserRepository userRepository, IHttpContextAccessor contextAccessor, IMapper mapper
+            , IObjectivesRepository objectivesRepository)
         {
             _evaluateTargetRepository = evaluateTargetRepository;
-            _departmentObjectivesRepository = departmentObjectivesRepository;
             _userRepository = userRepository;
             _contextAccessor = contextAccessor;
             _mapper = mapper;
-            _userObjectivesRepository = userObjectivesRepository;
+            _objectivesRepository = objectivesRepository;
         }
 
         public AppResponse<EvaluateTargetDto> Create(EvaluateTargetDto request)
@@ -35,33 +34,21 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<EvaluateTargetDto>();
             try
             {
-                if(request.DepartmentObjectivesId == null && request.UserObjectivesId == null)
+                var userName = _contextAccessor.HttpContext.User.Identity.Name;
+                if (request.ObjectivesId == null)
                 {
-                    return result.BuildError("Cannot find Objectives");
+                    result.BuildError("objectives null");
                 }
-                var typeObjectives = "";
-                if(request.UserObjectivesId != null)
+                var objectivesAsQueryable = _objectivesRepository.FindBy(x=>x.Id == request.ObjectivesId);
+                if(objectivesAsQueryable.Count() == 0)
                 {
-                    typeObjectives = "user";
-                    var userObjectives = _userObjectivesRepository.FindByPredicate(x=>x.Id == request.UserObjectivesId);
-                    if(userObjectives.Count() == 0)
-                    {
-                        return result.BuildError("cannot find user objectives");
-                    }
+                    return result.BuildError("cannot find objectives");
                 }
-                else
-                {
-                    typeObjectives = "department";
-                    var departmentObjectives = _departmentObjectivesRepository.FindByPredicate(x => x.Id == request.DepartmentObjectivesId);
-                    if (departmentObjectives.Count() == 0)
-                    {
-                        return result.BuildError("cannot find user objectives");
-                    }
-                }
-                var evaluateTarget = _mapper.Map<EvaluateTarget>(request);
-                evaluateTarget.CreatedBy = _contextAccessor.HttpContext.User.Identity.Name;
-                evaluateTarget.CreatedOn = DateTime.UtcNow;
-                _evaluateTargetRepository.Add(evaluateTarget);
+                var evaluaTarget = _mapper.Map<EvaluateTarget>(request);
+                evaluaTarget.Id = Guid.NewGuid();
+                evaluaTarget.CreatedBy = userName;
+                _evaluateTargetRepository.Add(evaluaTarget);
+                request.Id = evaluaTarget.Id;
                 result.BuildResult(request);
             }
             catch (Exception ex)
@@ -126,36 +113,30 @@ namespace OKR.Service.Implementation
                 var query = BuildFilterExpression(request.Filters);
                 var numOfRecords = _evaluateTargetRepository.CountRecordsByPredicate(query);
                 var evaluatarget = _evaluateTargetRepository.FindByPredicate(query);
-                //if (request.SortBy != null)
-                //{
-                //    users = _evaluateTargetRepository.addSort(users, request.SortBy);
-                //}
-                //else
-                //{
-                    evaluatarget = evaluatarget.OrderByDescending(x => x.CreatedOn);
-                //}
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = evaluatarget.Skip(startIndex).Take(pageSize);
-                var dtoList = UserList.Select(x => new EvaluateTargetDto
+                var list = evaluatarget.Skip(startIndex).Take(pageSize);
+
+                var data = list.Select(x=> new EvaluateTargetDto
                 {
-                    Id = x.Id,
                     Content = x.Content,
                     CreateBy = x.CreatedBy,
                     CreateOn = x.CreatedOn,
-                    DepartmentObjectivesId = x.DepartmentObjectivesId,
-                    UserObjectivesId = x.UserObjectivesId,
+                    ObjectivesId = x.ObjectivesId,
+                    Id = x.Id,
+                    Modifiedby = x.Modifiedby,
+                    ModifiedOn = x.ModifiedOn,
                 }).ToList();
+
                 var searchResult = new SearchResponse<EvaluateTargetDto>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
                     CurrentPage = pageIndex,
-                    Data = dtoList,
+                    Data = data,
                 };
-
-                result.Data = searchResult;
+                result.BuildResult(searchResult);
                 result.IsSuccess = true;
             }
             catch (Exception ex)
@@ -178,7 +159,7 @@ namespace OKR.Service.Implementation
                         switch (filter.FieldName)
                         {
                             case "objectivesId":
-                                predicate = predicate.And(x => x.DepartmentObjectives.ObjectivesId == Guid.Parse(filter.Value) || x.UserObjectives.ObjectivesId == Guid.Parse(filter.Value));
+                                predicate = predicate.And(x => x.ObjectivesId == Guid.Parse(filter.Value));
                                 break;
                             default:
                                 break;

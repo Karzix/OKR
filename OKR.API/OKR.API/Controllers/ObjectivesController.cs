@@ -21,34 +21,34 @@ namespace OKR.API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(ObjectiveDto request)
+        public async Task<IActionResult> Create(ObjectiveDto request)
         {
-            var result = _objectiveService.Create(request);
+            var result = await _objectiveService.Create(request);
             return Ok(result);
         }
 
         [HttpGet]
-        [Route("{Id}")]
-        public IActionResult Get(Guid Id)
+        [Route("{id}")]
+        public IActionResult Get(Guid id)
         {
-            var result = _objectiveService.Get(Id);
+            var result = _objectiveService.Get(id);
             return Ok(result);
         }
 
         [HttpPost]
         [Route("search")]
         [AllowAnonymous]
-        public IActionResult Search(SearchRequest request)
+        public async Task<IActionResult> Search(SearchRequest request)
         {
-            var result =  _objectiveService.Search(request);
+            var result = await _objectiveService.Search(request);
             return Ok(result);
         }
         [HttpPost]
         [Route("overal-progress")]
         [AllowAnonymous]
-        public IActionResult OverallProgress(SearchRequest request)
+        public async Task<IActionResult> OverallProgress(SearchRequest request)
         {
-            var result =  _objectiveService.CaculateOveralProgress(request);
+            var result = await _objectiveService.CaculateOveralProgress(request);
             return Ok(result);
         }
         [HttpPut]
@@ -57,6 +57,26 @@ namespace OKR.API.Controllers
             var result = _objectiveService.Edit(request);
             return Ok(result);
         }
-
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var result = _objectiveService.Delete(id);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("periods")]
+        public IActionResult GetPeriod()
+        {
+            var result= _objectiveService.GetPeriods();
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("statusStatistics")]
+        public async Task<IActionResult> GetStatusStatistics(SearchRequest request)
+        {
+            var result = await _objectiveService.StatusStatistics(request);
+            return Ok(result);
+        }
     }
 }

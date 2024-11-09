@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
 using OKR.Service.Contract;
+using OKR.Service.Implementation;
 using System.Diagnostics.Metrics;
 
 namespace OKR.API.Controllers
@@ -70,6 +71,13 @@ namespace OKR.API.Controllers
         public IActionResult DepartmentLevelNumber()
         {
             var result = _departmentService.DepartmentLevelNumber();
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("list-by-keyword/{keyword}")]
+        public IActionResult GetListByKeyword(string keyword)
+        {
+            var result = _departmentService.GetDepartByKeyword(keyword);
             return Ok(result);
         }
     }

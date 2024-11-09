@@ -38,7 +38,7 @@ import { ElMessage } from 'element-plus';
 
 
 const props = defineProps<{
-  EntotyOfjectivesId: string;
+  objectivesId: string;
 }>();
 const emit = defineEmits<{
   (e: "onSuccess",request : DepartmentProgressApprovalDto): void;
@@ -77,7 +77,7 @@ const handleAddRow = () => {
 onMounted(() => {
   var filter = new Filter();
   filter.FieldName = "entityObjectivesId";
-  filter.Value = props.EntotyOfjectivesId;
+  filter.Value = props.objectivesId;
   addFilter(searchRequest.value.filters as [],deepCopy(filter));
   Search()
 })

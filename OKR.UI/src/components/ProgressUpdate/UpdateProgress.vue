@@ -19,7 +19,7 @@
         v-model="props.keyresults.addedPoints"
         class="current-point"
         :min="(-1 * (props.keyresults.currentPoint ?? 0))"
-        :max="props.keyresults.maximunPoint"
+        :max="(props.keyresults.maximunPoint! - (props.keyresults.currentPoint ?? 0))"
         controls-position="right"
       />
     </div>
@@ -40,15 +40,17 @@ import { axiosInstance } from "../../Service/axiosConfig";
 import { ElMessage, ElLoading } from "element-plus";
 import { ref, watch } from "vue";
 import Cookies from "js-cookie";
+import type { Objectives } from "@/Models/Objective";
+import { hasPermission } from "@/components/maynghien/Common/handleRole";
 
 const props = defineProps<{
   keyresults: KeyResult;
-  UserCreateObjectives: string
+  // UserCreateObjectives: string
+  objectives: Objectives
 }>();
 const emit = defineEmits<{
   (e: "close"): void;
-  (e: "onSaveUpdateProgress"): void;
-  (e: "onUpdateProgress", point: number, keyresultId: string): void;
+  (e: "onUpdatedSuccessfully", point: number): void;
 }>();
 const caculateCrrentPoint = ref(0);
 const Save = async () => {
@@ -57,27 +59,41 @@ const Save = async () => {
     text: "The request is being processed",
     background: "rgba(0, 0, 0, 0.7)",
   });
-  console.log(props.UserCreateObjectives);
-  await axiosInstance.put("KeyResults", props.keyresults).then((res) => {
+  console.log(props.keyresults.createdBy);
+  try{
+    var k = new KeyResult();
+    k.id = props.keyresults.id;
+    k.addedPoints = props.keyresults.addedPoints;
+    k.objectivesId = props.keyresults.objectivesId;
+    k.currentPoint = props.keyresults.currentPoint;
+    k.maximunPoint = props.keyresults.maximunPoint;
+    k.note = props.keyresults.note;
+    k.progressUpdates = undefined;
+    k.description = props.keyresults.description;
+
+    console.log(k);
+    await axiosInstance.put("KeyResults", k).then((res) => {
     if (!res.data.isSuccess) {
       ElMessage.error(res.data.message);
     } else {
-      if(!isTheCreator()){
+      if(!isTeamleadOrOwner()){
         ElMessage.success("Your request will be processed when the owner accepts it.");
       }
       else{
-        emit("onSaveUpdateProgress");
         var crpoint = props.keyresults.currentPoint ?? 0;
         var addpoint = props.keyresults.addedPoints ?? 0;
         emit(
-          "onUpdateProgress",
-          (crpoint + addpoint),
-          props.keyresults.id ?? ""
+          "onUpdatedSuccessfully",
+          (crpoint + addpoint)
         );
       }
       
     }
   });
+  }
+  catch(e){
+    console.error(e);
+  }
   loading.close();
 };
 watch(() => props.keyresults.addedPoints , () => {
@@ -86,9 +102,21 @@ watch(() => props.keyresults.addedPoints , () => {
   caculateCrrentPoint.value = cur + add;
 },{immediate: true})
 
-const isTheCreator = () : boolean => {
+const isTeamleadOrOwner = () : boolean => {
   var userLogin = Cookies.get("userName")?.toString();
-  return userLogin == props.UserCreateObjectives;
+  var userIdOfCurrentUser = Cookies.get("UserId")?.toString();
+  var departmentIdOfCurrentUser = Cookies.get("DepartmentId")?.toString();
+  var jsonString = Cookies.get('Roles')?.toString() ?? '';
+  var jsonObject = JSON.parse(jsonString);
+  var arrayFromString = Object.values(jsonObject);
+  var userRoles = arrayFromString as string[];
+  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+    return true;
+  }
+  else if(props.objectives.applicationUserId == userIdOfCurrentUser){
+    return true;
+  }
+  return false
 }
 </script>
 <style scoped>

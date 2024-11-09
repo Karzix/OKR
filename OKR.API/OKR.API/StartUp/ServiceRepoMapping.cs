@@ -16,11 +16,8 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IObjectivesRepository, ObjectivesRepository>();
             builder.Services.AddScoped<IKeyResultRepository, KeyResultRepository>();
-            builder.Services.AddScoped<ISidequestsRepository, SidequestsRepository>();
             builder.Services.AddScoped<IProgressUpdatesRepository, ProgressUpdatesRepository>();
-            builder.Services.AddScoped<IDepartmentObjectivesRepository, DepartmentObjectivesRepository>();
             builder.Services.AddScoped<IEvaluateTargetRepository, EvaluateTargetRepository>();
-            builder.Services.AddScoped<IUserObjectivesRepository, UserObjectivesRepository>();
             builder.Services.AddScoped<IDepartmentProgressApprovalRepository, DepartmentProgressApprovalRepository>();
 
             builder.Services.AddScoped<IAuthencationService, AuthencationService>();
@@ -29,9 +26,7 @@ namespace OKR.API.StartUp
             builder.Services.AddScoped<IObjectivesService, ObjectiveService>();
             builder.Services.AddScoped<IKeyResultsService, KeyResultsService>();
             builder.Services.AddScoped<IProgressUpdatesService, ProgressUpdatesService>();
-            builder.Services.AddScoped<ISidequestsService, SidequestsService>();
             builder.Services.AddScoped<IEvaluateTargetService, EvaluateTargetService>();
-            builder.Services.AddScoped<IEntityObjectivesService, EntityObjectivesService>();
             builder.Services.AddScoped<IDepartmentProgressApprovalService, DepartmentProgressApprovalService>();
 
             builder.Services.AddScoped<SendReminderEmailJob>();

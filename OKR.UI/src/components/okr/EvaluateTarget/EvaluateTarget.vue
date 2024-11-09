@@ -1,14 +1,12 @@
 <template>
-  <div class="infinite-list-wrapper" style="overflow: auto">
+  <div class="infinite-list-wrapper" >
     <ul
-      v-infinite-scroll="search"
       class="list"
-      :infinite-scroll-disabled="disabled"
     >
       <div class="comment" v-for="(item, index)  in listEvaluateTarget" :key="item.id">
         <p class="comment-header">
           <strong>{{ item.createBy }}</strong> -
-          <span class="timestamp">{{ formatDate(item.createOn) }}</span>
+          <span class="timestamp">{{ item.createOn ? formatDate_dd_mm_yyyy_hh_mm(item.createOn) : '' }}</span>
         </p>
         <p class="comment-body" v-if="!isEdit">{{ item.content }}</p>
         <div class="comment-body-edit" v-else>
@@ -25,12 +23,13 @@
         </div>
       </div>
       <p v-if="loading" class="loading-av"><el-icon class="spinning-icon"><Loading /></el-icon></p>
-      <p v-if="noMore">nomore</p>
+      <p v-if="noMore" class="no-more-text">No more items</p>
     </ul>
+    <el-button v-if="!noMore" @click="search" :loading="loading" type="primary" link>Show more...</el-button>
   </div>
-  <div>
+  <div class="form-comment" >
     <el-input v-model="content" />
-    <el-button @click="AddEvaluateTarget">Add</el-button>
+    <el-button @click="AddEvaluateTarget"><el-icon><Promotion /></el-icon></el-button>
   </div>
 </template>
 <script setup lang="ts">
@@ -44,7 +43,7 @@ import { axiosInstance } from "@/Service/axiosConfig";
 import type { SearchResponse } from "@/Models/SearchResponse";
 import { EvaluateTarget } from "@/Models/EvaluateTarget";
 import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
-import { formatDate, RecalculateTheDate } from "@/Service/formatDate";
+import { formatDate, RecalculateTheDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
 import { Loading } from "@element-plus/icons-vue";
 import { CloseBold, EditPen, Promotion } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
@@ -62,7 +61,6 @@ const searchResponse = ref<SearchResponse<EvaluateTarget>>({
 });
 const props = defineProps<{
   searchRequest: SearchRequest;
-  targetType: string;
 }>();
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
@@ -78,10 +76,6 @@ const search = async () => {
   if (loading.value && noMore.value) return;
   loading.value = true;
   try {
-    // setTimeout(() => {
-      
-    // },5000);
-    // ElLoading.service({ lock: true, text: "Loading", background: "rgba(0, 0, 0, 0.7)" });
     await axiosInstance
       .post("EvaLuateTarget/search", searchRequest.value)
       .then((res) => {
@@ -112,7 +106,6 @@ const search = async () => {
           noMore.value = true;
           disabled.value = true;
         }
-        // ElLoading.service().close();
       });
   } catch (e) {
     console.error(e);
@@ -139,24 +132,17 @@ watch(
   },
   { deep: true }
 );
-onMounted(() => {
-  console.log(props.targetType);
-  search();
-});
+// onMounted(() => {
+//   searchRequest.value = props.searchRequest;
+//   console.log(props.targetType);
+//   search();
+// });
 
 const AddEvaluateTarget = async () => {
   // const evaluateTarget = new EvaluateTarget();
   const evaluateTarget = new EvaluateTarget();
-  if (props.targetType == "0") {
-    evaluateTarget.userObjectivesId = props.searchRequest.filters?.filter(
-      (x) => x.FieldName == "entityObjectivesId"
-    )[0].Value as string;
-  } else {
-    evaluateTarget.departmentObjectivesId = props.searchRequest.filters?.filter(
-      (x) => x.FieldName == "entityObjectivesId"
-    )[0].Value as string;
-  }
   evaluateTarget.content = content.value;
+  evaluateTarget.objectivesId = props.searchRequest.filters?.filter(x=>x.FieldName == "objectivesId")[0].Value;
   console.log(evaluateTarget);
   await axiosInstance.post("EvaLuateTarget", evaluateTarget).then((res) => {
     if (res.data.isSuccess) {
@@ -246,10 +232,13 @@ const Edit = (item: EvaluateTarget) => {
       
     )
 }
+onMounted(() => {
+  search();
+});
 </script>
 <style scoped>
 .infinite-list-wrapper {
-  max-height: calc(100vh - 200px);
+  /* max-height: calc(100vh - 200px); */
   /* overflow: auto; */
   padding: 0 20px;
 }
@@ -309,6 +298,14 @@ p.loading-av {
   top: 0;
 }
 .comment-body-edit{
+  display: flex;
+}
+.no-more-text {
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+.form-comment{
   display: flex;
 }
 </style>

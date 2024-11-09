@@ -55,10 +55,10 @@ namespace OKR.Service.Implementation
                     Email = request.Email,
                     UserName = request.Email,
                     EmailConfirmed = true,
-                    
+                    ManagerName = request.ManagerName
                 };
                 await _userManager.CreateAsync(newUser);
-                await _userManager.AddPasswordAsync(newUser, request.Password ?? "Abc@123");
+                await _userManager.AddPasswordAsync(newUser, request.Password ?? "Abc@123456");
                 if (!(await _roleManager.RoleExistsAsync(request.Role )))
                 {
                     IdentityRole role = new IdentityRole { Name = request.Role };
@@ -131,9 +131,10 @@ namespace OKR.Service.Implementation
                     {
                         Email = x.Email,
                         UserName = x.UserName,
-                        Id = Guid.Parse(x.Id),
+                        Id = (x.Id),
                         DepartmentName = x.DepartmentId != null ? x.Department.Name : "",
-                        DepartmentId = x.DepartmentId
+                        DepartmentId = x.DepartmentId,
+                        ManagerName = x.ManagerName
                     }).ToList();
                 if (dtoList != null && dtoList.Count > 0)
                 {
@@ -233,6 +234,9 @@ namespace OKR.Service.Implementation
                             case "userName":
                                 predicate = predicate.And(m => m.UserName.Contains(filter.Value));
                                 break;
+                            case "departmentId":
+                                predicate = predicate.And(x => x.DepartmentId == Guid.Parse(filter.Value));
+                                break;
                             default:
                                 break;
                         }
@@ -257,7 +261,7 @@ namespace OKR.Service.Implementation
                     DepartmentId = x.DepartmentId,
                     DepartmentName = x.Department.Name,
                     Email = x.Email,
-                    Id = Guid.Parse(x.Id),
+                    Id = (x.Id),
                     UserName = x.UserName,
                 }).ToList();
                 result.BuildResult(data);
@@ -304,7 +308,7 @@ namespace OKR.Service.Implementation
                         {
                             DepartmentId = x.DepartmentId,
                             Email = x.Email,
-                            Id = Guid.Parse(x.Id),
+                            Id = (x.Id),
                             UserName = x.UserName,
                         }).ToList();
                         if(list.Count() == 0)

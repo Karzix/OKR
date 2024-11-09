@@ -9,7 +9,7 @@ namespace OKR.Infrastructure.Enum
     public enum TargetType
     {
         individual,
-        branch,
+        company,
         team
     }
     public class FormatTargetType
@@ -20,7 +20,7 @@ namespace OKR.Infrastructure.Enum
             {
                 case TargetType.individual:
                     return "Individual";
-                case TargetType.branch:
+                case TargetType.company:
                     return "Branch";
                 case TargetType.team:
                     return "Team";

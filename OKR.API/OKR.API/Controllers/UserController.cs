@@ -64,8 +64,8 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("list-by-keyworld/{username}")]
-        public IActionResult GetListByKeyworld(string username)
+        [Route("list-by-keyword/{username}")]
+        public IActionResult GetListByKeyword(string username)
          {
             var result = _userService.GetListByKeyworld(username);
             return Ok(result);

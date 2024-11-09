@@ -20,5 +20,6 @@ namespace OKR.Service.Contract
         AppResponse<SearchResponse<DepartmentDto>> Search(SearchRequest request);
         AppResponse<List<DepartmentDto>> GetParentDepartmentByLevel(int level);
         AppResponse<List<int>> DepartmentLevelNumber();
+        AppResponse<List<DepartmentDto>> GetDepartByKeyword(string keyword);
     }
 }

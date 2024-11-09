@@ -1,16 +1,10 @@
 ﻿using Maynghien.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.IO;
 using OKR.Infrastructure.Enum;
 using OKR.Models.Context;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static OKR.Infrastructure.Enum.helperQuarter;
 
 namespace OKR.Repository.Implementation
 {
@@ -20,66 +14,21 @@ namespace OKR.Repository.Implementation
         {
         }
 
-        public void Add(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests, Guid? DepartmentId)
+        public void Add(Objectives obj, List<KeyResults> keyResults)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    var now = DateTime.UtcNow;
-                    //StatusObjectives status;
-                    if(now < obj.StartDay)
-                    {
-                        obj.status = StatusObjectives.notStarted;
-                    }
-                    else
-                    {
-                        obj.status = StatusObjectives.working;
-                    }
                     obj.CreatedOn = DateTime.UtcNow;
-                    _context.Add(obj);
+                    _context.Objectives.Add(obj);
 
-                    foreach (var item in keyResults)
+                    keyResults.ForEach(keyResults =>
                     {
-                        item.CreatedOn = DateTime.UtcNow;
-                        item.ObjectivesId = obj.Id;
-                        item.Active = true;
-                    }
-                    _context.AddRange(keyResults);
-
-                    foreach (var item in sidequests)
-                    {
-                        item.CreatedOn = DateTime.UtcNow;
-                    }
-                    _context.AddRange(sidequests);
-
-                    if(obj.TargetType == TargetType.individual)
-                    {
-                        var newUserObj = new UserObjectives
-                        {
-                            ApplicationUserId = _context.Users.Where(x => x.UserName == obj.CreatedBy).First().Id,
-                            CreatedBy = obj.CreatedBy,
-                            Id = Guid.NewGuid(),
-                            ObjectivesId = obj.Id,
-                            CreatedOn = DateTime.UtcNow,
-                            //status = status
-                        };
-                        _context.UserObjectives.Add(newUserObj);
-                    }
-                    else
-                    {
-                        var newDepartmentObj = new DepartmentObjectives
-                        {
-                            CreatedBy = obj.CreatedBy,
-                            DepartmentId = DepartmentId.Value,
-                            CreatedOn = DateTime.UtcNow,
-                            ObjectivesId = obj.Id,
-                            Id = Guid.NewGuid(),
-                            //status = status
-                        };
-                        _context.DepartmentObjectives.Add(newDepartmentObj);
-                    }
-
+                        keyResults.CreatedOn = DateTime.UtcNow;
+                        keyResults.CreatedBy = obj.CreatedBy;
+                    });
+                    _context.KeyResults.AddRange(keyResults);
                     _context.SaveChanges();
                     transaction.Commit();
                 }
@@ -89,112 +38,64 @@ namespace OKR.Repository.Implementation
                     throw;
                 }
             }
-        } 
-
-        public Dictionary<Guid,int> caculatePercentObjectives(IQueryable<Objectives> input)
-        {
-            var result = input.Select(obj => new
-            {
-                pointObj = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
-                .Select(kr => new
-                {
-                    krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
-                                                    ? (kr.CurrentPoint/ (double)kr.MaximunPoint)
-                    :(kr.CurrentPoint / kr.MaximunPoint) / 2
-                    + (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
-                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()) / 2
-                    : (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
-                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()) ,
-                    krId = kr.Id,
-                }).ToList(),
-                Id = obj.Id
-            }).ToList();
-
-            // Convert the result to a dictionary with the correct calculations
-            var resultDictionary = result.ToDictionary(
-                x => x.Id,
-                x => (int)x.pointObj.Average(po => po.krPoint * 100)
-            );
-
-            return resultDictionary;
         }
+
         public int caculateOveralProgress(IQueryable<Objectives> input)
         {
+            var totalProgress = Math.Round(input.Select(obj =>
+                 _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
+                     .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint))
+             ).Sum(), 2);
+            var objectiveCount = input.Count();
+            var averageProgress = objectiveCount > 0 ? (totalProgress / objectiveCount) * 100 : 0;
+
+            return (int)Math.Round(averageProgress, 2);
+        }
+
+        public Dictionary<Guid, int> caculatePercentObjectives(IQueryable<Objectives> input)
+        {
             var result = input.Select(obj => new
             {
                 pointObj = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
-                .Select(kr => new
-                {
-                    krPoint = kr.Unit != TypeUnitKeyResult.Checked ? _context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count() == 0
-                                                    ? (kr.CurrentPoint / (double)kr.MaximunPoint)
-                    : (kr.CurrentPoint / kr.MaximunPoint) / 2
-                    + (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
-                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()) / 2
-                    : (_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id && sq.Status == true).Count() /
-                        (double)_context.Sidequests.Where(sq => sq.KeyResultsId == kr.Id).Count()),
-                    krId = kr.Id,
-                }).ToList(),
+                    .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint)),
                 Id = obj.Id
-            }).ToList();
-
-            // Convert the result to a dictionary with the correct calculations
-            var point = result.ToDictionary(
+            }).ToDictionary(
                 x => x.Id,
-                x => (int)x.pointObj.Average(po => po.krPoint * 100)
-            ).Average(x=>x.Value);
+                x => (int)x.pointObj 
+            );
 
-            return (int)point;
+            return result;
         }
 
-        public void Edit(Objectives obj, List<KeyResults> keyResults, List<Sidequests> sidequests)
+        public int caculatePercentObjectivesById(Guid id)
+        {
+            var point = _context.KeyResults
+               .Where(x => x.ObjectivesId.Equals(id) && x.MaximunPoint > 0) // Kiểm tra MaximunPoint > 0
+               .Select(x => ((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+               .Sum();
+            return (int)Math.Round(point);
+        }
+
+        public void Edit(Objectives updatedObj, List<KeyResults> updatedKeyResults, List<KeyResults> createKeyresult)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
                 try
                 {
-                    // Kiểm tra sự tồn tại của đối tượng
-                    if (_context.Objectives.Any(o => o.Id == obj.Id) == false)
-                    {
-                        throw new Exception("Objective does not exist.");
-                    }
-
-                    _context.Objectives.Update(obj);
-                    _context.SaveChanges();
-                    var existingKeyResults = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id).ToList();
-
-                    var listKeyResultsEdit = keyResults.Where(x => existingKeyResults.Any(kr => kr.Id == x.Id)).ToList();
-                    _context.KeyResults.UpdateRange(listKeyResultsEdit);
-                    _context.SaveChanges();
-                    var listNewKeyResults = keyResults.Where(x => existingKeyResults.All(kr => kr.Id != x.Id)).ToList();
-                    _context.KeyResults.AddRange(listNewKeyResults);
-                    _context.SaveChanges();
-                    var ListIdKeyresults = listKeyResultsEdit.Select(x => x.Id).ToList();
-
-                    var editSidequestsID = _context.Sidequests.Where(x => ListIdKeyresults.Contains(x.KeyResultsId)).Select(x=>x.Id).ToList();
-                    var listSidequestsEdit = sidequests.Where(x => editSidequestsID.Contains(x.Id)).ToList();
-                    _context.Sidequests.UpdateRange(listSidequestsEdit);
-                    _context.SaveChanges();
-                    var listNewSidequests = sidequests.Where(x => !editSidequestsID.Contains(x.Id)).ToList();
-                    _context.Sidequests.AddRange(listNewSidequests);
-
+                    _context.Objectives.Update(updatedObj);
+                    _context.KeyResults.UpdateRange(updatedKeyResults);
+                    _context.KeyResults.AddRange(createKeyresult);
                     _context.SaveChanges();
                     transaction.Commit();
                 }
-                catch (DbUpdateException dbEx)
+                catch (Exception)
                 {
                     transaction.Rollback();
-                    // Log inner exception details for further investigation
-                    Console.WriteLine(dbEx.InnerException?.Message);
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    // Log general exception details
-                    Console.WriteLine(ex.Message);
                     throw;
                 }
             }
         }
+
+
     }
 }

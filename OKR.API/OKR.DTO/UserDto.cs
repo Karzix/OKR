@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace OKR.DTO
 {
-    public class UserDto: BaseDto
+    public class UserDto
     {
+        public string Id { get; set; }
         public string? UserName { get; set; }
         public string? Password { get; set; }
         public string? Email { get; set; }
@@ -18,5 +19,6 @@ namespace OKR.DTO
         public string? DepartmentName { get; set; }
         public string? RefreshToken { get; set; }
         public string? Token { get; set; }
+        public string? ManagerName { get; set; }
     }
 }

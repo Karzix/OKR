@@ -2,21 +2,15 @@
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
-using OKR.Infrastructure;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
-using OKR.Repository.Implementation;
 using OKR.Service.Contract;
-using RabbitMQ.Client;
 using System.Data.Entity;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Channels;
+using static OKR.Infrastructure.Enum.helperQuarter;
 
 namespace OKR.Service.Implementation
 {
@@ -30,7 +24,6 @@ namespace OKR.Service.Implementation
         //private readonly IModel _channel;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDepartmentRepository _departmentRepository;
-
         private IDepartmentProgressApprovalRepository _progressApprovalRepository;
         public KeyResultsService(IKeyResultRepository keyResultRepository, IHttpContextAccessor httpContextAccessor,
             IMapper mapper, IProgressUpdatesRepository progressUpdatesRepository, IObjectivesRepository objectivesRepository,
@@ -53,7 +46,7 @@ namespace OKR.Service.Implementation
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<AppResponse<KeyResultDto>> Update(KeyResultDto request)
+        public async Task<AppResponse<KeyResultDto>> UpdateWeight(KeyResultDto request)
         {
             var result = new AppResponse<KeyResultDto>();
             try
@@ -62,43 +55,40 @@ namespace OKR.Service.Implementation
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var now = DateTime.UtcNow;
                 var keyresult = _keyResultRepository.Get(request.Id.Value);
-                if (request.CurrentPoint == null || request.CurrentPoint > keyresult.MaximunPoint)
+                var objectivesAsQueryable = _objectivesRepository.AsQueryable().Where(x=>x.Id == request.ObjectivesId);
+                if(!objectivesAsQueryable.Any())
                 {
-                    return result.BuildError("current point is invalid");
+                    return result.BuildError("Cannot find objectives");
                 }
-                //var objectives = _objectivesRepository.Get(keyresult.ObjectivesId);
+                var objectives = objectivesAsQueryable.First();
+                var currentUser = await _userManager.FindByNameAsync(userName);
+                if (GetCurrentUserRole() == "Teamleader" || currentUser.Id == objectives.ApplicationUserId)
+                {
+                    var progress = new ProgressUpdates();
+                    progress.Id = Guid.NewGuid();
+                    progress.CreatedOn = now;
+                    progress.CreatedBy = userName;
+                    progress.Note = GetUpdateString(request, keyresult);
+                    progress.KeyResultId = keyresult.Id;
+                    progress.OldPoint = keyresult.CurrentPoint;
+                    progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
 
-                var objectives = _objectivesRepository.AsQueryable()
-                    .Where(x=>x.Id == keyresult.ObjectivesId)
-                    .Include(x=>x.UserObjectives).Include(x=>x.DepartmentObjectives).First();
-                if (now > objectives.Deadline || objectives.status == Infrastructure.Enum.StatusObjectives.end || objectives.status == Infrastructure.Enum.StatusObjectives.notStarted)
-                {
-                    return result.BuildError("objectives has expired!");
-                }
-                var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
-                
-                if(objectives.CreatedBy == userName)
-                {
-                    Update_Save(keyresult, request);
+                    keyresult.CurrentPoint += (int)request.AddedPoints!;
+                    _keyResultRepository.Edit(keyresult);
+                    progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                    _progressUpdatesRepository.Add(progress);
                 }
                 else
                 {
-                    //if (objectives.CreatedBy == userName)
-                    //{
-                    //    Update_Save(keyresult, request);
-                    //    goto exit;
-                    //}
-                    var departmentProgressApproval = new DepartmentProgressApproval
-                    {
-                        Id = Guid.NewGuid(),
-                        CreatedBy = userName,
-                        CreatedOn = DateTime.UtcNow,
-                        KeyResultsId = keyresult.Id,
-                        Note = updateString,
-                        AddedPoints = (int)request.AddedPoints
-                    };
+                    var departmentProgressApproval = new DepartmentProgressApproval();
+                    departmentProgressApproval.Id = Guid.NewGuid();
+                    departmentProgressApproval.CreatedOn = now;
+                    departmentProgressApproval.CreatedBy = userName;
+                    departmentProgressApproval.Note = GetUpdateString(request, keyresult);
+                    departmentProgressApproval.AddedPoints = (int)request.AddedPoints;
+                    departmentProgressApproval.KeyResultsId = keyresult.Id;
+                    departmentProgressApproval.Note = GetUpdateString(request, keyresult);
                     _progressApprovalRepository.Add(departmentProgressApproval);
-                    exit:;
                 }
 
                 result.BuildResult(request);
@@ -112,18 +102,14 @@ namespace OKR.Service.Implementation
 
         private string GetUpdateString(KeyResultDto NewKeyResult, KeyResults CurKeyResults)
         {
-            string content = _contextAccessor.HttpContext.User.Identity.Name + " ";
-            if(NewKeyResult.Description != CurKeyResults.Description)
+            if(!string.IsNullOrEmpty(NewKeyResult.Note))
             {
-                content += "update keyresults name from " + CurKeyResults.Description + " to " + NewKeyResult.Description + "; ";
+                return NewKeyResult.Note;
             }
+            string content = _contextAccessor.HttpContext.User.Identity.Name + " ";
             if ((CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints) != CurKeyResults.CurrentPoint)
             {
                 content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + (CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints)+ "; ";
-            }
-            if(NewKeyResult.Deadline != CurKeyResults.Deadline)
-            {
-                content += "update deadline from " + CurKeyResults.Deadline.ToString("dd/MM/yyyy") + " to " + NewKeyResult.Deadline.Value.ToString("dd/MM/yyyy") + "; ";
             }
             return content;
         }
@@ -136,15 +122,12 @@ namespace OKR.Service.Implementation
             progressUpdates.CreatedBy = userName;
             progressUpdates.CreatedOn = DateTime.UtcNow;
             progressUpdates.Note = updateString;
-            progressUpdates.KeyResultId = keyresult.Id;
+            progressUpdates.KeyResultId = keyresult.Id; 
             progressUpdates.OldPoint = keyresult.CurrentPoint;
             progressUpdates.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
 
             keyresult.CurrentPoint = (int)(keyresult.CurrentPoint + request.AddedPoints);
             _keyResultRepository.Edit(keyresult);
-            progressUpdates.KeyresultCompletionRate = _keyResultRepository.caculatePercentKeyResults(keyresult);
-            Dictionary<Guid, int> op = _objectivesRepository.caculatePercentObjectives(_objectivesRepository.AsQueryable().Where(x => x.Id == keyresult.ObjectivesId));
-            progressUpdates.ObjectivesCompletionRate = op.ContainsKey(keyresult.ObjectivesId) ? op[keyresult.ObjectivesId] : 0;
             _progressUpdatesRepository.Add(progressUpdates);
         }
         private string GetCurrentUserRole()
@@ -165,6 +148,58 @@ namespace OKR.Service.Implementation
             }
 
             return "";
+        }
+
+        public AppResponse<KeyResultDto> Get(Guid Id)
+        {
+            var result = new AppResponse<KeyResultDto>();
+            try
+            {
+                var dto = _keyResultRepository.AsQueryable().Where(x=>x.Id == Id).Include(x=>x.Objectives).Select(x=> new KeyResultDto
+                {
+                    Active = x.Active,
+                    CreatedBy = x.CreatedBy,
+                    CreatedOn = x.CreatedOn,
+                    CurrentPoint = x.CurrentPoint,
+                    EndDay = x.Deadline,
+                    MaximunPoint = x.MaximunPoint,
+                    Description = x.Description,
+                    Id = x.Id,
+                    StartDay = x.Objectives.StartDay,
+                    Status = x.Status,
+                    //LastProgressUpdate = _progressUpdatesRepository.FindBy(pr => pr.KeyResultId == Id)
+                    //.OrderByDescending(x => x.CreatedOn).Select(x => x.CreatedOn).FirstOrDefault(),
+                    //Percentage = x.Percentage,
+                    ObjectivesId = x.ObjectivesId,
+                    Percentage = x.Percentage,
+                    
+                    
+                }).First();
+                dto.LastProgressUpdate = _progressUpdatesRepository.AsQueryable()
+                    .Where(x => x.KeyResultId == Id).OrderByDescending(x => x.CreatedOn)
+                    .Select(x => x.CreatedOn)
+                    .FirstOrDefault();
+                //var dto = _mapper.Map<KeyResultDto>(keyresult);
+
+                dto.ProgressUpdates = _progressUpdatesRepository.AsQueryable().Where(x => x.KeyResultId == dto.Id).OrderByDescending(x=>x.CreatedOn)
+                    .Select(x => new ProgressUpdatesDto
+                    {
+                        CreateBy = x.CreatedBy,
+                        CreateOn = x.CreatedOn,
+                        Id = x.Id,
+                        KeyResultId = x.KeyResultId,
+                        NewPoint = x.NewPoint,
+                        Note = x.Note,
+                        OldPoint = x.OldPoint,
+                    }).ToList();
+
+                result.BuildResult(dto);
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
         }
 
     }

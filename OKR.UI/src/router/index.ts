@@ -8,9 +8,8 @@ import HomePageView from '@/views/HomeView.vue'
 import LoginVue from '@/views/Auth/Login.vue';
 import UserVue from '@/views/User/Index.vue'
 import BranchVue from '@/views/Department/Branch.vue'
-import TeamVue from '@/views/Department/Team.vue'
+import Department from '@/views/Department/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
-import UserInfor from '@/views/OKR/UserInfor.vue'
 import SeeObjectives from '@/views/OKR/SeeObjectives.vue';
 import layout2 from '@/components/Layout/layout2.vue';
 import Layout2 from '@/components/Layout/layout2.vue';
@@ -33,14 +32,14 @@ const router = createRouter({
           component: UserVue,
           meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
+        // {
+        //   path: "Branch",
+        //   component: BranchVue,
+        //   meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
+        // },
         {
-          path: "Branch",
-          component: BranchVue,
-          meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
-        },
-        {
-          path: "Team",
-          component: TeamVue,
+          path: "Department",
+          component: Department,
           meta: { requiresAuth: true, roles: ["Admin", "superadmin"]},
         },
       ],
@@ -62,12 +61,7 @@ const router = createRouter({
       meta: { requiresAuth: false },
       children: [
         {
-          path: "UserName=:UserName",
-          component: UserInfor,
-          meta: { requiresAuth: true},
-        },
-        {
-          path: "Objectives=:EntityObjectiveId&:targetTpye",
+          path: "Objectives=:ObjectiveId",
           component: SeeObjectives,
           meta: { requiresAuth: true},
         },

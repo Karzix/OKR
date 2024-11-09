@@ -24,14 +24,10 @@ namespace OKR.Models.Context
         }
 
         public DbSet<Department> Department { get; set; }
-        public DbSet<DepartmentObjectives> DepartmentObjectives { get; set; }
         public DbSet<EvaluateTarget> EvaluateTarget { get; set; }
         public DbSet<Objectives> Objectives { get; set; }
         public DbSet<KeyResults> KeyResults { get; set; }
         public DbSet<ProgressUpdates> ProgressUpdates { get; set; }
-        public DbSet<Sidequests> Sidequests { get; set; }
-        //public DbSet<TargetType> TargetType { get; set; }
-        public DbSet<UserObjectives> UserObjectives { get; set; }
         public DbSet<DepartmentProgressApproval> DepartmentProgressApproval { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

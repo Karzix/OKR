@@ -13,10 +13,25 @@ namespace OKR.Models.Entity
     {
         public string Name { get; set; }
         public DateTime StartDay { get; set; }
-        public DateTime Deadline { get; set; }
+        public DateTime EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
-        public StatusObjectives status { get; set; } = StatusObjectives.working;
-        public ICollection<UserObjectives>? UserObjectives { get; set; }
-        public ICollection<DepartmentObjectives>? DepartmentObjectives { get; set; }
+        public StatusObjectives status { get; set; } = StatusObjectives.noStatus;
+        [ForeignKey("Department")]
+        public Guid? DepartmentId { get; set; }
+        [ForeignKey("DepartmentId")]
+        public Department? Department { get; set; }
+
+
+        [ForeignKey("ApplicationUser")]
+        public string? ApplicationUserId { get; set; }
+        [ForeignKey("ApplicationUserId")]
+        public ApplicationUser? ApplicationUser { get; set; }
+
+        public bool IsPublic { get; set; } = true;
+        public bool IsUserObjectives { get; set; } = true;
+
+        public ICollection<KeyResults>? KeyResults { get; set; }
+        public string Period { get; set; }
+        public int Year { get; set; }
     }
 }

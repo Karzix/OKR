@@ -182,6 +182,9 @@ namespace OKR.Models.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("ManagerName")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -261,42 +264,6 @@ namespace OKR.Models.Migrations
                     b.ToTable("Department");
                 });
 
-            modelBuilder.Entity("OKR.Models.Entity.DepartmentObjectives", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Modifiedby")
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("ObjectivesId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("ObjectivesId");
-
-                    b.ToTable("DepartmentObjectives");
-                });
-
             modelBuilder.Entity("OKR.Models.Entity.DepartmentProgressApproval", b =>
                 {
                     b.Property<Guid>("Id")
@@ -351,9 +318,6 @@ namespace OKR.Models.Migrations
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("DepartmentObjectivesId")
-                        .HasColumnType("char(36)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -363,14 +327,12 @@ namespace OKR.Models.Migrations
                     b.Property<string>("Modifiedby")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("UserObjectivesId")
+                    b.Property<Guid>("ObjectivesId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentObjectivesId");
-
-                    b.HasIndex("UserObjectivesId");
+                    b.HasIndex("ObjectivesId");
 
                     b.ToTable("EvaluateTarget");
                 });
@@ -415,6 +377,12 @@ namespace OKR.Models.Migrations
                     b.Property<Guid>("ObjectivesId")
                         .HasColumnType("char(36)");
 
+                    b.Property<int>("Percentage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int?>("Unit")
                         .HasColumnType("int");
 
@@ -431,16 +399,28 @@ namespace OKR.Models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("Deadline")
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("EndDay")
                         .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsUserObjectives")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("ModifiedOn")
@@ -453,16 +433,27 @@ namespace OKR.Models.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("StartDay")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("TargetType")
                         .HasColumnType("int");
 
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
                     b.Property<int>("status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("DepartmentId");
 
                     b.ToTable("Objectives");
                 });
@@ -511,81 +502,6 @@ namespace OKR.Models.Migrations
                     b.HasIndex("KeyResultId");
 
                     b.ToTable("ProgressUpdates");
-                });
-
-            modelBuilder.Entity("OKR.Models.Entity.Sidequests", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<Guid>("KeyResultsId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Modifiedby")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KeyResultsId");
-
-                    b.ToTable("Sidequests");
-                });
-
-            modelBuilder.Entity("OKR.Models.Entity.UserObjectives", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Modifiedby")
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("ObjectivesId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("ObjectivesId");
-
-                    b.ToTable("UserObjectives");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -659,25 +575,6 @@ namespace OKR.Models.Migrations
                     b.Navigation("ParentDepartment");
                 });
 
-            modelBuilder.Entity("OKR.Models.Entity.DepartmentObjectives", b =>
-                {
-                    b.HasOne("OKR.Models.Entity.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OKR.Models.Entity.Objectives", "Objectives")
-                        .WithMany("DepartmentObjectives")
-                        .HasForeignKey("ObjectivesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("Objectives");
-                });
-
             modelBuilder.Entity("OKR.Models.Entity.DepartmentProgressApproval", b =>
                 {
                     b.HasOne("OKR.Models.Entity.KeyResults", "KeyResults")
@@ -691,23 +588,6 @@ namespace OKR.Models.Migrations
 
             modelBuilder.Entity("OKR.Models.Entity.EvaluateTarget", b =>
                 {
-                    b.HasOne("OKR.Models.Entity.DepartmentObjectives", "DepartmentObjectives")
-                        .WithMany()
-                        .HasForeignKey("DepartmentObjectivesId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("OKR.Models.Entity.UserObjectives", "UserObjectives")
-                        .WithMany()
-                        .HasForeignKey("UserObjectivesId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("DepartmentObjectives");
-
-                    b.Navigation("UserObjectives");
-                });
-
-            modelBuilder.Entity("OKR.Models.Entity.KeyResults", b =>
-                {
                     b.HasOne("OKR.Models.Entity.Objectives", "Objectives")
                         .WithMany()
                         .HasForeignKey("ObjectivesId")
@@ -715,6 +595,34 @@ namespace OKR.Models.Migrations
                         .IsRequired();
 
                     b.Navigation("Objectives");
+                });
+
+            modelBuilder.Entity("OKR.Models.Entity.KeyResults", b =>
+                {
+                    b.HasOne("OKR.Models.Entity.Objectives", "Objectives")
+                        .WithMany("KeyResults")
+                        .HasForeignKey("ObjectivesId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Objectives");
+                });
+
+            modelBuilder.Entity("OKR.Models.Entity.Objectives", b =>
+                {
+                    b.HasOne("OKR.Models.Entity.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("OKR.Models.Entity.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.ProgressUpdates", b =>
@@ -728,41 +636,9 @@ namespace OKR.Models.Migrations
                     b.Navigation("KeyResults");
                 });
 
-            modelBuilder.Entity("OKR.Models.Entity.Sidequests", b =>
-                {
-                    b.HasOne("OKR.Models.Entity.KeyResults", "KeyResults")
-                        .WithMany()
-                        .HasForeignKey("KeyResultsId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("KeyResults");
-                });
-
-            modelBuilder.Entity("OKR.Models.Entity.UserObjectives", b =>
-                {
-                    b.HasOne("OKR.Models.Entity.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OKR.Models.Entity.Objectives", "Objectives")
-                        .WithMany("UserObjectives")
-                        .HasForeignKey("ObjectivesId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Objectives");
-                });
-
             modelBuilder.Entity("OKR.Models.Entity.Objectives", b =>
                 {
-                    b.Navigation("DepartmentObjectives");
-
-                    b.Navigation("UserObjectives");
+                    b.Navigation("KeyResults");
                 });
 #pragma warning restore 612, 618
         }

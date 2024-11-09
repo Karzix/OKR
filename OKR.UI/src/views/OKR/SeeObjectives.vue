@@ -1,53 +1,65 @@
 <template>
-  <DeatailObjectives v-if="!isLoading" :objective="objectives" :is-guest="true" :target-type="targetType" :entity-objectives-id="route.params.EntityObjectiveId.toString()"></DeatailObjectives>
+  <div class="body">
+    <DeatailObjectives :is-owner="false" :objectives="objectives" ></DeatailObjectives>
+  </div>
+  
 </template>
 
 <script setup lang="ts">
-import DeatailObjectives from '@/components/okr/DeatailObjectives.vue';
+import DeatailObjectives from '@/components/okr/DetailObjectives.vue';
 import { EntityObjectives } from '@/Models/EntityObjectives';
-import type { Objective } from '@/Models/Objective';
+import type { Objectives } from '@/Models/Objective';
 import { axiosInstance } from '@/Service/axiosConfig';
-import { onMounted, ref } from 'vue';
+import { onBeforeMount, onMounted, ref } from 'vue';
 import { useRoute } from "vue-router";
+import DetailObjectives from '@/components/okr/DetailObjectives.vue';
+import { ElLoading } from 'element-plus';
+import { TargetType } from '@/Models/Enum/TargetType';
 
 const route = useRoute();
 const isLoading = ref(true); 
 // const props = defineProps<{
 //   objective: Objective
 // }>();
-const objectives = ref<EntityObjectives>({
+const objectives = ref<Objectives>({
   id: undefined,
   name: "",
   startDay: undefined,
-  deadline: undefined,
-  listKeyResults: [],
-  targetType: undefined,
+  endDay: undefined,
+  keyResults: [],
+  targetType: TargetType.Individual,
   targetTypeName: "",
   point: 0,
-  objectivesId: undefined,
   status: 0,
+  isPublic: true,
+  isUserObjectives: true,
+  year: new Date().getFullYear(),
+  period: "Q1",
+  createdOn: new Date(),
+  lastProgressUpdate: new Date(),
   numberOfPendingUpdates: 0
 });
-const targetType = ref<string>("");
+// const targetType = ref<string>("");
 const search = async () => {
-  const id = route.params.EntityObjectiveId.toString();
-  var entityObjectives = new EntityObjectives();
-  await axiosInstance.get(`EntityObjectives/${id}`).then((res) => {
-    if (res.data.isSuccess) {
-      entityObjectives = res.data.data;
-      objectives.value = entityObjectives;
-    } else {
-      console.log(res.data.message);
-    }
-    isLoading.value = false; // Đặt cờ thành false khi dữ liệu đã được tải xong
-  });
+  const id = route.params.ObjectiveId.toString();
+  objectives.value.id = id;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
   search();
-  targetType.value = route.params.targetTpye.toString();
+  // targetType.value = route.params.targetTpye.toString();
 });
 </script>
 
 <style scoped>
+.body{
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #ffffffcc;
+  border-radius: 1px;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0px 5px 5px 5px rgba(0, 0, 0, 0.3);
+}
 </style>

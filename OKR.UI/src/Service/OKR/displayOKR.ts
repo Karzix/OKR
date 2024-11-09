@@ -1,0 +1,15 @@
+import type { EntityObjectives } from "@/Models/EntityObjectives";
+import { RecalculateTheDate } from "../formatDate";
+
+export const DisplayOKR = (okr: EntityObjectives) =>{
+    okr.quarterText = convertValueToLabel(okr);
+    okr.keyResults.forEach((keyResult) => {
+        keyResult.endDay = RecalculateTheDate(keyResult.endDay);
+    });
+}
+const convertValueToLabel = (okr:EntityObjectives) : string => {
+    const value = okr.quarter + ":" + okr.year;
+    if (!value) return "";
+    const [quarter, year] = value.split(":");
+    return `Quarter ${quarter} - ${year}`;
+};

@@ -246,5 +246,6 @@ watch(() => pageSize.value, () => {
   Cookies.set('pageSize', pageSize.value.toString(), { expires: undefined });
   Search();
 })
+defineExpose({ Search });
 
 </script>
