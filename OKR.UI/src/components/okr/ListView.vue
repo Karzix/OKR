@@ -73,7 +73,7 @@
                 </template>
                 <DepartmentProgressQueue :objectivesId="row.id ?? ''" 
                 @close="DialogDepartmentProgressQueueVisible = false"
-                @onSuccess="(request) => {recaculateObjectivesAfterProgressApproval(row, request)}"
+                @onSuccess="(request) => {DepartmentProgressQueue_onSuccess(row, request)}"
                 />
             </el-popover>
               
@@ -146,6 +146,7 @@ import type { KeyResult } from "@/Models/KeyResult";
 import {Hide} from '@element-plus/icons-vue'
 import DepartmentProgressQueue from "@/components/DepartmentProgressApproval/DepartmentProgressQueue.vue";
 import { hasPermission } from "../maynghien/Common/handleRole";
+import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressApprovalDto";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -268,6 +269,11 @@ const isTeamleadOrOwner = (objectives : Objectives) : boolean => {
     return true;
   }
   return false
+}
+const DepartmentProgressQueue_onSuccess = (objectives: Objectives, DepartmentProgressApproval : DepartmentProgressApprovalDto) => {
+  var o = listObjectivesDisplay.value.filter((item) => item.id === objectives.id)[0];
+  o.point = recaculateObjectivesAfterProgressApproval(objectives, DepartmentProgressApproval);
+  o.numberOfPendingUpdates -=1;
 }
 defineExpose({ onAddFilterAndSearch, ReLoad });
 </script>

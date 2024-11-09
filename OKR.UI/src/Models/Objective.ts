@@ -31,8 +31,10 @@ export const recaculateObjectivesAfterProgressApproval = (objectives: Objectives
     }
     var newpoint = 0;
     objectives.lastProgressUpdate = new Date();
-    objectives.keyResults.forEach((keyResult) => {
-      newpoint += (keyResult.currentPoint! / keyResult.maximunPoint!)* keyResult.percentage!;
+    objectives.keyResults.forEach((k) => {
+      console.log(k);
+      newpoint += (k.currentPoint! / k.maximunPoint!)* k.percentage!;
     });
     objectives.point = newpoint;
+    return newpoint;
 }
