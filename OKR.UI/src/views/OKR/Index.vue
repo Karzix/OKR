@@ -18,7 +18,9 @@
           <el-tag type="info">{{ statusStatistics.closed }} Closed</el-tag>
         </div>
         <div class="actions">
-          
+          <el-select v-model="period" placeholder="Filter by status" @change="onChangePeriod">
+            <el-option v-for="period in periods" :key="period.value" :label="period.label" :value="period.value" />
+          </el-select>
         </div>
       </div>
     </div>
@@ -57,6 +59,7 @@ import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter"
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
 import type { StatusStatistics } from "@/Models/StatusStatistics";
 import ActionSearch from "@/components/okr/ActionSearch.vue";
+import { deepCopy } from "@/Service/deepCopy";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -84,6 +87,7 @@ const objectives = ref<Objectives>({
 });
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
 const periods = ref<{value: string; label: string}[]>([]);
+const period = ref("");
 const statusStatistics = ref<StatusStatistics>({
   onTrack: 0,
   atRisk: 0,
@@ -135,9 +139,17 @@ const onUpdateData = async () => {
   listViewRef.value?.ReLoad();
 }
 
-const onClickButtonSearch = (filters: Filter[]) => {
-  searchRequest.value.filters = filters;
-  onUpdateData();
+// const onClickButtonSearch = (filters: Filter[]) => {
+//   searchRequest.value.filters = filters;
+//   onUpdateData();
+// }
+const onChangePeriod = (filters: string) => {
+  var filPeriod = new Filter();
+  filPeriod.FieldName = "period";
+  filPeriod.Value = filters;
+  handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filPeriod));
+  searchRequest.value.PageIndex = 1;
+  AddFilterAndSearch(searchRequest.value.filters as [])
 }
 </script>
 
@@ -192,7 +204,9 @@ const onClickButtonSearch = (filters: Filter[]) => {
   align-items: center;
   gap: 20px;
 }
-
+.actions > .el-select {
+  width: 230px;
+}
 .view-options .el-button {
   background-color: #6366f1;
   color: #ffffff;

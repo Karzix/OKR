@@ -517,7 +517,7 @@ namespace OKR.Service.Implementation
             var result = new AppResponse<List<string>>();
             try
             {
-                var list = _objectiveRepository.AsQueryable().Distinct().Select(x => x.Period + ":" + x.Year).ToList();
+                var list = _objectiveRepository.AsQueryable().Select(x => x.Period + ":" + x.Year).Distinct().ToList();
                 result.BuildResult(list);
             }
             catch (Exception ex)
