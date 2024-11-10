@@ -505,19 +505,13 @@ namespace OKR.Service.Implementation
             return (startDate, endDate);
         }
 
-      
-        public async Task<ApplicationUser> CurrentUser()
-        {
-            var user = new ApplicationUser();
-            user = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
-            return user;
-        }
+     
         public AppResponse<List<string>> GetPeriods()
         {
             var result = new AppResponse<List<string>>();
             try
             {
-                var list = _objectiveRepository.AsQueryable().Distinct().Select(x => x.Period + ":" + x.Year).ToList();
+                var list = _objectiveRepository.AsQueryable().Select(x => x.Period + ":" + x.Year).Distinct().ToList();
                 result.BuildResult(list);
             }
             catch (Exception ex)
@@ -554,7 +548,8 @@ namespace OKR.Service.Implementation
         private async Task<ExpressionStarter<Objectives>> BuildFilterUserName(ExpressionStarter<Objectives> predicate, string userName)
         {
             var User = await _userManager.FindByNameAsync(userName);
-            predicate = predicate.And(x => x.ApplicationUserId == User.Id 
+            var currentUserName = _contextAccessor.HttpContext.User.Identity.Name;
+            predicate = predicate.And(x => x.ApplicationUserId == User.Id
                 || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
             //var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
             //predicate = predicate.And(x=>x.IsPublic == true);
@@ -563,7 +558,7 @@ namespace OKR.Service.Implementation
         private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate, List<Filter> filters)
         {
             predicate = predicate.And(x=>x.IsDeleted != true);
-            var currentUser = await CurrentUser();
+            var currentUser =  await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
             //predicate = predicate.And(x => x.CreatedBy == currentUser.UserName || x.IsPublic == true);
             var filUseName = filters.Where(x=>x.FieldName == "userName").FirstOrDefault();
             if(filUseName == null || 
