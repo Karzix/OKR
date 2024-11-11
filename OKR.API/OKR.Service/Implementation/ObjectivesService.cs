@@ -554,6 +554,7 @@ namespace OKR.Service.Implementation
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
               || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+                predicate = predicate.And(x=>x.TargetType == TargetType.company);
             }
             else if(User.UserName != currentUserName)
             {
@@ -580,6 +581,7 @@ namespace OKR.Service.Implementation
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
               || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+                predicate = predicate.And(x => x.TargetType == TargetType.company);
             }
             return predicate;
         }
