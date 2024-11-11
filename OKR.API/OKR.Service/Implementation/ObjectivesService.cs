@@ -65,11 +65,12 @@ namespace OKR.Service.Implementation
                 else
                 {
                     var role = GetUserRole();
-                    if((role == "Teamleader" && request.TargetType == TargetType.company) || (role == "Admin" && request.TargetType == TargetType.team))
+                    if(!((role == "Teamleader" && request.TargetType == TargetType.department) || (role == "Admin" && request.TargetType == TargetType.company)))
                     {
                         return result.BuildError("wrong range!");
                     }
-                    objectives.DepartmentId = user.DepartmentId;
+                    if(request.TargetType == TargetType.department) 
+                        objectives.DepartmentId = user.DepartmentId;
                 }
                 var listKeyresults = _mapper.Map<List<KeyResults>>(request.KeyResults);
                 listKeyresults.ForEach(x =>
@@ -411,7 +412,7 @@ namespace OKR.Service.Implementation
             {
                 return predicate;
             }
-            else if(targetType == TargetType.team)
+            else if(targetType == TargetType.department)
             {
                 Department department = new Department();
                 ApplicationUser user = new ApplicationUser();
@@ -553,8 +554,8 @@ namespace OKR.Service.Implementation
             {
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
-              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
-                predicate = predicate.And(x=>x.TargetType == TargetType.company);
+              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null) || x.TargetType == TargetType.company);
+                //predicate = predicate.And(x=>x.TargetType == TargetType.company);
             }
             else if(User.UserName != currentUserName)
             {
@@ -580,8 +581,8 @@ namespace OKR.Service.Implementation
             {
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
-              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
-                predicate = predicate.And(x => x.TargetType == TargetType.company);
+              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null) || x.TargetType == TargetType.company);
+                //predicate = predicate.And(x => x.TargetType == TargetType.company);
             }
             return predicate;
         }
