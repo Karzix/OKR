@@ -75,6 +75,7 @@ namespace OKR.API.Controllers
         }
         [HttpGet]
         [Route("list-by-keyword/{keyword}")]
+        [AllowAnonymous]
         public IActionResult GetListByKeyword(string keyword)
         {
             var result = _departmentService.GetDepartByKeyword(keyword);

@@ -199,7 +199,7 @@ namespace OKR.Service.Implementation
             }
             catch (Exception ex)
             {
-                result.BuildError(ex.Message + " " + ex.StackTrace);
+                result.BuildError(ex.Message + " " );
             }
             return result;
         }
@@ -280,11 +280,7 @@ namespace OKR.Service.Implementation
                                 break;
                         }
                     }
-                if (Filters == null || !Filters.Any(f => f.FieldName == "period"))
-                {
-                    var currentQuarterRange = GetCurrentQuarterDateRange();
-                    predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
-                }
+                
                 predicate = await AddDefaultConditions(predicate, Filters);
                 return predicate;
             }
@@ -549,8 +545,24 @@ namespace OKR.Service.Implementation
         {
             var User = await _userManager.FindByNameAsync(userName);
             var currentUserName = _contextAccessor.HttpContext.User.Identity.Name;
-            predicate = predicate.And(x => x.ApplicationUserId == User.Id
-                || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
+            if(User.ManagerName != currentUserName && User.UserName != currentUserName)
+            {
+                throw new Exception("You are not the manager of this user");
+            }
+            else if (User.UserName == currentUserName)
+            {
+                var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
+                predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
+              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+            }
+            else if(User.UserName != currentUserName)
+            {
+                predicate = predicate.And(x => x.ApplicationUserId == User.Id
+            /*  || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null)*/);
+                predicate = predicate.And(x => x.IsPublic == true);
+            }
+            //predicate = predicate.And(x => x.ApplicationUserId == User.Id
+            //   /* || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null)*/);
             //var test = _objectiveRepository.AsQueryable().Where(x => (x.DepartmentId == User.DepartmentId )).ToList();
             //predicate = predicate.And(x=>x.IsPublic == true);
             return predicate;
@@ -558,25 +570,19 @@ namespace OKR.Service.Implementation
         private async Task<ExpressionStarter<Objectives>> AddDefaultConditions(ExpressionStarter<Objectives> predicate, List<Filter> filters)
         {
             predicate = predicate.And(x=>x.IsDeleted != true);
-            var currentUser =  await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
-            //predicate = predicate.And(x => x.CreatedBy == currentUser.UserName || x.IsPublic == true);
-            var filUseName = filters.Where(x=>x.FieldName == "userName").FirstOrDefault();
-            if(filUseName == null || 
-                (filUseName != null && filUseName.Value == currentUser.UserName)
-                )
+            if (filters == null || !filters.Any(f => f.FieldName == "period"))
             {
-                predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
-               || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
-                //predicate = predicate.And(x => x.IsPublic == true || x.IsPublic == false);
+                var currentQuarterRange = GetCurrentQuarterDateRange();
+                predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
             }
-            else if(filUseName != null && filUseName.Value != currentUser.UserName)
+            if (filters == null || !filters.Any(f => f.FieldName == "userName"))
             {
-                var User = await _userManager.FindByNameAsync(filUseName.Value);
-                predicate = predicate.And(x => x.ApplicationUserId == User.Id
-              || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null));
-                predicate = predicate.And(x=>x.IsPublic == true);
+                var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
+                predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
+              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
             }
             return predicate;
         }
+
     }
 }

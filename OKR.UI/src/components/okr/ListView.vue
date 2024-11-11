@@ -147,6 +147,7 @@ import {Hide} from '@element-plus/icons-vue'
 import DepartmentProgressQueue from "@/components/DepartmentProgressApproval/DepartmentProgressQueue.vue";
 import { hasPermission } from "../maynghien/Common/handleRole";
 import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressApprovalDto";
+import { ElMessage } from "element-plus";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -188,7 +189,11 @@ const search = async () => {
     .post("Objectives/search", searchRequest.value)
     .then((res) => {
       var result = res.data as AppResponse<SearchResponse<Objectives[]>>;
+      if(result.isSuccess == false){
+        ElMessage.error(result.message);
+      }
       searchResponseObjectives.value = result.data as SearchResponse<Objectives[]>;
+      
       if(res)
       if (searchResponseObjectives.value.data && searchResponseObjectives.value.data?.length == 0) {
         noMore.value = true;
