@@ -50,7 +50,7 @@
     <div class="comment-progress">
         <el-tabs v-model="tabs" class="demo-tabs">
             <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest"></EvaluateTarget></el-tab-pane>
-            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
+            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest" :key="keyProgressUpdate"></ProgressUpdate></el-tab-pane>
         </el-tabs>
     </div>
     <el-dialog v-model="showDialogDetailKeyresult">
@@ -118,6 +118,7 @@ const searchRequest = ref<SearchRequest>({
   filters: [],
   SortBy: undefined,
 });
+const keyProgressUpdate = ref(1);
 const emit = defineEmits<{
     (e: "update:objectives" , objectives: Objectives): void;
     (e: "delete:objectives" , objectives: Objectives): void;
@@ -139,15 +140,64 @@ const onSelectKeyResult = (item: KeyResult) => {
 }
 const refreshObjectives = async () => {
     await getObjectives(); // Làm mới dữ liệu objectives
+    keyProgressUpdate.value++;
     emit('update:objectives', objectives.value)
 };
 
-const copyLinkShare = () =>{
-    navigator.clipboard.writeText(urlUI + "Objectives=" + props.objectives.id);
-    ElMessage({
-    message: 'Copy url success ',
-    type: 'success',
-  })
+// const copyLinkShare = () =>{
+//     navigator.clipboard.writeText(urlUI + "Objectives=" + props.objectives.id);
+//     ElMessage({
+//     message: 'Copy url success ',
+//     type: 'success',
+//   })
+// }
+async function copyLinkShare() {
+    var text = urlUI + "Objectives=" + props.objectives.id
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.log("Text copied to clipboard");
+                ElMessage({
+                    message: 'Copy url success ',
+                    type: 'success',
+                })
+        } catch (err) {
+            console.error("Error copying text: ", err);
+        }
+    } else {
+        // Sử dụng execCommand làm cách thay thế
+        copyTextToClipboard(text);
+    }
+}
+function copyTextToClipboard(text : string) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Đảm bảo phần tử không ảnh hưởng đến giao diện
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand("copy");
+        if (successful) {
+            console.log("Text copied to clipboard");
+               ElMessage({
+                    message: 'Copy url success ',
+                    type: 'success',
+                })
+        } else {
+            console.log("Failed to copy text");
+        }
+
+    } catch (err) {
+        console.error("Error copying text: ", err);
+    }
+    
+    document.body.removeChild(textArea);
 }
 const onDelete = () => {
     
