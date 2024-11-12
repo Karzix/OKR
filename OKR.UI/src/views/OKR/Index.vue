@@ -31,7 +31,7 @@
     
   </div>
   <div class="ListView">
-    <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true"></ListView>
+    <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true" @update:objectives="updateData" @delete:objectives="updateData"></ListView>
   </div>
   <el-dialog v-model="dialogCreate">
     <CreateEdit :objectives="objectives" @updateData="onUpdateData"></CreateEdit>
@@ -138,7 +138,10 @@ onBeforeMount(async () => {
 const onUpdateData = async () => {
   listViewRef.value?.ReLoad();
 }
-
+const updateData = async (objectives : Objectives) => {
+  getStatusStatistics()
+  getOverallProgress()
+}
 // const onClickButtonSearch = (filters: Filter[]) => {
 //   searchRequest.value.filters = filters;
 //   onUpdateData();

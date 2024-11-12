@@ -79,7 +79,7 @@ import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import DetailKeyresult from "./DetailKeyresult.vue";
 import CreateEditObjectives from "./Create-Edit/Create.vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import Cookies from "js-cookie";
 
 
@@ -150,6 +150,7 @@ const copyLinkShare = () =>{
   })
 }
 const onDelete = () => {
+    
     axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
         emit('delete:objectives', objectives.value)
     })

@@ -174,7 +174,10 @@ const props = defineProps<{
   searchRequest: SearchRequest;
 }>();
 
-
+const emit = defineEmits<{
+    (e: "update:objectives" , objectives: Objectives): void;
+    (e: "delete:objectives" , objectives: Objectives): void;
+}>();
 const noMore = ref(false);
 const loadingTable = ref(false);
 const dialogDetail = ref(false);
@@ -239,12 +242,14 @@ const refreshObjectives = (objective: Objectives) => {
   if (index !== -1) {
     listObjectivesDisplay.value.splice(index, 1, objective); 
   }
+  emit('update:objectives', objective);
 };
 const onDelete = (Objectives : Objectives) => {
   const index = listObjectivesDisplay.value.findIndex((item) => item.id === Objectives.id);
   if (index !== -1) {
     listObjectivesDisplay.value.splice(index, 1); 
   }
+  emit('delete:objectives', Objectives);
 }
 const showDialogDepartmentProgressQueue = () => {
   DialogDepartmentProgressQueueVisible.value = true;
