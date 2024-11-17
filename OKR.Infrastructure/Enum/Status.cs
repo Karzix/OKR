@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OKR.Infrastructure.Enum
 {
-    public enum StatusObjectives
+    public enum Status
     {
         noStatus,
         onTrack,
@@ -17,19 +17,19 @@ namespace OKR.Infrastructure.Enum
 
     public class FormatStatusObjectives
     {
-        public static string getStatusObjectivesName(StatusObjectives type)
+        public static string getStatusObjectivesName(Status type)
         {
             switch (type)
             {
-                case StatusObjectives.noStatus:
+                case Status.noStatus:
                     return "No Sratus";
-                case StatusObjectives.onTrack:
+                case Status.onTrack:
                     return "On Track";
-                case StatusObjectives.atRisk:
+                case Status.atRisk:
                     return "At Risk";
-                case StatusObjectives.offTrack:
+                case Status.offTrack:
                     return "Off Track";
-                case StatusObjectives.closed:
+                case Status.closed:
                     return "Closed";
             }
             return type.ToString();

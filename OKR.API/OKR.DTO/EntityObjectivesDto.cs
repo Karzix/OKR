@@ -20,7 +20,7 @@ namespace OKR.DTO
         public double? Point { get; set; }
         public Guid? ObjectivesId { get; set; }
         public string? CreateBy { get; set; }
-        public StatusObjectives? Status { get; set; }
+        public Status? Status { get; set; }
         public int? NumberOfPendingUpdates { get; set; }
     }
 }

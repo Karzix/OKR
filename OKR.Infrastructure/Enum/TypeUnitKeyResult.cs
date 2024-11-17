@@ -10,5 +10,6 @@ namespace OKR.Infrastructure.Enum
     {
         Percent,
         Value,
+        CompletedOrNotCompleted
     }
 }

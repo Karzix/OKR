@@ -245,7 +245,7 @@ namespace OKR.Service.Implementation
                                         break;
                                     }
                                     var enumN = int.Parse(filter.Value);
-                                    StatusObjectives statusObjectives = (StatusObjectives)enumN;
+                                    Status statusObjectives = (Status)enumN;
                                     predicate = predicate.And(x => x.status == statusObjectives);
                                     break;
                                 }
@@ -385,11 +385,11 @@ namespace OKR.Service.Implementation
                 var query = _objectiveRepository.FindByPredicate(expression);
                 var data = new StatusStatistics
                 {
-                    atRisk = query.Where(x => x.status == StatusObjectives.atRisk).Count(),
-                    closed = query.Where(x=>x.status == StatusObjectives.closed).Count(),
-                    noStatus = query.Where(x=>x.status == StatusObjectives.noStatus).Count(),
-                    offTrack = query.Where(x=>x.status == StatusObjectives.offTrack).Count(),
-                    onTrack = query.Where(x=>x.status == StatusObjectives.onTrack).Count(),
+                    atRisk = query.Where(x => x.status == Status.atRisk).Count(),
+                    closed = query.Where(x=>x.status == Status.closed).Count(),
+                    noStatus = query.Where(x=>x.status == Status.noStatus).Count(),
+                    offTrack = query.Where(x=>x.status == Status.offTrack).Count(),
+                    onTrack = query.Where(x=>x.status == Status.onTrack).Count(),
                     total = query.Count(),
                 };
                 result.BuildResult(data);

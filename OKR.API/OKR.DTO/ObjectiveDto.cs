@@ -16,7 +16,7 @@ namespace OKR.DTO
         public DateTime? EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
         public string? TargetTypeName { get; set; }
-        public StatusObjectives status { get; set; }
+        public Status status { get; set; }
         public Guid? DepartmentId { get; set; }
         public string? ApplicationUserId { get; set; }
 

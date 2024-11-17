@@ -19,7 +19,7 @@ namespace OKR.DTO
         public string? Note { get; set; }
         public int? AddedPoints { get; set; }
         public int? Percentage {  get; set; }
-        public StatusObjectives Status { get; set; }
+        public Status Status { get; set; }
         public List<ProgressUpdatesDto>? ProgressUpdates { get; set; }
         public Guid? ObjectivesId { get; set; }
         public string? CreatedBy { get; set; }
