@@ -43,9 +43,9 @@ namespace OKR.Service.Implementation
             _progressApprovalRepository = departmentProgressApprovalRepository;
         }
 
-        public async Task<AppResponse<ObjectiveDto>> Create(ObjectiveDto request)
+        public async Task<AppResponse<ObjectivesRespone>> Create(ObjectivesRequest request)
         {
-            var result = new AppResponse<ObjectiveDto>();
+            var result = new AppResponse<ObjectivesRespone>();
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
@@ -80,7 +80,7 @@ namespace OKR.Service.Implementation
                     x.Id = Guid.NewGuid();
                 });
                 _objectiveRepository.Add(objectives,listKeyresults);
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<ObjectivesRespone>(objectives));
             }
             catch (Exception ex)
             {
@@ -106,15 +106,15 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<ObjectiveDto> Get(Guid Id)
+        public AppResponse<ObjectivesRespone> Get(Guid Id)
         {
-            var result = new AppResponse<ObjectiveDto>();
+            var result = new AppResponse<ObjectivesRespone>();
             try
             {
                 var ojective = _objectiveRepository.Get(Id);
                 var listKeyResult = _keyResultRepository.FindBy(x=>x.ObjectivesId == Id).ToList();
-                var data = _mapper.Map<ObjectiveDto>(ojective);
-                data.KeyResults = _mapper.Map<List<KeyResultDto>>(listKeyResult);
+                var data = _mapper.Map<ObjectivesRespone>(ojective);
+                data.KeyResults = _mapper.Map<List<KeyResultRespone>>(listKeyResult);
                 data.LastProgressUpdate = _progressUpdatesRepository.AsQueryable()
                     .Where(x=>x.KeyResults.ObjectivesId == ojective.Id).OrderByDescending(x => x.CreatedOn)
                     .Select(x=>x.CreatedOn)
@@ -130,9 +130,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<SearchResponse<ObjectiveDto>>> Search(SearchRequest request)
+        public async Task<AppResponse<SearchResponse<ObjectivesRespone>>> Search(SearchRequest request)
         {
-            var result = new AppResponse<SearchResponse<ObjectiveDto>>();
+            var result = new AppResponse<SearchResponse<ObjectivesRespone>>();
             try
             {
                 var query = await  BuildFilterExpression(request.Filters);
@@ -149,16 +149,16 @@ namespace OKR.Service.Implementation
                 model = model.Skip(startIndex).Take(pageSize);
                 //var objectId_point = _objectiveRepository.caculatePercentObjectives(model);
                 var List = model.Include(x=>x.TargetType)
-                    .Select(x => new ObjectiveDto
+                    .Select(x => new ObjectivesRespone
                     {
                         Id = x.Id,
                         Name = x.Name,
                         TargetType = x.TargetType,
                         TargetTypeName = getTargetTypeName(x.TargetType),
                         KeyResults = _keyResultRepository.AsQueryable().Where(k=>k.ObjectivesId == x.Id)
-                        .Select(k=> new KeyResultDto
+                        .Select(k=> new KeyResultRespone
                         {
-                            Active = k.Active,
+                            IsCompleted = k.IsCompleted,
                             CurrentPoint = k.CurrentPoint,
                             //Deadline = k.Deadline,
                             Description = k.Description,
@@ -188,7 +188,7 @@ namespace OKR.Service.Implementation
                 {
                     item.Point = _objectiveRepository.caculatePercentObjectivesById((Guid)item.Id);
                 }
-                var searchUserResult = new SearchResponse<ObjectiveDto>
+                var searchUserResult = new SearchResponse<ObjectivesRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
@@ -314,9 +314,9 @@ namespace OKR.Service.Implementation
         }
 
 
-        public AppResponse<ObjectiveDto> Edit(ObjectiveDto request)
+        public AppResponse<ObjectivesRespone> Edit(ObjectivesRequest request)
         {
-            var result = new AppResponse<ObjectiveDto>();
+            var result = new AppResponse<ObjectivesRespone>();
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
@@ -367,7 +367,7 @@ namespace OKR.Service.Implementation
                 objectives.EndDay = Day.EndDate;
                 objectives.status = request.status;
                 _objectiveRepository.Edit(objectives, keyresults, listNewKeyresult);
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<ObjectivesRespone>(objectives));
 
             }
             catch (Exception ex)
@@ -516,7 +516,7 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
-        private bool AreKeyResultsEqual(KeyResultDto dto, KeyResults entity)
+        private bool AreKeyResultsEqual(KeyResultRequest dto, KeyResults entity)
         {
             if (dto == null || entity == null)
             {
@@ -524,7 +524,6 @@ namespace OKR.Service.Implementation
             }
 
             return dto.Description == entity.Description &&
-                   dto.Active == entity.Active &&
                    dto.EndDay == entity.Deadline &&
                    dto.Unit == entity.Unit &&
                    //dto.CurrentPoint == entity.CurrentPoint &&

@@ -39,9 +39,9 @@ namespace OKR.Service.Implementation
             _progressUpdatesRepository = progressUpdatesRepository;
             _objectivesRepository = objectivesRepository;
         }
-        public AppResponse<SearchResponse<DepartmentProgressApprovalDto>> Search(SearchRequest request)
+        public AppResponse<SearchResponse<DepartmentProgressApprovalRespone>> Search(SearchRequest request)
         {
-            var result = new AppResponse<SearchResponse<DepartmentProgressApprovalDto>>();
+            var result = new AppResponse<SearchResponse<DepartmentProgressApprovalRespone>>();
             try
             {
                 var query = BuildFilterExpression(request.Filters);
@@ -52,7 +52,7 @@ namespace OKR.Service.Implementation
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 var UserList = users.Skip(startIndex).Take(pageSize);
-                var dtoList = UserList.Select(x => new DepartmentProgressApprovalDto
+                var dtoList = UserList.Select(x => new DepartmentProgressApprovalRespone
                 {
                     Id = x.Id,
                     AddedPoints = x.AddedPoints,
@@ -61,7 +61,7 @@ namespace OKR.Service.Implementation
                     KeyresultID = x.KeyResultsId,
                     Note = x.Note,
                 }).ToList();
-                var searchResult = new SearchResponse<DepartmentProgressApprovalDto>
+                var searchResult = new SearchResponse<DepartmentProgressApprovalRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
@@ -150,9 +150,9 @@ namespace OKR.Service.Implementation
             return Guid.Empty;
         }
 
-        public AppResponse<DepartmentProgressApprovalDto> Confirm(DepartmentProgressApprovalDto dept)
+        public AppResponse<DepartmentProgressApprovalRespone> Confirm(DepartmentProgressApprovalRequest dept)
         {
-            var result = new AppResponse<DepartmentProgressApprovalDto>();
+            var result = new AppResponse<DepartmentProgressApprovalRespone>();
             try
             {
                 var departmentProgressApproval = _departmentProgressApprovalRepository.Get(dept.Id.Value);
@@ -177,7 +177,7 @@ namespace OKR.Service.Implementation
                 }
                 departmentProgressApproval.IsDeleted = true;
                 _departmentProgressApprovalRepository.Edit(departmentProgressApproval);
-                result.BuildResult(dept);
+                result.BuildResult(_mapper.Map<DepartmentProgressApprovalRespone>(departmentProgressApproval));
             }
             catch (Exception ex)
             {

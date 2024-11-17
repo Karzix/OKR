@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OKR.DTO
 {
-    public class ObjectiveDto : BaseDto
+    public class ObjectivesRespone : BaseDto
     {
         public string Name { get; set; }
         public DateTime? StartDay { get; set; }
@@ -22,7 +22,7 @@ namespace OKR.DTO
 
         public bool IsPublic { get; set; } = true;
         public bool IsUserObjectives { get; set; } = true;
-        public List<KeyResultDto> KeyResults { get; set; }
+        public List<KeyResultRespone> KeyResults { get; set; }
         public string? Period {  get; set; }
         public int? Year {  get; set; }
         public string? CreatedBy { get; set; }

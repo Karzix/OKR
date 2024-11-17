@@ -16,7 +16,7 @@ namespace OKR.DTO
         //public int MaximunPoint { get; set; }
         public TargetType? TargetType { get; set; }
         public string? TargetTypeName { get; set; }
-        public List<KeyResultDto>? ListKeyResults { get; set; }
+        public List<KeyResultRespone>? ListKeyResults { get; set; }
         public double? Point { get; set; }
         public Guid? ObjectivesId { get; set; }
         public string? CreateBy { get; set; }

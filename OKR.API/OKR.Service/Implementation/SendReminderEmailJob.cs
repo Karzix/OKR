@@ -34,17 +34,15 @@ namespace OKR.Service.Implementation
                 //_sidequestsRepository = scope.ServiceProvider.GetRequiredService<ISidequestsRepository>();
                 //var objectives = _objectivesRepository.AsQueryable().ToList();
                 var objectives = _objectivesRepository.FindByPredicate(x => x.EndDay.Date <= thresholdDate.Date && x.EndDay.Date >= currentDate.Date)
-                    .Select(x => new ObjectiveDto
+                    .Select(x => new ObjectivesRespone
                     {
                         CreatedBy = x.CreatedBy,
                         Id = x.Id,
                         Name = x.Name,
                         Point = 0,
                         TargetType = x.TargetType,
-                        KeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.Id).Select(k => new KeyResultDto
+                        KeyResults = _keyResultRepository.AsQueryable().Where(k => k.ObjectivesId == x.Id).Select(k => new KeyResultRespone
                         {
-                            Active = k.Active,
-                            AddedPoints = 0,
                             CurrentPoint = k.CurrentPoint,
                             EndDay = k.Deadline,
                             Description = k.Description,
@@ -117,7 +115,7 @@ namespace OKR.Service.Implementation
             }
         }
 
-        private async Task<string> buildEmailAsync(ObjectiveDto objectives)
+        private async Task<string> buildEmailAsync(ObjectivesRespone objectives)
         {
             try
             {
@@ -144,7 +142,7 @@ namespace OKR.Service.Implementation
             }
         }
 
-        private string BuildKeyresult(List<KeyResultDto> keyResultDto)
+        private string BuildKeyresult(List<KeyResultRespone> keyResultDto)
         {
             string content = "";
             foreach (var keyResult in keyResultDto)

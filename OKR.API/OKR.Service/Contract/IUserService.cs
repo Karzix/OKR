@@ -11,12 +11,12 @@ namespace OKR.Service.Contract
 {
     public interface IUserService
     {
-        Task<AppResponse<UserDto>> Create(UserDto request);
-        Task<AppResponse<UserDto>> Update(UserDto request);
-        Task<AppResponse<string>> LockAsync(UserDto request, int day = 30);
-        Task<AppResponse<SearchResponse<UserDto>>> Search(SearchRequest request);
-        AppResponse<List<UserDto>> GetAll();
-        Task<AppResponse<UserDto>> Get(string iduserName);
-        AppResponse<List<UserDto>> GetListByKeyworld(string userName);
+        Task<AppResponse<UserRespone>> Create(UserRequest request);
+        Task<AppResponse<UserRespone>> Update(UserRequest request);
+        Task<AppResponse<string>> LockAsync(UserRequest request, int day = 30);
+        Task<AppResponse<SearchResponse<UserRespone>>> Search(SearchRequest request);
+        AppResponse<List<UserRespone>> GetAll();
+        Task<AppResponse<UserRespone>> Get(string iduserName);
+        AppResponse<List<UserRespone>> GetListByKeyworld(string userName);
     }
 }

@@ -14,12 +14,16 @@ namespace OKR.Service.Mapper
 
 		public void CreateMap()
 		{
-			CreateMap<DepartmentDto, Department>().ReverseMap();
-			CreateMap<KeyResultDto, KeyResults>().ReverseMap();
-			CreateMap<ObjectiveDto, Objectives>().ReverseMap();
-			CreateMap<ProgressUpdatesDto, ProgressUpdates>().ReverseMap();
-			CreateMap<UserDto, ApplicationUser>().ReverseMap();
-			CreateMap<EvaluateTargetDto, EvaluateTarget>().ReverseMap();
+			CreateMap<DepartmentRespone, Department>().ReverseMap();
+			CreateMap<DepartmentRequest, Department>().ReverseMap();
+			CreateMap<KeyResultRespone, KeyResults>().ReverseMap();
+			CreateMap<ObjectivesRespone, Objectives>().ReverseMap();
+			CreateMap<ProgressUpdatesRespone, ProgressUpdates>().ReverseMap();
+			CreateMap<UserRespone, ApplicationUser>().ReverseMap();
+			CreateMap<UserRequest, ApplicationUser>().ReverseMap();
+			CreateMap<EvaluateTargetRespone, EvaluateTarget>().ReverseMap();
+			CreateMap<DepartmentProgressApprovalRespone, DepartmentProgressApproval>().ReverseMap();
+			CreateMap<EvaluateTargetRequest, EvaluateTarget>().ReverseMap();
 		}
 	}
 }

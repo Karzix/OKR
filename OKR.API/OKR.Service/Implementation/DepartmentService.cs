@@ -31,9 +31,9 @@ namespace OKR.Service.Implementation
             _memoryCache = memoryCache;
         }
 
-        public AppResponse<DepartmentDto> Create(DepartmentDto request)
+        public AppResponse<DepartmentRespone> Create(DepartmentRequest request)
         {
-            var result = new AppResponse<DepartmentDto>();
+            var result = new AppResponse<DepartmentRespone>();
             try
             {
                 var parentDepartment =  _departmentRepository.FindBy(x=>x.Id == request.ParentDepartmentId);
@@ -48,7 +48,7 @@ namespace OKR.Service.Implementation
                 _departmentRepository.Add(newDeparment);
 
                 request.Id = newDeparment.Id;
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<DepartmentRespone>(newDeparment));
 
             }
             catch (Exception ex)
@@ -75,13 +75,13 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<DepartmentDto> Get(Guid id)
+        public AppResponse<DepartmentRespone> Get(Guid id)
         {
-            var result = new AppResponse<DepartmentDto>();
+            var result = new AppResponse<DepartmentRespone>();
             try
             {
                 var department =_departmentRepository.Get(id);
-                var dto = _mapper.Map<DepartmentDto>(department);
+                var dto = _mapper.Map<DepartmentRespone>(department);
                 result.BuildResult(dto);
             }
             catch (Exception ex)
@@ -91,12 +91,12 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<List<DepartmentDto>> GetAll()
+        public AppResponse<List<DepartmentRespone>> GetAll()
         {
-            var result = new AppResponse<List<DepartmentDto>>();
+            var result = new AppResponse<List<DepartmentRespone>>();
             try
             {
-                var data = _departmentRepository.AsQueryable().Select(x => new DepartmentDto
+                var data = _departmentRepository.AsQueryable().Select(x => new DepartmentRespone
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -117,13 +117,13 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<List<DepartmentDto>> GetByParentDepartment(Guid parentId)
+        public AppResponse<List<DepartmentRespone>> GetByParentDepartment(Guid parentId)
         {
-            var result = new AppResponse<List<DepartmentDto>>();
+            var result = new AppResponse<List<DepartmentRespone>>();
             try
             {
                 var data = _departmentRepository.FindBy(x=>x.ParentDepartmentId == parentId)
-                    .Select(x => new DepartmentDto
+                    .Select(x => new DepartmentRespone
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -138,9 +138,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<DepartmentDto> Update(DepartmentDto request)
+        public AppResponse<DepartmentRespone> Update(DepartmentRequest request)
         {
-            var result = new AppResponse<DepartmentDto>();
+            var result = new AppResponse<DepartmentRespone>();
             try
             {
                 var parentDepartment = _departmentRepository.FindBy(x => x.Id == request.ParentDepartmentId);
@@ -165,7 +165,7 @@ namespace OKR.Service.Implementation
 
                 _departmentRepository.EditRange(allChild);
 
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<DepartmentRespone>(department));
             }
             catch (Exception ex)
             {
@@ -174,9 +174,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<SearchResponse<DepartmentDto>> Search(SearchRequest request)
+        public AppResponse<SearchResponse<DepartmentRespone>> Search(SearchRequest request)
         {
-            var result = new AppResponse<SearchResponse<DepartmentDto>>();
+            var result = new AppResponse<SearchResponse<DepartmentRespone>>();
             try
             {
                 var query = BuildFilterExpression(request.Filters);
@@ -194,7 +194,7 @@ namespace OKR.Service.Implementation
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 var UserList = users.Skip(startIndex).Take(pageSize);
-                var dtoList = UserList.Select(x => new DepartmentDto
+                var dtoList = UserList.Select(x => new DepartmentRespone
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -202,7 +202,7 @@ namespace OKR.Service.Implementation
                     ParentDepartmentName = x.ParentDepartmentId != null ? x.ParentDepartment.Name : "",
                     level = x.Level,
                 }).ToList();
-                var searchResult = new SearchResponse<DepartmentDto>
+                var searchResult = new SearchResponse<DepartmentRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
@@ -255,13 +255,13 @@ namespace OKR.Service.Implementation
             }
         }
 
-        public AppResponse<List<DepartmentDto>> GetParentDepartmentByLevel(int level)
+        public AppResponse<List<DepartmentRespone>> GetParentDepartmentByLevel(int level)
         {
-            var result = new AppResponse<List<DepartmentDto>>();
+            var result = new AppResponse<List<DepartmentRespone>>();
             try
             {
                 var data = _departmentRepository.AsQueryable().Where(x=>x.Level == (level - 1))
-                    .Select(x=> new DepartmentDto
+                    .Select(x=> new DepartmentRespone
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -277,10 +277,10 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        private List<DepartmentDto> BuildTree(List<DepartmentDto> departments)
+        private List<DepartmentRespone> BuildTree(List<DepartmentRespone> departments)
         {
             var departmentDict = departments.ToDictionary(d => d.Id);
-            var rootDepartments = new List<DepartmentDto>();
+            var rootDepartments = new List<DepartmentRespone>();
 
             foreach (var department in departments)
             {
@@ -292,7 +292,7 @@ namespace OKR.Service.Implementation
                 {
                     if (parentDepartment.Zones == null)
                     {
-                        parentDepartment.Zones = new List<DepartmentDto>();
+                        parentDepartment.Zones = new List<DepartmentRespone>();
                     }
                     parentDepartment.Zones.Add(department);
                 }
@@ -301,7 +301,7 @@ namespace OKR.Service.Implementation
             return rootDepartments;
         }
 
-        public AppResponse<List<int>> DepartmentLevelNumber()
+        public AppResponse<List<int>> GetDepartmentLevelNumber()
         {
             var result = new AppResponse<List<int>>();
             try
@@ -321,18 +321,18 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<List<DepartmentDto>> GetDepartByKeyword(string keyword)
+        public AppResponse<List<DepartmentRespone>> GetDepartByKeyword(string keyword)
         {
-            var result = new AppResponse<List<DepartmentDto>>();
+            var result = new AppResponse<List<DepartmentRespone>>();
             try
             {
-                if (!_memoryCache.TryGetValue(cacheDepartmentKey, out List<DepartmentDto> departments))
+                if (!_memoryCache.TryGetValue(cacheDepartmentKey, out List<DepartmentRespone> departments))
                 {
                     int page = 0;
-                    departments = new List<DepartmentDto>();
+                    departments = new List<DepartmentRespone>();
                     while (true)
                     {
-                        var list = _departmentRepository.AsQueryable().Skip(page * 500).Take(500).Select(x => new DepartmentDto
+                        var list = _departmentRepository.AsQueryable().Skip(page * 500).Take(500).Select(x => new DepartmentRespone
                         {
                             Id = x.Id,
                             Name = x.Name,

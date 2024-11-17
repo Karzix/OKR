@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OKR.DTO
 {
-    public class DepartmentProgressApprovalDto : BaseDto
+    public class DepartmentProgressApprovalRespone : BaseDto
     {
         public Guid KeyresultID { get; set; }
         public string Note { get; set; } = "";

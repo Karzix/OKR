@@ -13,7 +13,7 @@ namespace OKR.Models.Entity
     public class KeyResults : BaseEntity
     {
         public string Description { get; set; }
-        public bool Active { get; set; } = true;
+        //public bool Active { get; set; } = true;
         public DateTime Deadline { get; set; }
         public TypeUnitKeyResult? Unit {  get; set; } // % Percent, # value
         public int CurrentPoint { get; set; }

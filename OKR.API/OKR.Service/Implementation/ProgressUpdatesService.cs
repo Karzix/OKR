@@ -41,9 +41,9 @@ namespace OKR.Service.Implementation
         }
 
 
-        public AppResponse<SearchResponse<ProgressUpdatesDto>> Search(SearchRequest request)
+        public AppResponse<SearchResponse<ProgressUpdatesRespone>> Search(SearchRequest request)
         {
-            var result = new AppResponse<SearchResponse<ProgressUpdatesDto>>();
+            var result = new AppResponse<SearchResponse<ProgressUpdatesRespone>>();
             try
             {
                 var query = BuildFilterExpression(request.Filters);
@@ -61,7 +61,7 @@ namespace OKR.Service.Implementation
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 var progressList = progress.Skip(startIndex).Take(pageSize).Include(x=>x.KeyResults);
-                var dtoList = progressList.Select(x => new ProgressUpdatesDto
+                var dtoList = progressList.Select(x => new ProgressUpdatesRespone
                 {
                     Id = x.Id,
                     CreateBy = x.CreatedBy,
@@ -72,7 +72,7 @@ namespace OKR.Service.Implementation
                     OldPoint = x.OldPoint,
                     Unit = x.KeyResults.Unit,
                 }).ToList();
-                var searchResult = new SearchResponse<ProgressUpdatesDto>
+                var searchResult = new SearchResponse<ProgressUpdatesRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),

@@ -21,7 +21,7 @@ namespace OKR.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ObjectiveDto request)
+        public async Task<IActionResult> Create(ObjectivesRequest request)
         {
             var result = await _objectiveService.Create(request);
             return Ok(result);
@@ -52,7 +52,7 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
         [HttpPut]
-        public IActionResult Edit(ObjectiveDto request)
+        public IActionResult Edit(ObjectivesRequest request)
         {
             var result = _objectiveService.Edit(request);
             return Ok(result);

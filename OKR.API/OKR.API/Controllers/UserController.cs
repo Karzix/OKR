@@ -21,14 +21,14 @@ namespace OKR.API.Controllers
 
         [HttpPost]
         [Authorize(Roles ="superadmin, Admin")]
-        public async Task<IActionResult> Create(UserDto request)
+        public async Task<IActionResult> Create(UserRequest request)
         {
             var result =await _userService.Create(request);
             return Ok(result);
         }
         [HttpPut]
         [Authorize(Roles = "superadmin, Admin")]
-        public async Task<IActionResult> Update(UserDto request)
+        public async Task<IActionResult> Update(UserRequest request)
         {
             var result =await _userService.Update(request);
             return Ok(result);
@@ -36,7 +36,7 @@ namespace OKR.API.Controllers
         [HttpPut]
         [Route("lock")]
         [Authorize(Roles = "superadmin, Admin")]
-        public async Task<IActionResult> Lock(UserDto request)
+        public async Task<IActionResult> Lock(UserRequest request)
         {
             var result = await _userService.LockAsync(request);
             return Ok(result);
