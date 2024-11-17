@@ -56,6 +56,10 @@ namespace OKR.Service.Implementation
                 objectives.KeyResults.Clear();
                 objectives.CreatedBy = userName;
                 var Day = GetDateRange(request.Period + ":" +request.Year);
+                if(Day.EndDate < now)
+                {
+                    return result.BuildError("You need to select the cycle in the current or future time");
+                }
                 objectives.StartDay = Day.StartDate;
                 objectives.EndDay = Day.EndDate;
                 if (request.TargetType == TargetType.individual)
