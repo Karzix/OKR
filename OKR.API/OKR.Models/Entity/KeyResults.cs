@@ -13,13 +13,14 @@ namespace OKR.Models.Entity
     public class KeyResults : BaseEntity
     {
         public string Description { get; set; }
-        public bool Active { get; set; } = true;
+        //public bool Active { get; set; } = true;
         public DateTime Deadline { get; set; }
         public TypeUnitKeyResult? Unit {  get; set; } // % Percent, # value
         public int CurrentPoint { get; set; }
         public int MaximunPoint { get; set; }
         public int Percentage { get; set; }
-        public StatusObjectives Status { get; set; } = StatusObjectives.noStatus;
+        public Status Status { get; set; } = Status.noStatus;
+        public bool IsCompleted { get; set; } = false;
 
 
         [ForeignKey("Objectives")]

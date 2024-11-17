@@ -19,7 +19,7 @@ namespace OKR.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(KeyResultDto request)
+        public async Task<IActionResult> Update(KeyResultRequest request)
         {
             var result = await _keyResultsService.UpdateWeight(request);
             return Ok(result);

@@ -11,15 +11,15 @@ namespace OKR.Service.Contract
 {
     public interface IDepartmentService
     {
-        AppResponse<List<DepartmentDto>> GetByParentDepartment(Guid parentId);
-        AppResponse<List<DepartmentDto>> GetAll();
-        AppResponse<DepartmentDto> Get(Guid id);
-        AppResponse<DepartmentDto> Update(DepartmentDto request);
-        AppResponse<DepartmentDto> Create(DepartmentDto request);
+        AppResponse<List<DepartmentRespone>> GetByParentDepartment(Guid parentId);
+        AppResponse<List<DepartmentRespone>> GetAll();
+        AppResponse<DepartmentRespone> Get(Guid id);
+        AppResponse<DepartmentRespone> Update(DepartmentRequest request);
+        AppResponse<DepartmentRespone> Create(DepartmentRequest request);
         AppResponse<string> Delete(Guid id);
-        AppResponse<SearchResponse<DepartmentDto>> Search(SearchRequest request);
-        AppResponse<List<DepartmentDto>> GetParentDepartmentByLevel(int level);
-        AppResponse<List<int>> DepartmentLevelNumber();
-        AppResponse<List<DepartmentDto>> GetDepartByKeyword(string keyword);
+        AppResponse<SearchResponse<DepartmentRespone>> Search(SearchRequest request);
+        AppResponse<List<DepartmentRespone>> GetParentDepartmentByLevel(int level);
+        AppResponse<List<int>> GetDepartmentLevelNumber();
+        AppResponse<List<DepartmentRespone>> GetDepartByKeyword(string keyword);
     }
 }

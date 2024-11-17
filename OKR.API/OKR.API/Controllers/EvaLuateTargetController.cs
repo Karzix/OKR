@@ -17,7 +17,7 @@ namespace OKR.API.Controllers
             _evaluateTargetService = evaluateTargetService;
         }
         [HttpPost]
-        public IActionResult Create(EvaluateTargetDto request)
+        public IActionResult Create(EvaluateTargetRequest request)
         {
             var result = _evaluateTargetService.Create(request);
             return Ok(result);
@@ -30,7 +30,7 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
         [HttpPut]
-        public IActionResult Edit(EvaluateTargetDto request)
+        public IActionResult Edit(EvaluateTargetRequest request)
         {
             var reuslt = _evaluateTargetService.Edit(request);
             return Ok(reuslt);

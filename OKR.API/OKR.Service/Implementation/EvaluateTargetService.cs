@@ -29,9 +29,9 @@ namespace OKR.Service.Implementation
             _objectivesRepository = objectivesRepository;
         }
 
-        public AppResponse<EvaluateTargetDto> Create(EvaluateTargetDto request)
+        public AppResponse<EvaluateTargetRespone> Create(EvaluateTargetRequest request)
         {
-            var result = new AppResponse<EvaluateTargetDto>();
+            var result = new AppResponse<EvaluateTargetRespone>();
             try
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
@@ -49,7 +49,7 @@ namespace OKR.Service.Implementation
                 evaluaTarget.CreatedBy = userName;
                 _evaluateTargetRepository.Add(evaluaTarget);
                 request.Id = evaluaTarget.Id;
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<EvaluateTargetRespone>(evaluaTarget));
             }
             catch (Exception ex)
             {
@@ -81,9 +81,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<EvaluateTargetDto> Edit(EvaluateTargetDto request)
+        public AppResponse<EvaluateTargetRespone> Edit(EvaluateTargetRequest request)
         {
-            var result = new AppResponse<EvaluateTargetDto>();
+            var result = new AppResponse<EvaluateTargetRespone>();
             try
             {
                 var userNamme = _contextAccessor.HttpContext.User.Identity.Name;
@@ -96,7 +96,7 @@ namespace OKR.Service.Implementation
                 evaluateTarget.ModifiedOn = DateTime.UtcNow;
                 evaluateTarget.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
                 _evaluateTargetRepository.Edit(evaluateTarget);
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<EvaluateTargetRespone>(evaluateTarget));
             }
             catch (Exception ex)
             {
@@ -105,9 +105,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<SearchResponse<EvaluateTargetDto>> Search(SearchRequest request)
+        public AppResponse<SearchResponse<EvaluateTargetRespone>> Search(SearchRequest request)
         { 
-            var result = new AppResponse<SearchResponse<EvaluateTargetDto>>();
+            var result = new AppResponse<SearchResponse<EvaluateTargetRespone>>();
             try
             {
                 var query = BuildFilterExpression(request.Filters);
@@ -118,7 +118,7 @@ namespace OKR.Service.Implementation
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 var list = evaluatarget.Skip(startIndex).Take(pageSize);
 
-                var data = list.Select(x=> new EvaluateTargetDto
+                var data = list.Select(x=> new EvaluateTargetRespone
                 {
                     Content = x.Content,
                     CreateBy = x.CreatedBy,
@@ -129,7 +129,7 @@ namespace OKR.Service.Implementation
                     ModifiedOn = x.ModifiedOn,
                 }).ToList();
 
-                var searchResult = new SearchResponse<EvaluateTargetDto>
+                var searchResult = new SearchResponse<EvaluateTargetRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),

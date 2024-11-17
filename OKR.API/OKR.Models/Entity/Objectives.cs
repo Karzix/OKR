@@ -15,7 +15,7 @@ namespace OKR.Models.Entity
         public DateTime StartDay { get; set; }
         public DateTime EndDay { get; set; }
         public TargetType TargetType { get; set; } = 0;
-        public StatusObjectives status { get; set; } = StatusObjectives.noStatus;
+        public Status status { get; set; } = Status.noStatus;
         [ForeignKey("Department")]
         public Guid? DepartmentId { get; set; }
         [ForeignKey("DepartmentId")]

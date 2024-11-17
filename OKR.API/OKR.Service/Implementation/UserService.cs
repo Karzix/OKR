@@ -39,9 +39,9 @@ namespace OKR.Service.Implementation
             _memoryCache = memoryCache;
         }
 
-        public async Task<AppResponse<UserDto>> Create(UserDto request)
+        public async Task<AppResponse<UserRespone>> Create(UserRequest request)
         {
-            var result = new AppResponse<UserDto>();
+            var result = new AppResponse<UserRespone>();
             try
             {
                 var departmant = request.DepartmentId != null ? _departmentRepository.FindBy(x=> x.Id == request.DepartmentId).FirstOrDefault() : null;
@@ -65,7 +65,7 @@ namespace OKR.Service.Implementation
                     await _roleManager.CreateAsync(role);
                 }
                 await _userManager.AddToRoleAsync(newUser, request.Role);
-                result.BuildResult(request);
+                result.BuildResult(_mappper.Map<UserRespone>(newUser));
             }
             catch (Exception ex)
             {
@@ -74,7 +74,7 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<string>> LockAsync(UserDto request, int day = 30)
+        public async Task<AppResponse<string>> LockAsync(UserRequest request, int day = 30)
         {
             var result = new AppResponse<string>();
             try
@@ -106,9 +106,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<SearchResponse<UserDto>>> Search(SearchRequest request)
+        public async Task<AppResponse<SearchResponse<UserRespone>>> Search(SearchRequest request)
         {
-            var result = new AppResponse<SearchResponse<UserDto>>();
+            var result = new AppResponse<SearchResponse<UserRespone>>();
             try
             {
                 var query =  BuildFilterExpression(request.Filters);
@@ -127,7 +127,7 @@ namespace OKR.Service.Implementation
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 var UserQueryable = users.Skip(startIndex).Take(pageSize).Include(x=>x.Department);
                 var UserList = UserQueryable.ToList();
-                var dtoList = UserQueryable.Select(x => new UserDto
+                var dtoList = UserQueryable.Select(x => new UserRespone
                     {
                         Email = x.Email,
                         UserName = x.UserName,
@@ -145,7 +145,7 @@ namespace OKR.Service.Implementation
                         userDto.Role = (await _userManager.GetRolesAsync(identityUser)).FirstOrDefault();
                     }
                 }
-                var searchUserResult = new SearchResponse<UserDto>
+                var searchUserResult = new SearchResponse<UserRespone>
                 {
                     TotalRows = numOfRecords,
                     TotalPages = CalculateNumOfPages(numOfRecords, pageSize),
@@ -164,9 +164,9 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<UserDto>> Update(UserDto request)
+        public async Task<AppResponse<UserRespone>> Update(UserRequest request)
         {
-            var result = new AppResponse<UserDto>();
+            var result = new AppResponse<UserRespone>();
             try
             {
                 var user = await _userManager.FindByIdAsync(request.Id.ToString());
@@ -187,7 +187,7 @@ namespace OKR.Service.Implementation
                 }
 
                 await _userManager.UpdateAsync(user);
-                result.BuildResult(request);
+                result.BuildResult(_mappper.Map<UserRespone>(user));
             }
             catch (Exception ex)
             {
@@ -251,12 +251,12 @@ namespace OKR.Service.Implementation
             }
         }
 
-        public AppResponse<List<UserDto>> GetAll()
+        public AppResponse<List<UserRespone>> GetAll()
         {
-            var result = new AppResponse<List<UserDto>>();
+            var result = new AppResponse<List<UserRespone>>();
             try
             {
-                var data = _userRepository.FindByPredicate(x => true).Select(x => new UserDto
+                var data = _userRepository.FindByPredicate(x => true).Select(x => new UserRespone
                 {
                     DepartmentId = x.DepartmentId,
                     DepartmentName = x.Department.Name,
@@ -272,13 +272,13 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
-        public async Task<AppResponse<UserDto>> Get(string userName)
+        public async Task<AppResponse<UserRespone>> Get(string userName)
         {
-            var result = new AppResponse<UserDto>();
+            var result = new AppResponse<UserRespone>();
             try
             {
                 var applicationUser = await _userManager.FindByNameAsync(userName);
-                var userDto = _mappper.Map<UserDto>(applicationUser);
+                var userDto = _mappper.Map<UserRespone>(applicationUser);
                 var department = _departmentRepository.FindBy(x=>x.Id == applicationUser.DepartmentId).FirstOrDefault();
                 if(department != null)
                 {
@@ -293,18 +293,18 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public AppResponse<List<UserDto>> GetListByKeyworld(string userName)
+        public AppResponse<List<UserRespone>> GetListByKeyworld(string userName)
         {
-            var result = new AppResponse<List<UserDto>>();
+            var result = new AppResponse<List<UserRespone>>();
             try
             {
-                if (!_memoryCache.TryGetValue(cacheUserKey, out List<UserDto> users))
+                if (!_memoryCache.TryGetValue(cacheUserKey, out List<UserRespone> users))
                 {
                     int page = 0;
-                    users = new List<UserDto>();
+                    users = new List<UserRespone>();
                     while (true)
                     {
-                        var list = _userRepository.AsQueryable().Skip(page*500).Take(500).Select(x=> new UserDto
+                        var list = _userRepository.AsQueryable().Skip(page*500).Take(500).Select(x=> new UserRespone
                         {
                             DepartmentId = x.DepartmentId,
                             Email = x.Email,

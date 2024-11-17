@@ -25,7 +25,7 @@ namespace OKR.API.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<IActionResult> Login(UserDto login)
+        public async Task<IActionResult> Login(UserRequest login)
         {
             var result = await _authencationService.AuthencationUser(login);
             return Ok(result);
@@ -33,7 +33,7 @@ namespace OKR.API.Controllers
         [HttpPost]
         [Route("Refresh")]
         [AllowAnonymous]
-        public IActionResult Refresh(UserDto request)
+        public IActionResult Refresh(UserRespone request)
         {
             var result =  _authencationService.Refresh(request);
             return Ok(result);

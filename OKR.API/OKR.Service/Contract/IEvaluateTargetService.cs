@@ -11,9 +11,9 @@ namespace OKR.Service.Contract
 {
     public interface IEvaluateTargetService
     {
-        AppResponse<SearchResponse<EvaluateTargetDto>> Search(SearchRequest request);
-        AppResponse<EvaluateTargetDto> Create(EvaluateTargetDto request);
-        AppResponse<EvaluateTargetDto> Edit(EvaluateTargetDto request);
+        AppResponse<SearchResponse<EvaluateTargetRespone>> Search(SearchRequest request);
+        AppResponse<EvaluateTargetRespone> Create(EvaluateTargetRequest request);
+        AppResponse<EvaluateTargetRespone> Edit(EvaluateTargetRequest request);
         AppResponse<string> Delete(Guid id);
     }
 }

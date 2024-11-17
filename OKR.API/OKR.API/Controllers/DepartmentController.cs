@@ -34,7 +34,7 @@ namespace OKR.API.Controllers
             return Ok(reuslt);
         }
         [HttpPost]
-        public IActionResult Create(DepartmentDto request)
+        public IActionResult Create(DepartmentRequest request)
         {
             var result = _departmentService.Create(request);
             return Ok(result);
@@ -47,7 +47,7 @@ namespace OKR.API.Controllers
             return Ok(result);
         }
         [HttpPut]
-        public IActionResult Edit(DepartmentDto request)
+        public IActionResult Edit(DepartmentRequest request)
         {
             var reuslt = _departmentService.Update(request);
             return Ok(reuslt);
@@ -70,7 +70,7 @@ namespace OKR.API.Controllers
         [Route("department-level")]
         public IActionResult DepartmentLevelNumber()
         {
-            var result = _departmentService.DepartmentLevelNumber();
+            var result = _departmentService.GetDepartmentLevelNumber();
             return Ok(result);
         }
         [HttpGet]

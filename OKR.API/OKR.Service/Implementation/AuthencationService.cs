@@ -36,12 +36,12 @@ namespace OKR.Service.Implementation
             _httpContextAccessor = httpContextAccessor;
             _refreshTokenModelRepository = refreshTokenModelRepository;
         }
-        public async Task<AppResponse<LoginResult>> AuthencationUser(UserDto login)
+        public async Task<AppResponse<LoginResult>> AuthencationUser(UserRequest login)
         {
             var result = new AppResponse<LoginResult>();
             try
             {
-                UserDto user = null;
+                UserRespone user = null;
                 ApplicationUser identityUser = new ApplicationUser();
                 var loginResult = new LoginResult();
                 //Validate the User Credentials    
@@ -52,7 +52,7 @@ namespace OKR.Service.Implementation
                 {
                     if (await _userManager.CheckPasswordAsync(identityUser, login.Password))
                     {
-                        user = new UserDto { UserName = identityUser.UserName, Email = identityUser.Email };
+                        user = new UserRespone { UserName = identityUser.UserName, Email = identityUser.Email };
                     }
 
                 }
@@ -123,7 +123,7 @@ namespace OKR.Service.Implementation
 
         //    return new JwtSecurityTokenHandler().WriteToken(token);
         //}
-        private async Task<List<Claim>> GetClaims(UserDto user, ApplicationUser identityUser)
+        private async Task<List<Claim>> GetClaims(UserRespone user, ApplicationUser identityUser)
         {
          
             var claims = new List<Claim>
@@ -185,7 +185,7 @@ namespace OKR.Service.Implementation
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenString;
         }
-        public AppResponse<LoginResult> Refresh(UserDto request)
+        public AppResponse<LoginResult> Refresh(UserRespone request)
         {
             var result = new AppResponse<LoginResult>();
             try
@@ -218,14 +218,14 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<UserDto>> GetInforAccount()
+        public async Task<AppResponse<UserRespone>> GetInforAccount()
         {
-            var result = new AppResponse<UserDto>();
+            var result = new AppResponse<UserRespone>();
             try
             {
                 var user = await _userManager.FindByNameAsync(_httpContextAccessor.HttpContext.User.Identity.Name);
                 var roles = await _userManager.GetRolesAsync(user);
-                var userDto = new UserDto
+                var userDto = new UserRespone
                 {
                     UserName = user.UserName,
                     Roles = roles.ToArray(),

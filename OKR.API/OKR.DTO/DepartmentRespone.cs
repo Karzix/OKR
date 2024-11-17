@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OKR.DTO
 {
-    public class DepartmentDto
+    public class DepartmentRespone
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
@@ -15,6 +15,6 @@ namespace OKR.DTO
         public string? ParentDepartmentName { get; set; }
         public int? level {  get; set; }
 
-        public List<DepartmentDto>? Zones { get; set; }
+        public List<DepartmentRespone>? Zones { get; set; }
     }
 }

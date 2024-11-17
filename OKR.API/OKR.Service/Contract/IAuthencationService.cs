@@ -11,9 +11,9 @@ namespace OKR.Service.Contract
 {
     public interface IAuthencationService
     {
-        public Task<AppResponse<LoginResult>> AuthencationUser(UserDto user);
-        public AppResponse<LoginResult> Refresh(UserDto request);
-        public Task<AppResponse<UserDto>> GetInforAccount();
+        public Task<AppResponse<LoginResult>> AuthencationUser(UserRequest user);
+        public AppResponse<LoginResult> Refresh(UserRespone request);
+        public Task<AppResponse<UserRespone>> GetInforAccount();
 
     }
 }

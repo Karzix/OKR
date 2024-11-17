@@ -27,7 +27,7 @@ namespace OKR.API.Controllers
         }
         [HttpPut]
         [Route("confirm")]
-        public IActionResult Confirm(DepartmentProgressApprovalDto dto)
+        public IActionResult Confirm(DepartmentProgressApprovalRequest dto)
         {
             var result = _service.Confirm(dto);
             return Ok(result);

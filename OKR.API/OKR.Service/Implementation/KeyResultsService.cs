@@ -46,9 +46,9 @@ namespace OKR.Service.Implementation
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<AppResponse<KeyResultDto>> UpdateWeight(KeyResultDto request)
+        public async Task<AppResponse<KeyResultRespone>> UpdateWeight(KeyResultRequest request)
         {
-            var result = new AppResponse<KeyResultDto>();
+            var result = new AppResponse<KeyResultRespone>();
             try
             {   
                 
@@ -91,7 +91,7 @@ namespace OKR.Service.Implementation
                     _progressApprovalRepository.Add(departmentProgressApproval);
                 }
 
-                result.BuildResult(request);
+                result.BuildResult(_mapper.Map<KeyResultRespone>(keyresult));
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        private string GetUpdateString(KeyResultDto NewKeyResult, KeyResults CurKeyResults)
+        private string GetUpdateString(KeyResultRequest NewKeyResult, KeyResults CurKeyResults)
         {
             if(!string.IsNullOrEmpty(NewKeyResult.Note))
             {
@@ -114,7 +114,7 @@ namespace OKR.Service.Implementation
             return content;
         }
 
-        private void Update_Save(KeyResults keyresult, KeyResultDto request)
+        private void Update_Save(KeyResults keyresult, KeyResultRequest request)
         {
             var updateString = request.Note.IsNullOrEmpty() ? GetUpdateString(request, keyresult) : request.Note;
             var userName = _contextAccessor.HttpContext.User.Identity.Name;
@@ -150,14 +150,14 @@ namespace OKR.Service.Implementation
             return "";
         }
 
-        public AppResponse<KeyResultDto> Get(Guid Id)
+        public AppResponse<KeyResultRespone> Get(Guid Id)
         {
-            var result = new AppResponse<KeyResultDto>();
+            var result = new AppResponse<KeyResultRespone>();
             try
             {
-                var dto = _keyResultRepository.AsQueryable().Where(x=>x.Id == Id).Include(x=>x.Objectives).Select(x=> new KeyResultDto
+                var dto = _keyResultRepository.AsQueryable().Where(x=>x.Id == Id).Include(x=>x.Objectives).Select(x=> new KeyResultRespone
                 {
-                    Active = x.Active,
+                    IsCompleted = x.IsCompleted,
                     CreatedBy = x.CreatedBy,
                     CreatedOn = x.CreatedOn,
                     CurrentPoint = x.CurrentPoint,
@@ -182,7 +182,7 @@ namespace OKR.Service.Implementation
                 //var dto = _mapper.Map<KeyResultDto>(keyresult);
 
                 dto.ProgressUpdates = _progressUpdatesRepository.AsQueryable().Where(x => x.KeyResultId == dto.Id).OrderByDescending(x=>x.CreatedOn)
-                    .Select(x => new ProgressUpdatesDto
+                    .Select(x => new ProgressUpdatesRespone
                     {
                         CreateBy = x.CreatedBy,
                         CreateOn = x.CreatedOn,

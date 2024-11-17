@@ -57,7 +57,9 @@ namespace OKR.Repository.Implementation
             var result = input.Select(obj => new
             {
                 pointObj = _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
-                    .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint)),
+                    .Sum(x => x.Unit != TypeUnitKeyResult.CompletedOrNotCompleted
+                        ? (((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+                        : (x.IsCompleted ? x.Percentage : 0)),
                 Id = obj.Id
             }).ToDictionary(
                 x => x.Id,
@@ -71,7 +73,9 @@ namespace OKR.Repository.Implementation
         {
             var point = _context.KeyResults
                .Where(x => x.ObjectivesId.Equals(id) && x.MaximunPoint > 0) // Kiểm tra MaximunPoint > 0
-               .Select(x => ((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+               .Select(x => x.Unit != TypeUnitKeyResult.CompletedOrNotCompleted 
+                ? (((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+                : (x.IsCompleted ? x.Percentage : 0 ))
                .Sum();
             return (int)Math.Round(point);
         }
