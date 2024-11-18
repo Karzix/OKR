@@ -69,7 +69,7 @@ namespace OKR.Service.Implementation
                 else
                 {
                     var role = GetUserRole();
-                    if((role == "Teamleader" && request.TargetType == TargetType.company) || (role == "Admin" && request.TargetType == TargetType.team))
+                    if((role == "Teamleader" && request.TargetType == TargetType.company) || (role == "Admin" && request.TargetType == TargetType.department))
                     {
                         return result.BuildError("wrong range!");
                     }
@@ -255,14 +255,25 @@ namespace OKR.Service.Implementation
                                 }
                             case "period":
                                 {
-                                    //var parts = filter.Value.Split(':');
-                                    //int period = int.Parse(parts[0]);
-                                    //int year = int.Parse(parts[1]);
-
-                                    var (quarterStart, quarterEnd) = GetDateRange(filter.Value);
-
+                                    if(filter.Value == "default")
+                                    {
+                                        var currentQuarterRange = GetCurrentQuarterDateRange();
+                                        predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
+                                        var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
+                                        break;
+                                    }
+                                    var parts = filter.Value.Split(':');
+                                    if (parts.Length != 2)
+                                    {
+                                        throw new ArgumentException("Invalid time period format. Expected format is {period}:{year}.");
+                                    }
+                                    string period = parts[0];
+                                    if (!int.TryParse(parts[1], out int year))
+                                    {
+                                        throw new ArgumentException("Invalid year format.");
+                                    }
                                     predicate = predicate.And(m =>
-                                        (m.StartDay <= quarterEnd && m.EndDay >= quarterStart));
+                                        (m.Period == period && m.Year >= year));
                                     break;
                                 }
                             case "name":
@@ -410,12 +421,27 @@ namespace OKR.Service.Implementation
             var enumN = int.Parse(filter.Value);
             TargetType targetType = (TargetType)enumN;
             
-            predicate = predicate.And(x => x.TargetType == targetType);
-            if (targetType == TargetType.individual || targetType == TargetType.company)
+            
+            if (targetType == TargetType.company)
             {
+                predicate = predicate.And(x => x.TargetType == targetType);
                 return predicate;
             }
-            else if(targetType == TargetType.team)
+            if(targetType == TargetType.individual)
+            {
+                string user = "";
+                var filterCreeateBy = Filters.Where(x => x.FieldName == "createBy").FirstOrDefault();
+                if (filterCreeateBy == null)
+                {
+                    user =  _contextAccessor.HttpContext.User.Identity.Name;
+                }
+                else
+                {
+                    user = filterCreeateBy.Value;
+                }
+                predicate = predicate.And(x => x.CreatedBy == user);
+            }
+            else if(targetType == TargetType.department)
             {
                 Department department = new Department();
                 ApplicationUser user = new ApplicationUser();
@@ -577,12 +603,14 @@ namespace OKR.Service.Implementation
             {
                 var currentQuarterRange = GetCurrentQuarterDateRange();
                 predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
+                var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
             }
             if (filters == null || !filters.Any(f => f.FieldName == "userName"))
             {
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
-              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null));
+              || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null) || x.TargetType == TargetType.company);
+                var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
             }
             return predicate;
         }
