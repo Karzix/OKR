@@ -12,7 +12,7 @@
       <div class="form-item">
         <p>Status:</p>
         <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus">
-            <el-radio-button 
+            <el-radio 
             v-for="status in statusOptions"
             :key="status.value"
             :label="status.value"
@@ -21,11 +21,11 @@
             <el-tag :type="getTagType(status.value)" effect="dark">
                 {{ status.text }}
             </el-tag>
-            </el-radio-button>
+            </el-radio>
         </el-radio-group>
       </div>
       <div class="form-item-2">
-        <div class="form-item min-w-150px" >
+        <div class="form-item min-w-200px" >
             <p class="form-label">Progress type:</p> 
             <el-select
                 v-model="keyresults.unit"
@@ -37,6 +37,7 @@
                 v-for="item in [
                     { key: 1, name: '# Value' },
                     { key: 0, name: '% Percent' },
+                    { key: 2, name: ' Completed/Not Completed' },
                 ]"
                 :key="item.key"
                 :label="item.name"
@@ -155,6 +156,11 @@ watch(
     customFillStatus.value = getStatusColor(keyresults.value.status);
   }
 )
+function getRadioStyle(status: StatusObjectives) {
+  return {
+    borderColor: keyresults.value.status === status ? getStatusColor(status) : undefined
+  };
+}
 </script>
 <style scope>
 .form-item{
@@ -179,7 +185,7 @@ watch(
 .max-w-150px{
     max-width: 150px !important;
 }
-.min-w-150px{
-    min-width: 150px !important;
+.min-w-200px{
+    min-width: 200px !important;
 }
 </style>

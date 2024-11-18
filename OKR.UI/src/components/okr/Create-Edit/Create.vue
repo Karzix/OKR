@@ -1,5 +1,5 @@
 <template>
-  <div class="header">New Objectives</div>
+  <div class="header">{{ props.isEdit ? 'Edit objective' : 'New objective' }}</div>
   <div class="objective-form">
     <div class="left">
       <div class="form-item">
@@ -14,7 +14,6 @@
         <el-radio-group
           v-model="objectives.targetType"
           size="large"
-          :fill="currentFill"
         >
           <el-radio-button
             :value="TargetType.Individual"
@@ -39,18 +38,20 @@
       <div class="form-item">
         <p>Status:</p>
         <el-radio-group v-model="objectives.status" size="medium" :fill="customFillStatus">
-            <el-radio-button
+            <el-radio
             v-for="status in statusOptions"
             :key="status.value"
             :label="status.value"
             :border="true"
+            :style="getRadioStyle(status.value)"
             >
             <el-tag :type="getTagType(status.value)" effect="dark">
                 {{ status.text }}
             </el-tag>
-            </el-radio-button>
+            </el-radio>
         </el-radio-group>
       </div>
+      <!-- <Radio.Group block options={options} defaultValue="Pear" optionType="button" /> -->
       <div class="btn-add-keyresult form-item">
        <p>Keyresults</p>
         <el-button :icon="Plus" @click="onShowDialogCreateKeyResult">Add new</el-button> 
@@ -90,10 +91,10 @@
           v-model="objectives.isPublic"
           size="large"
         >
-          <el-radio-button :value="false" class="individual-button" :disabled="objectives.targetType == TargetType.Department || objectives.targetType == TargetType.Company  ">
+          <el-radio-button :value="false" class="individual-button Visibility-button" :disabled="objectives.targetType == TargetType.Department || objectives.targetType == TargetType.Company  ">
             <el-icon><Hide /></el-icon> Private
           </el-radio-button>
-          <el-radio-button :value="true" class="department-button">
+          <el-radio-button :value="true" class="department-button Visibility-button" :style="{ width: '150px' }">
             <el-icon><View /></el-icon> Public
           </el-radio-button>
         </el-radio-group>
@@ -412,6 +413,11 @@ const onSelectKeyResult = (item: KeyResult) => {
   isEdit.value = true;
   dialogAddKeyResult.value = true;
 }
+function getRadioStyle(status: StatusObjectives) {
+  return {
+    borderColor: objectives.value.status === status ? getStatusColor(status) : undefined
+  };
+}
 </script>
 <style scoped>
 .header {
@@ -445,5 +451,16 @@ const onSelectKeyResult = (item: KeyResult) => {
 .btn-add-keyresult{
     display: flex;
     justify-content: space-between;
+}
+
+
+.el-radio{
+  margin-right: 0 !important;
+}
+
+</style>
+<style>
+.Visibility-button > span {
+    width: 165px;
 }
 </style>

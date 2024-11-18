@@ -1,6 +1,6 @@
 <template>
   <div class="okr-table">
-    <el-table :data="listObjectivesDisplay" style="width: 100%" v-loading="loadingTable">
+    <el-table :data="listObjectivesDisplay" v-loading="loadingTable">
       <!-- Expandable Row -->
       <el-table-column type="expand">
         <template #default="props">
@@ -8,11 +8,11 @@
            <div class="expand-table">
             <el-table
               :data="props.row.keyResults"
-              style="width: 100%; padding-left: 20px"
+              style="width: 100%;"
               :show-header="false"
             >
               <!-- Title Column -->
-              <el-table-column >
+              <el-table-column  width="350">
                 <template #default="{ row }">
                   <div class="title-cell">
                     <CustomIconTargetType :targetType="row.targetType"></CustomIconTargetType>
@@ -22,7 +22,7 @@
               </el-table-column>
 
               <!-- Progress Column -->
-              <el-table-column :with="customCSS.withProgress">
+              <el-table-column :width="customCSS.withProgress">
                 <template #default="{ row }">
                   <el-progress :percentage="Math.round(row.currentPoint / row.maximunPoint * 100)" :color="getStatusColor(row.status)" />
                   <!-- <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span> -->
@@ -30,14 +30,14 @@
               </el-table-column>
 
               <!-- Status Column -->
-              <el-table-column label="Status" :with="customCSS.withStatus">
+              <el-table-column label="Status" :width="customCSS.withStatus">
                 <template #default="{ row }">
                   <el-tag :type="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
                 </template>
               </el-table-column>
 
               <!-- End Date Column -->
-              <el-table-column :with="customCSS.withEndDate">
+              <el-table-column :width="customCSS.withEndDate">
                 <template #default="{ row }">
                   <span :class="{ 'date-warning': row.status === 'At risk' }">{{
                     formatDate(row.deadline)
@@ -51,7 +51,7 @@
       </el-table-column>
 
       <!-- Main Table Columns -->
-      <el-table-column label="Title" >
+      <el-table-column label="Title" width="350" >
         <template #default="{ row }">
           <div class="title-cell">
             <CustomIconTargetType :targetType="row.targetType"></CustomIconTargetType>
@@ -81,27 +81,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Progress"  :with="customCSS.withProgress">
+      <el-table-column label="Progress"  :width="customCSS.withProgress">
         <template #default="{ row }">
           <el-progress :percentage="row.point" :color="getStatusColor(row.status)" />
           <!-- <span class="progress-percentage">{{ row.point }}%</span> -->
         </template>
       </el-table-column>
 
-      <el-table-column label="Status" :with="customCSS.withStatus">
+      <el-table-column label="Status" :width="customCSS.withStatus">
         <template #default="{ row }">
           <el-tag :type="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column label="End Date" :with="customCSS.withEndDate">
+      <el-table-column label="End Date" :width="customCSS.withEndDate">
         <template #default="{ row }">
           <span :class="{ 'date-warning': row.status === 'At risk' }">{{
             getDisplayString(row.period + ":" + row.year) 
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="50">
+      <el-table-column width="50" fixed="right">
         <template #default="scope">
           <el-button type="info" link @click="onShowDialogDetail(scope.row)"><el-icon><MoreFilled /></el-icon></el-button>
         </template>
@@ -116,7 +116,7 @@
       </template>
     </el-table>
   </div>
-  <el-dialog v-model="dialogDetail" width="900px">
+  <el-dialog v-model="dialogDetail" style="width: 900px !important;">
     <DetailObjectives  :objectives="ObjectivesSelect" v-if="dialogDetail" :is-owner="allowEdit"
      @update:objectives="refreshObjectives" @delete:objectives="onDelete" ></DetailObjectives>
   </el-dialog>
@@ -165,10 +165,9 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 })
 const customCSS = {
-  withProgress: 200,
-  withStatus: 150,
-  withEndDate: 200,
-
+  withProgress: 350,
+  withStatus: 200,
+  withEndDate: 300,
 }
 const props = defineProps<{
   searchRequest: SearchRequest;
@@ -202,6 +201,11 @@ const search = async () => {
           listObjectivesDisplay.value.push(...searchResponseObjectives.value.data);
         }
       }
+
+      if(searchResponseObjectives.value.currentPage == searchResponseObjectives.value.totalPages){
+        noMore.value = true;
+      }
+
     });
   }
   catch(e){
@@ -287,7 +291,9 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
 .okr-table {
   border-radius: 10px;
   overflow: hidden;
-  background: #f9fafb;
+  max-width: 1300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .title-cell {
@@ -315,7 +321,7 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
  margin-left: 40px;
 }
 .okr-table {
-  font-size: 14px; /* Tăng kích thước font */
+
 }
 
 .el-table .el-table__row,
@@ -333,7 +339,7 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
 }
 
 .el-tag {
-  font-size: 18px; /* Tăng kích thước font của tag */
+
   padding: 8px 12px; /* Thêm padding cho tag */
 }
 

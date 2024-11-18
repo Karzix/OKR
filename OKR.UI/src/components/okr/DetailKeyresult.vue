@@ -17,7 +17,7 @@
                 <!-- <p class="progress-caption">The objectives progress is calculated from the key results</p> -->
                  {{ keyresult.currentPoint }} / {{ keyresult.maximunPoint }}
             </div>
-            <div><el-button type="primary" link @click="showDialogUpdateProgress = true" v-if="props.allowUpdateWeight">progress update</el-button></div>
+            <div><el-button type="primary" link @click="showDialogUpdateProgress = true" v-if="props.allowUpdateWeight && keyresult.unit != 2">progress update</el-button></div>
             <div class="keyresult-status">
                 <p class="label">Status: </p>
                 <el-tag :type="getTagType(keyresult.status)">{{ getStatusText(keyresult.status) }}</el-tag>

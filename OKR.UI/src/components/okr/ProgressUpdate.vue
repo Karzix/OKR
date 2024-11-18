@@ -83,6 +83,9 @@ const searchProgressUpdate = async () => {
       } else {
         noMore.value = true;
       }
+      if(searchResponse.value.currentPage == searchResponse.value.totalPages){
+        noMore.value = true;
+      }
     }
   } catch (e) {
     console.error(e);

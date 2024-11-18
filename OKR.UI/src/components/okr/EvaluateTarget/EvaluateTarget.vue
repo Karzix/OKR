@@ -97,6 +97,9 @@ const search = async () => {
             noMore.value = true;
             disabled.value = true;
           }
+          if(searchResponse.value.currentPage == searchResponse.value.totalPages){
+            noMore.value = true;
+          }
         } else {
           ElMessage({
             message: res.data.message,

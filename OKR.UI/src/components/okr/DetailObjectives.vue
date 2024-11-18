@@ -2,7 +2,6 @@
     <div class="detail-objectives">
         <div class="left">
             <div class="left-header">
-                <p class="user-name">{{ objectives.createdBy }}</p>
                 <el-button-group class="ml-4">
                     <el-button type="primary" :icon="Edit" v-if="isOwner" @click="onEdit"/>
                     <el-button type="primary" :icon="Share" @click="copyLinkShare" />
@@ -45,6 +44,10 @@
                 <p class="label">Visibility: </p>
                 <p class="value">{{  objectives.isPublic ? 'Public' : 'Private' }}</p>
             </div>
+            <div class="right-item">
+                <p class="label">Created by: </p>
+                <p class="value">{{ objectives.createdBy }}</p>
+            </div>
         </div>
     </div>
     <div class="comment-progress">
@@ -79,7 +82,7 @@ import { addFilter } from "../maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import DetailKeyresult from "./DetailKeyresult.vue";
 import CreateEditObjectives from "./Create-Edit/Create.vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import Cookies from "js-cookie";
 
 
@@ -150,8 +153,24 @@ const copyLinkShare = () =>{
   })
 }
 const onDelete = () => {
-    axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
-        emit('delete:objectives', objectives.value)
+    ElMessageBox.confirm(
+        'Are you sure to delete this objective?',
+        'Warning',
+        {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    ).then(() => {
+        axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
+            emit('delete:objectives', objectives.value)
+        })
+    })
+   .catch(() => {
+        ElMessage({
+            type: 'info',
+            message: 'Delete canceled',
+        })
     })
 }
 const onEdit = () => {
@@ -201,7 +220,7 @@ onBeforeMount(() => {
 .left-header{
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content:end;
 }
 .title{
     font-size: 24px;

@@ -4,7 +4,7 @@
       {{ Cookies.get("userName")?.toString() }}
     </div>
     <el-container>
-      <el-header class="layout2_header" v-if="!isMobile">
+      <el-header class="layout2_header" >
         <div class="layout2-logo" @click="handleAsideClick('')">
           <img src="@/assets/logo2.png" alt="" >
         </div>
@@ -21,39 +21,9 @@
             </el-icon>
             <span>Department</span>
           </el-col>
-          <!-- <el-col
-            v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])"
-            :span="6"
-            class="item-menu"
-            @click="handleAsideClick('Branch')"
-          >
-            <el-icon>
-              <OfficeBuilding />
-            </el-icon>
-            <span>Branch</span>
-          </el-col> -->
-          <!-- <el-col :span="6" class="layout2-search">
-            <el-select
-              v-model="searchUsername"
-              clearable
-              placeholder="User Name"
-              style="width: 190px"
-              filterable
-              remote
-              :remote-method="seachUser"
-            >
-              <el-option
-                v-for="item in listUser"
-                :key="item.userName"
-                :label="item.userName"
-                :value="item.userName"
-              />
-            </el-select>
-            <el-icon><Search /></el-icon>
-          </el-col> -->
         </el-row>
       </el-header>
-      <el-header class="mobile-header" v-if="isMobile">
+      <el-header class="mobile-header" v-if="false">
         <div class="mobile-header-content">
           <el-button
             class="toggle-button"
@@ -220,10 +190,10 @@ watch(() => searchUsername.value, () => {
   justify-content: center;
   border-radius: 10px;
 }
+
 .common-layout {
-  background-image: url("../../assets/web.png");
-  background-repeat: no-repeat;
-  background-size: cover; /* Đảm bảo hình nền phủ toàn bộ khung */
+  background: linear-gradient(199deg, #e6673966, #9585f43b, #c4c1c1a3);
+  background-size: cover; /* Đảm bảo nền phủ toàn bộ khung */
   background-position: center center;
   background-attachment: fixed; /* Cố định hình nền */
   min-height: 100vh; /* Chiều cao tối thiểu luôn bằng chiều cao của màn hình */
