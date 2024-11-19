@@ -17,6 +17,7 @@ namespace OKR.Service.Mapper
 			CreateMap<DepartmentRespone, Department>().ReverseMap();
 			CreateMap<DepartmentRequest, Department>().ReverseMap();
 			CreateMap<KeyResultRespone, KeyResults>().ReverseMap();
+			CreateMap<KeyResultRequest, KeyResults>().ReverseMap();
 			CreateMap<ObjectivesRespone, Objectives>().ReverseMap();
 			CreateMap<ObjectivesRequest, Objectives>().ReverseMap();
 			CreateMap<ProgressUpdatesRespone, ProgressUpdates>().ReverseMap();
@@ -25,6 +26,7 @@ namespace OKR.Service.Mapper
 			CreateMap<EvaluateTargetRespone, EvaluateTarget>().ReverseMap();
 			CreateMap<DepartmentProgressApprovalRespone, DepartmentProgressApproval>().ReverseMap();
 			CreateMap<EvaluateTargetRequest, EvaluateTarget>().ReverseMap();
+
 		}
 	}
 }

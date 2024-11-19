@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OKR.Models.Context;
 
@@ -11,9 +12,11 @@ using OKR.Models.Context;
 namespace OKR.Models.Migrations
 {
     [DbContext(typeof(OKRDBContext))]
-    partial class OKRDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241119063515_addColTargetTypeAndIsCompletedForDepartmentProgressApproval")]
+    partial class addColTargetTypeAndIsCompletedForDepartmentProgressApproval
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -298,7 +301,7 @@ namespace OKR.Models.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Unit")
+                    b.Property<int>("TargetType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

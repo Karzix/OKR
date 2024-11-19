@@ -44,10 +44,12 @@ namespace OKR.Repository.Implementation
         {
             var totalProgress = Math.Round(input.Select(obj =>
                  _context.KeyResults.Where(kr => kr.ObjectivesId == obj.Id)
-                     .Sum(kr => (float)(kr.Percentage / 100.0) * (kr.CurrentPoint / (float)kr.MaximunPoint))
+                     .Sum(x => x.Unit != TypeUnitKeyResult.CompletedOrNotCompleted
+                        ? (((double)x.CurrentPoint / x.MaximunPoint) * x.Percentage)
+                        : (x.IsCompleted ? x.Percentage : 0))
              ).Sum(), 2);
             var objectiveCount = input.Count();
-            var averageProgress = objectiveCount > 0 ? (totalProgress / objectiveCount) * 100 : 0;
+            var averageProgress = objectiveCount > 0 ? (totalProgress / objectiveCount)  : 0;
 
             return (int)Math.Round(averageProgress, 2);
         }

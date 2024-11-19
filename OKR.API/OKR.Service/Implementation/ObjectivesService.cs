@@ -172,7 +172,6 @@ namespace OKR.Service.Implementation
                             Status = k.Status,
                             Percentage = k.Percentage
                         }).ToList(),
-                        //Point = objectId_point.ContainsKey(x.Id) ? objectId_point[x.Id] : 0
                         ApplicationUserId = x.ApplicationUserId,
                         DepartmentId = x.DepartmentId,
                         EndDay = x.EndDay,

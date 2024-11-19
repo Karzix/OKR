@@ -4,6 +4,7 @@ using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using Microsoft.AspNetCore.Http;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Repository.Implementation;
@@ -160,20 +161,38 @@ namespace OKR.Service.Implementation
                 if (dept.IsApproved)
                 {
                     var keyresult = _keyResultRepository.Get(departmentProgressApproval.KeyResultsId);
-                    var progress = new ProgressUpdates();
-                    progress.Id = Guid.NewGuid();
-                    progress.CreatedOn = DateTime.UtcNow;
-                    progress.CreatedBy = userName;
-                    progress.Note = departmentProgressApproval.Note;
-                    progress.KeyResultId = departmentProgressApproval.Id;
-                    progress.OldPoint = keyresult.CurrentPoint;
-                    progress.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
-                    progress.KeyResultId = departmentProgressApproval.KeyResultsId;
+                    if(keyresult.Unit != TypeUnitKeyResult.CompletedOrNotCompleted)
+                    {
+                        var progress = new ProgressUpdates();
+                        progress.Id = Guid.NewGuid();
+                        progress.CreatedOn = DateTime.UtcNow;
+                        progress.CreatedBy = userName;
+                        progress.Note = departmentProgressApproval.Note;
+                        progress.OldPoint = keyresult.CurrentPoint;
+                        progress.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
+                        progress.KeyResultId = departmentProgressApproval.KeyResultsId;
 
-                    keyresult.CurrentPoint += (int)departmentProgressApproval.AddedPoints!;
-                    _keyResultRepository.Edit(keyresult);
-                    progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
-                    _progressUpdatesRepository.Add(progress);
+                        keyresult.CurrentPoint += (int)departmentProgressApproval.AddedPoints!;
+                        _keyResultRepository.Edit(keyresult);
+                        progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                        _progressUpdatesRepository.Add(progress);
+                    }
+                    else
+                    {
+                        var progress = new ProgressUpdates();
+                        progress.Id = Guid.NewGuid();
+                        progress.CreatedOn = DateTime.UtcNow;
+                        progress.CreatedBy = userName;
+                        progress.Note = departmentProgressApproval.Note;
+                        progress.KeyResultId = departmentProgressApproval.KeyResultsId;
+                        progress.OldPoint = departmentProgressApproval.IsCompleted ?  0 : 1;
+                        progress.NewPoint = departmentProgressApproval.IsCompleted ? 1 : 0;
+                        keyresult.IsCompleted = departmentProgressApproval.IsCompleted;
+                        _keyResultRepository.Edit(keyresult);
+                        progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
+                        _progressUpdatesRepository.Add(progress);
+                    }
+                    
                 }
                 departmentProgressApproval.IsDeleted = true;
                 _departmentProgressApprovalRepository.Edit(departmentProgressApproval);
