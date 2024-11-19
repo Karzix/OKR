@@ -32,9 +32,14 @@ export const recaculateObjectivesAfterProgressApproval = (objectives: Objectives
     var newpoint = 0;
     objectives.lastProgressUpdate = new Date();
     objectives.keyResults.forEach((k) => {
-      console.log(k);
+      if(k.unit == 2 && DepartmentProgressApproval.isCompleted == true) {
+        newpoint += k.percentage!
+      }
+      else{
       newpoint += (k.currentPoint! / k.maximunPoint!)* k.percentage!;
+      }
     });
     objectives.point = newpoint;
+
     return newpoint;
 }

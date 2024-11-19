@@ -92,6 +92,8 @@ import { deepCopy } from "@/Service/deepCopy";
 import lineChartKeyresult from "./lineChartKeyresult.vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { hasPermission } from "../maynghien/Common/handleRole";
+import Cookies from "js-cookie";
 
 
 const keyresult =  ref<KeyResult>({
@@ -165,18 +167,25 @@ const CompletedKeyResult = async () => {
         }
     ).then(() => {
         var k = new KeyResult();
-
-        axiosInstance.put(`KeyResults`, keyresult.value).then( (rs) => {
-            if(rs.data.isSuccess){
-                getKeyresult();
-                emit("updateData");
-            }
-            else{
-                alert(rs.data.data.message);
-                keyresult.value.isCompleted = !keyresult.value.isCompleted;
-            }
-                
-        })
+        try{
+            axiosInstance.put(`KeyResults`, keyresult.value).then( (rs) => {
+                if(rs.data.isSuccess){
+                    getKeyresult();
+                    emit("updateData");
+                }
+                else{
+                    alert(rs.data.data.message);
+                    keyresult.value.isCompleted = !keyresult.value.isCompleted;
+                }
+                if(!isTeamleadOrOwner()){
+                    ElMessage.success("Your request will be processed when the owner accepts it.");
+                }
+            })
+        }
+        catch(e){
+            ElMessage.error("Something went wrong");
+            console.log(e);
+        }
     })
     .catch(() => {
         ElMessage({
@@ -188,6 +197,22 @@ const CompletedKeyResult = async () => {
     
 }
 
+const isTeamleadOrOwner = () : boolean => {
+  var userLogin = Cookies.get("userName")?.toString();
+  var userIdOfCurrentUser = Cookies.get("UserId")?.toString();
+  var departmentIdOfCurrentUser = Cookies.get("DepartmentId")?.toString();
+  var jsonString = Cookies.get('Roles')?.toString() ?? '';
+  var jsonObject = JSON.parse(jsonString);
+  var arrayFromString = Object.values(jsonObject);
+  var userRoles = arrayFromString as string[];
+  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+    return true;
+  }
+  else if(props.objectives.applicationUserId == userIdOfCurrentUser){
+    return true;
+  }
+  return false
+}
 </script>
 <style scoped>
 .keyresult-progress .progress-caption {

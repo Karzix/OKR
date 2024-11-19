@@ -5,5 +5,6 @@ export class DepartmentProgressApprovalDto {
     createdOn?: Date;
     createdBy?: string;
     isApproved: boolean = false;
-    id: string | undefined
+    id: string | undefined;
+    isCompleted?: boolean = false;
 }

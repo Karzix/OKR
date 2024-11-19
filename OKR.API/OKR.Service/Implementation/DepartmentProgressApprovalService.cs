@@ -52,8 +52,8 @@ namespace OKR.Service.Implementation
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 1;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
-                var UserList = users.Skip(startIndex).Take(pageSize);
-                var dtoList = UserList.Select(x => new DepartmentProgressApprovalRespone
+                var dpa = users.Skip(startIndex).Take(pageSize);
+                var dtoList = dpa.Select(x => new DepartmentProgressApprovalRespone
                 {
                     Id = x.Id,
                     AddedPoints = x.AddedPoints,
@@ -61,6 +61,7 @@ namespace OKR.Service.Implementation
                     CreatedOn = x.CreatedOn,
                     KeyresultID = x.KeyResultsId,
                     Note = x.Note,
+                    IsCompleted = x.IsCompleted
                 }).ToList();
                 var searchResult = new SearchResponse<DepartmentProgressApprovalRespone>
                 {

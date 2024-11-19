@@ -70,6 +70,7 @@ const Save = async () => {
     k.note = props.keyresults.note;
     k.progressUpdates = undefined;
     k.description = props.keyresults.description;
+    k.unit = props.keyresults.unit;
 
     console.log(k);
     await axiosInstance.put("KeyResults", k).then((res) => {

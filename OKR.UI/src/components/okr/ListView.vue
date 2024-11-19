@@ -281,6 +281,8 @@ const isTeamleadOrOwner = (objectives : Objectives) : boolean => {
 }
 const DepartmentProgressQueue_onSuccess = (objectives: Objectives, DepartmentProgressApproval : DepartmentProgressApprovalDto) => {
   var o = listObjectivesDisplay.value.filter((item) => item.id === objectives.id)[0];
+  var keyresult = o.keyResults.filter((item) => item.id === DepartmentProgressApproval.keyresultID)[0];
+  keyresult.isCompleted = DepartmentProgressApproval.isCompleted ?? false;
   o.point = recaculateObjectivesAfterProgressApproval(objectives, DepartmentProgressApproval);
   o.numberOfPendingUpdates -=1;
 }

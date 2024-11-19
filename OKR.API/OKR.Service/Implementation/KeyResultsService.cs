@@ -94,7 +94,7 @@ namespace OKR.Service.Implementation
                     departmentProgressApproval.CreatedOn = now;
                     departmentProgressApproval.CreatedBy = userName;
                     departmentProgressApproval.Note = GetUpdateString(request, keyresult);
-                    departmentProgressApproval.AddedPoints = (int)request.AddedPoints;
+                    departmentProgressApproval.AddedPoints = request.AddedPoints ?? 0;
                     departmentProgressApproval.KeyResultsId = keyresult.Id;
                     departmentProgressApproval.Note = GetUpdateString(request, keyresult);
                     departmentProgressApproval.Unit = (TypeUnitKeyResult)request.Unit;
