@@ -186,6 +186,7 @@ const keyresults = ref<KeyResult>({
   lastProgressUpdate: new Date(),
   createdOn: new Date(),
   progressUpdates: [],
+  isCompleted: false
 });
 const dialogAddKeyResult = ref(false);
 const isEdit = ref(false);
@@ -286,7 +287,8 @@ const onShowDialogCreateKeyResult = () => {
         note: "",
         lastProgressUpdate: new Date(),
         progressUpdates: [],
-  createdOn: new Date(),
+        createdOn: new Date(),
+        isCompleted: false
     };
     isEdit.value = false;
     dialogAddKeyResult.value = true;

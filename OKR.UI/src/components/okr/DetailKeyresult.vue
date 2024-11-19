@@ -2,7 +2,6 @@
     <div class="detail-keyresult">
         <div class="left">
             <div class="left-header">
-                <p class="user-name">{{ keyresult.createdBy }}</p>
                 <!-- <el-button-group class="ml-4">
                     <el-button type="primary" :icon="Edit" />
                     <el-button type="primary" :icon="Share" />
@@ -12,17 +11,33 @@
             <div>
             <p class="title">{{ keyresult.description }}</p>
             </div>
-            <div class="keyresult-progress">
+            <div class="keyresult-progress" v-if="keyresult.unit != 2">
                 <el-progress :percentage="((keyresult.currentPoint ?? 0) / (keyresult.maximunPoint ?? 1) * 100).toFixed(2)"color="#6366F1" />
                 <!-- <p class="progress-caption">The objectives progress is calculated from the key results</p> -->
                  {{ keyresult.currentPoint }} / {{ keyresult.maximunPoint }}
             </div>
-            <div><el-button type="primary" link @click="showDialogUpdateProgress = true" v-if="props.allowUpdateWeight && keyresult.unit != 2">progress update</el-button></div>
+            <div>
+                <el-button type="primary" link @click="showDialogUpdateProgress = true" v-if="props.allowUpdateWeight && keyresult.unit != 2">progress update</el-button>
+                <div v-if="props.allowUpdateWeight && keyresult.unit == 2">
+                    <el-switch
+                        @click="() => {
+                            console.log('change');
+                            CompletedKeyResult()
+                            }"
+                        v-model="keyresult.isCompleted"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+                        :active-value= true
+                        :inactive-value= false
+                    />
+                    {{ keyresult.isCompleted ? 'Completed' : 'Not Completed' }}
+                </div>
+                
+            </div>
             <div class="keyresult-status">
                 <p class="label">Status: </p>
                 <el-tag :type="getTagType(keyresult.status)">{{ getStatusText(keyresult.status) }}</el-tag>
             </div>
-            <lineChartKeyresult :keyResult="keyresult" :key="keyresult.currentPoint"></lineChartKeyresult>
+            <lineChartKeyresult :keyResult="keyresult" :key="keyProgressUpdate" v-if="keyresult.unit != 2"></lineChartKeyresult>
         </div>
         <div class="right">
             <div class="right-item">
@@ -41,22 +56,26 @@
                 <p class="label">Last progress update: </p>
                 <p class="value">{{ keyresult.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(keyresult.lastProgressUpdate) : '' }}</p>
             </div>
+            <div class="right-item">
+                <p class="label">Created by: </p>
+                <p class="value">{{ keyresult.createdBy }}</p>
+            </div>
         </div>
     </div>
     <div class="comment-progress">
         <el-tabs v-model="tabs" class="demo-tabs">
             <!-- <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest" :targetType="'0'"></EvaluateTarget></el-tab-pane> -->
-            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest"></ProgressUpdate></el-tab-pane>
+            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest" ></ProgressUpdate></el-tab-pane>
        </el-tabs>
     </div>  
 
     <el-dialog v-model="showDialogUpdateProgress">
-        <UpdateProgress :keyresults="keyresult" @on-updated-successfully="onUpdatedSuccessfully" :objectives="props.objectives"></UpdateProgress>
+        <UpdateProgress :keyresults="keyresult" @on-updated-successfully="onUpdatedSuccessfully" :objectives="props.objectives" ></UpdateProgress>
     </el-dialog>
 </template>
 <script setup lang="ts">
 import { Edit, Share, Delete } from "@element-plus/icons-vue";
-import { onBeforeMount, onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref, watch } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
 import ListKeyresult from "./Create-Edit/ListKeyresult.vue";
 import ProgressUpdate from "./ProgressUpdate.vue";
@@ -72,6 +91,7 @@ import { addFilter } from "@/components/maynghien/Common/handleSearchFilter";
 import { deepCopy } from "@/Service/deepCopy";
 import lineChartKeyresult from "./lineChartKeyresult.vue";
 import UpdateProgress from "@/components/ProgressUpdate/UpdateProgress.vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 
 const keyresult =  ref<KeyResult>({
@@ -87,7 +107,8 @@ const keyresult =  ref<KeyResult>({
     percentage: 50,
     createdOn: new Date(),
     lastProgressUpdate: new Date(),
-    progressUpdates:[]
+    progressUpdates:[],
+    isCompleted: false
 });
 const tabs = ref('progress');
 const props = defineProps<{
@@ -105,7 +126,7 @@ const searchRequest = ref<SearchRequest>({
     filters: [],
     SortBy: undefined,
 })
-
+const keyProgressUpdate= ref(1);
 const getKeyresult = async () => {
     await axiosInstance.get(`KeyResults/${props.keyresultId}`).then((res) => {
         keyresult.value = res.data.data
@@ -114,7 +135,9 @@ const getKeyresult = async () => {
         keyresult.value.lastProgressUpdate =keyresult.value.lastProgressUpdate? RecalculateTheDate(keyresult.value.lastProgressUpdate) : undefined;
         keyresult.value.startDay = RecalculateTheDate(keyresult.value.startDay);
         console.log(keyresult.value);
+        keyProgressUpdate.value ++
     })
+    
 }
 onBeforeMount(async () => {
     var filter = new Filter();
@@ -131,6 +154,40 @@ const onUpdatedSuccessfully = async (point : number) => {
     // keyresult.value.id = "";
     emit("updateData");
 }
+const CompletedKeyResult = async () => {
+    ElMessageBox.confirm(
+        `Are you sure you want to ${keyresult.value.isCompleted ? " complete" : "uncomplete"} this key result?`,
+        'Warning',
+        {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    ).then(() => {
+        var k = new KeyResult();
+
+        axiosInstance.put(`KeyResults`, keyresult.value).then( (rs) => {
+            if(rs.data.isSuccess){
+                getKeyresult();
+                emit("updateData");
+            }
+            else{
+                alert(rs.data.data.message);
+                keyresult.value.isCompleted = !keyresult.value.isCompleted;
+            }
+                
+        })
+    })
+    .catch(() => {
+        ElMessage({
+            type: 'info',
+            message: 'Cancel',
+        })
+        keyresult.value.isCompleted = !keyresult.value.isCompleted;
+    })
+    
+}
+
 </script>
 <style scoped>
 .keyresult-progress .progress-caption {

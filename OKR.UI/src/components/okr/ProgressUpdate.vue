@@ -3,13 +3,15 @@
     <ul class="list">
       <li v-for="item in listProgressUpdate" :key="item.id" class="list-item">
         <el-card>
-          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint)">
+          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint) && item.unit != 2">
             <strong>{{ item.oldPoint }}</strong>
             <el-icon><Right /></el-icon>
             <strong>{{ item.newPoint }}</strong>
-            <el-tag>
-              {{ item.unit == 0 ? "Percent" : item.unit == 1 ? "Value" : "Checked" }}
-            </el-tag>
+          </div>
+          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint) && item.unit == 2">
+            <strong>{{ item.oldPoint == 1 ? 'Completed' : 'not completed' }}</strong>
+            <el-icon><Right /></el-icon>
+            <strong>{{ item.newPoint == 1 ? 'Completed' : 'not completed' }}</strong>
           </div>
           <div class="content">
             <p>Date: <strong>{{ formatDate(item.createOn) }}</strong></p>

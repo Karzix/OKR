@@ -47,11 +47,11 @@
         </div>
         <div class="form-item max-w-150px">
             <p class="form-label">Initial:</p>
-            <el-input-number v-model="keyresults.currentPoint" class="form-input" :controls="false" :min="0"/>
+            <el-input-number v-model="keyresults.currentPoint" class="form-input" :controls="false" :min="0" :disabled="keyresults.unit == 2"/>
         </div>
         <div class="form-item max-w-150px" >
             <p class="form-label">Target:</p>
-            <el-input-number v-model="keyresults.maximunPoint" class="form-input" :controls="false" :max="keyresults.unit == 0 ?100 : Number.MAX_VALUE"/>
+            <el-input-number v-model="keyresults.maximunPoint" class="form-input" :controls="false" :max="keyresults.unit == 0 ?100 : Number.MAX_VALUE"  :disabled="keyresults.unit == 2"/>
         </div>
       </div>
     <!-- </div> -->
@@ -89,7 +89,8 @@ const keyresults = ref<KeyResult>({
   note: "",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
-  progressUpdates:[]
+  progressUpdates:[],
+  isCompleted: false
 });
 const props = defineProps<{ 
     keyresults: KeyResult,
@@ -121,7 +122,8 @@ onBeforeMount(() => {
       note: "",
       createdOn: new Date(),
       lastProgressUpdate: new Date(),
-      progressUpdates:[]
+      progressUpdates:[],
+      isCompleted: false
     }
   }
   else{

@@ -17,9 +17,9 @@ export class KeyResult {
   objectivesId?: string | undefined;
   lastProgressUpdate: Date | undefined;
   createdBy?: string | undefined;
-    createdOn: Date | undefined;
-    startDay?: Date;
-    endDay?: Date;
-
+  createdOn: Date | undefined;
+  startDay?: Date;
+  endDay?: Date;
+  isCompleted: boolean = false;
   progressUpdates: ProgressUpdates[] | undefined;
 }
