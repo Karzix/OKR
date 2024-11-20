@@ -7,7 +7,6 @@ import LayoutBlank from '@/components/Layout/LayoutBlank.vue';
 import HomePageView from '@/views/HomeView.vue'
 import LoginVue from '@/views/Auth/Login.vue';
 import UserVue from '@/views/User/Index.vue'
-import BranchVue from '@/views/Department/Branch.vue'
 import Department from '@/views/Department/Index.vue'
 import { LoginResult } from '@/Models/LoginResult';
 import SeeObjectives from '@/views/OKR/SeeObjectives.vue';

@@ -39,6 +39,7 @@ import { SearchRequest } from "../../components/maynghien/BaseModels/SearchReque
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
 import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
 import { Loading } from "@element-plus/icons-vue";
+import { toQueryParams } from "../maynghien/Common/toQueryParams";
 
 const route = useRoute();
 const loading = ref(false);
@@ -69,7 +70,8 @@ const searchProgressUpdate = async () => {
   loading.value = true;
   
   try {
-    const response = await axiosInstance.post("ProgressUpdates/search", searchRequest.value);
+    var url = "ProgressUpdates/search" + "?" + toQueryParams(searchRequest.value);
+    const response = await axiosInstance.get(url);
     if (!response.data.isSuccess) {
       ElMessage.error(response.data.message);
       noMore.value = true;

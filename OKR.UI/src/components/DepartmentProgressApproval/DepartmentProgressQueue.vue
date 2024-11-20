@@ -34,6 +34,7 @@ import { addFilter } from '../maynghien/Common/handleSearchFilter';
 import { deepCopy } from '@/Service/deepCopy';
 import { axiosInstance } from '@/Service/axiosConfig';
 import { ElMessage } from 'element-plus';
+import { toQueryParams } from '../maynghien/Common/toQueryParams';
 
 
 
@@ -58,8 +59,8 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 });
 const Search = async () => {
- 
-  await axiosInstance.post("DepartmentProgressApproval/search",searchRequest.value).then((res) => {
+  var url = "DepartmentProgressApproval/search" + "?" + toQueryParams(searchRequest.value);
+  await axiosInstance.get(url).then((res) => {
     if(!res.data.data.data || res.data.data.data.length == 0){
       noMore.value = true
     }

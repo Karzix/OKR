@@ -148,6 +148,7 @@ import DepartmentProgressQueue from "@/components/DepartmentProgressApproval/Dep
 import { hasPermission } from "../maynghien/Common/handleRole";
 import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressApprovalDto";
 import { ElMessage } from "element-plus";
+import { toQueryParams } from "../maynghien/Common/toQueryParams";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -184,8 +185,11 @@ const DialogDepartmentProgressQueueVisible = ref(false);
 const search = async () => {
   try{
     loadingTable.value = true;
+    var url = "Objectives/search";
+    var parramsQuery = toQueryParams(searchRequest.value);
+    var urlFull = url + "?" + parramsQuery;
     await axiosInstance
-    .post("Objectives/search", searchRequest.value)
+    .get(urlFull )
     .then((res) => {
       var result = res.data as AppResponse<SearchResponse<Objectives[]>>;
       if(result.isSuccess == false){

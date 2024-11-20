@@ -76,6 +76,7 @@ import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequ
 import type { StatusStatistics } from "@/Models/StatusStatistics";
 import ActionSearch from "@/components/okr/ActionSearch.vue";
 import { deepCopy } from "@/Service/deepCopy";
+import { toQueryParams } from "@/components/maynghien/Common/toQueryParams";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -127,7 +128,10 @@ const searchRequest = ref<SearchRequest>({
   SortBy: undefined,
 })
 const getStatusStatistics = async () => {
-  await axiosInstance.post("Objectives/statusStatistics",searchRequest.value).then((res) => {
+  var url = "Objectives/statusStatistics";
+    var parramsQuery = toQueryParams(searchRequest.value);
+    var urlFull = url + "?" + parramsQuery;
+  await axiosInstance.get(urlFull).then((res) => {
     var result = res.data as AppResponse<StatusStatistics>;
       if (result.data) {
         statusStatistics.value = result.data;
@@ -135,10 +139,10 @@ const getStatusStatistics = async () => {
   })
 }
 const getOverallProgress = async () => {
-  var responeOverallProgress = await axiosInstance.post(
-    "Objectives/overal-progress",
-    searchRequest.value
-  );
+  var url = "Objectives/overal-progress";
+  var parramsQuery = toQueryParams(searchRequest.value);
+  var urlFull = url + "?" + parramsQuery;
+  var responeOverallProgress = await axiosInstance.get(urlFull);
   OverallProgress.value = responeOverallProgress.data.data;
 }
 onBeforeMount(async () => {

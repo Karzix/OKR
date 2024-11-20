@@ -71,6 +71,7 @@ namespace OKR.Service.Implementation
                 }
             }
         }
+
         private async Task SendEmailAsync(string recipientEmail, string subject, string body, string objectivesName= "")
         {
             try
