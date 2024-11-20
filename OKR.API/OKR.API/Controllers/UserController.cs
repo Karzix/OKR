@@ -41,10 +41,10 @@ namespace OKR.API.Controllers
             var result = await _userService.LockAsync(request);
             return Ok(result);
         }
-        [HttpPost]
+        [HttpGet]
         [Route("search")]
         [Authorize(Roles = "superadmin, Admin")]
-        public async Task<IActionResult> Search(SearchRequest request)
+        public async Task<IActionResult> Search([FromQuery]SearchRequest request)
         {
             var result =await _userService.Search(request);
             return Ok(result);
