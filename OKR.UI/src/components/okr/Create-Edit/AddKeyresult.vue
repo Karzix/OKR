@@ -11,7 +11,7 @@
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus">
+        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus" class="radio-status-addkeyresult">
             <el-radio 
             v-for="status in statusOptions"
             :key="status.value"
@@ -181,6 +181,10 @@ function getRadioStyle(status: StatusObjectives) {
 .btn-Save{
     text-align: center;
     margin-top: 30px ;
+}
+.radio-status-addkeyresult{
+  width: 100%;
+  justify-content: space-between;
 }
 </style>
 <style>

@@ -340,5 +340,36 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
+
+        public async Task<AppResponse<string>> ChangePassword(UserRequest request)
+        {
+            var result = new AppResponse<string>();
+            try
+            {
+                var user = await _userManager.FindByNameAsync(request.Email);
+                if (user == null)
+                {
+                    return result.BuildError("cannot find user");
+                }
+                var checkCurPassword = await _userManager.CheckPasswordAsync(user,request.Password);
+                if(checkCurPassword == false)
+                {
+                    return result.BuildError("Current passowrd wrong!");
+                }
+                var changePasswordResult = await _userManager.ChangePasswordAsync(user, request.Password, request.NewPassword);
+                if (!changePasswordResult.Succeeded)
+                {
+                    var errors = string.Join(", ", changePasswordResult.Errors.Select(e => e.Description));
+                    return result.BuildError($"Failed to change password: {errors}");
+                }
+                result.BuildResult("OK");
+
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
+        }
     }
 }

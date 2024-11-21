@@ -17,18 +17,18 @@
         >
           <el-radio-button
             :value="TargetType.Individual"
-            class="individual-button"
+            class="individual-button targetType-button"
           >
             <el-icon><User /></el-icon> Individual
           </el-radio-button>
           <el-radio-button
             :value="TargetType.Department"
-            class="department-button"
+            class="department-button targetType-button"
             :disabled="!(handleRole.IdentifyRoles([ 'Teamleader']))" 
           >
             <el-icon><Flag /></el-icon> Team
           </el-radio-button>
-          <el-radio-button :value="TargetType.Company" class="company-button"
+          <el-radio-button :value="TargetType.Company" class="company-button targetType-button"
           :disabled="!(handleRole.IdentifyRoles([ 'Admin']))" 
           >
             <el-icon><OfficeBuilding /></el-icon> Company
@@ -100,7 +100,7 @@
         </el-radio-group>
       </div>
       <div class="btn-Save">
-        <el-button type="primary" size="large" round @click="onSave">Save</el-button>
+        <el-button type="primary" size="large"  @click="onSave">Save</el-button>
       </div>
     </div>
   </div>
@@ -464,5 +464,8 @@ function getRadioStyle(status: StatusObjectives) {
 <style>
 .Visibility-button > span {
     width: 165px;
+}
+.targetType-button > span {
+    width: 163px;
 }
 </style>

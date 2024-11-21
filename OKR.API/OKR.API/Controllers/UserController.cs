@@ -70,5 +70,12 @@ namespace OKR.API.Controllers
             var result = _userService.GetListByKeyworld(username);
             return Ok(result);
         }
+        [HttpPut]
+        [Route("change-password")]
+        public async Task<IActionResult> ChangePassword(UserRequest request)
+        {
+            var result = await _userService.ChangePassword(request);
+            return Ok(result);
+        }
     }
 }

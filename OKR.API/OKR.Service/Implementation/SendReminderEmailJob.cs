@@ -78,7 +78,7 @@ namespace OKR.Service.Implementation
             {
                 var googleAccount = "nakiet.kn@gmail.com";
                 var key = "pqku gpwx xjne qnai";
-                Log.Information("Account: " + googleAccount + " /Password: "+ key);
+                //Log.Information("Account: " + googleAccount + " /Password: "+ key);
                 // Tạo một đối tượng MimeMessage
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("kz", googleAccount)); // Địa chỉ email người gửi
