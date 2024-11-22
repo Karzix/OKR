@@ -1,5 +1,6 @@
 <template>
   <div class="keyresult-container">
+    <h1 class="title">Progress Update</h1>
     <div class="input-group">
       <el-input
         v-model="caculateCrrentPoint"
@@ -14,7 +15,7 @@
         :disabled="true"
       />
     </div>
-    <div>
+    <div class="input-update">
       <el-input-number
         v-model="props.keyresults.addedPoints"
         class="current-point"
@@ -22,6 +23,7 @@
         :max="(props.keyresults.maximunPoint! - (props.keyresults.currentPoint ?? 0))"
         controls-position="right"
       />
+      <p class="subtitle">Enter the number to adjust progress, e.g., 10, -5.</p>
     </div>
     <div class="note-container">
       <el-input
@@ -29,6 +31,7 @@
         :rows="2"
         type="textarea"
         class="note-input"
+        placeholder="Enter a description for this update, e.g karzix adds 10 points"
       />
     </div>
     <el-button type="primary" @click="Save" class="save-button">Save</el-button>
@@ -42,6 +45,7 @@ import { ref, watch } from "vue";
 import Cookies from "js-cookie";
 import type { Objectives } from "@/Models/Objective";
 import { hasPermission } from "@/components/maynghien/Common/handleRole";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const props = defineProps<{
   keyresults: KeyResult;
@@ -70,6 +74,7 @@ const Save = async () => {
     k.note = props.keyresults.note;
     k.progressUpdates = undefined;
     k.description = props.keyresults.description;
+    k.unit = props.keyresults.unit;
 
     console.log(k);
     await axiosInstance.put("KeyResults", k).then((res) => {
@@ -110,7 +115,12 @@ const isTeamleadOrOwner = () : boolean => {
   var jsonObject = JSON.parse(jsonString);
   var arrayFromString = Object.values(jsonObject);
   var userRoles = arrayFromString as string[];
-  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])
+    && props.objectives.targetType == TargetType.Department
+  ){
+    return true;
+  }
+  else if(props.objectives.targetType == TargetType.Company && hasPermission(userRoles as string[], ['Admin'])){
     return true;
   }
   else if(props.objectives.applicationUserId == userIdOfCurrentUser){
@@ -157,5 +167,18 @@ const isTeamleadOrOwner = () : boolean => {
 
 .save-button {
   width: 100%;
+}
+.title{
+  margin-bottom: 20px ;
+}
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+.input-update{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px
 }
 </style>

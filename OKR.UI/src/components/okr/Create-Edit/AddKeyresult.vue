@@ -11,8 +11,8 @@
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus">
-            <el-radio-button 
+        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus" class="radio-status-addkeyresult">
+            <el-radio 
             v-for="status in statusOptions"
             :key="status.value"
             :label="status.value"
@@ -21,11 +21,11 @@
             <el-tag :type="getTagType(status.value)" effect="dark">
                 {{ status.text }}
             </el-tag>
-            </el-radio-button>
+            </el-radio>
         </el-radio-group>
       </div>
       <div class="form-item-2">
-        <div class="form-item min-w-150px" >
+        <div class="form-item min-w-200px" >
             <p class="form-label">Progress type:</p> 
             <el-select
                 v-model="keyresults.unit"
@@ -37,6 +37,7 @@
                 v-for="item in [
                     { key: 1, name: '# Value' },
                     { key: 0, name: '% Percent' },
+                    { key: 2, name: ' Completed/Not Completed' },
                 ]"
                 :key="item.key"
                 :label="item.name"
@@ -46,11 +47,11 @@
         </div>
         <div class="form-item max-w-150px">
             <p class="form-label">Initial:</p>
-            <el-input-number v-model="keyresults.currentPoint" class="form-input" :controls="false" :min="0"/>
+            <el-input-number v-model="keyresults.currentPoint" class="form-input" :controls="false" :min="0" :disabled="keyresults.unit == 2"/>
         </div>
         <div class="form-item max-w-150px" >
             <p class="form-label">Target:</p>
-            <el-input-number v-model="keyresults.maximunPoint" class="form-input" :controls="false" :max="keyresults.unit == 0 ?100 : Number.MAX_VALUE"/>
+            <el-input-number v-model="keyresults.maximunPoint" class="form-input" :controls="false" :max="keyresults.unit == 0 ?100 : Number.MAX_VALUE"  :disabled="keyresults.unit == 2"/>
         </div>
       </div>
     <!-- </div> -->
@@ -88,7 +89,8 @@ const keyresults = ref<KeyResult>({
   note: "",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
-  progressUpdates:[]
+  progressUpdates:[],
+  isCompleted: false
 });
 const props = defineProps<{ 
     keyresults: KeyResult,
@@ -120,7 +122,8 @@ onBeforeMount(() => {
       note: "",
       createdOn: new Date(),
       lastProgressUpdate: new Date(),
-      progressUpdates:[]
+      progressUpdates:[],
+      isCompleted: false
     }
   }
   else{
@@ -155,6 +158,11 @@ watch(
     customFillStatus.value = getStatusColor(keyresults.value.status);
   }
 )
+function getRadioStyle(status: StatusObjectives) {
+  return {
+    borderColor: keyresults.value.status === status ? getStatusColor(status) : undefined
+  };
+}
 </script>
 <style scope>
 .form-item{
@@ -174,12 +182,16 @@ watch(
     text-align: center;
     margin-top: 30px ;
 }
+.radio-status-addkeyresult{
+  width: 100%;
+  justify-content: space-between;
+}
 </style>
 <style>
 .max-w-150px{
     max-width: 150px !important;
 }
-.min-w-150px{
-    min-width: 150px !important;
+.min-w-200px{
+    min-width: 200px !important;
 }
 </style>

@@ -71,6 +71,7 @@ const User = ref<UserModel>({
     departmentName: "",
     departmentId: undefined,
     managerName: "",
+    newPassword: "",
 })
 const props = defineProps<{
     openDialog: Boolean,

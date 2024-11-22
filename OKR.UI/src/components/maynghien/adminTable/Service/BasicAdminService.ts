@@ -8,6 +8,7 @@ import { TableColumn } from '../Models/TableColumn'
 import { SearchDTOItem } from '../Models/SearchDTOItem'
 import { ApiActionType, CustomAction, CustomActionResponse } from '../Models/CustomAction.js'
 import type { AxiosResponse } from 'axios'
+import { toQueryParams } from '../../Common/toQueryParams';
 
 
 export const handleAPISearch = async (model: SearchRequest, apiurl: string, searchUrl?: string): Promise<AppResponse<SearchResponse<SearchDTOItem[] | undefined>>> => {
@@ -20,7 +21,9 @@ export const handleAPISearch = async (model: SearchRequest, apiurl: string, sear
 
     try {
         var url = searchUrl ? searchUrl : "/search";
-        const postResult = await axiosInstance.post(apiurl + url, model);
+        var parramsQuery = toQueryParams(model);
+        var urlFull = apiurl + url + "?" + parramsQuery;
+        const postResult = await axiosInstance.get(urlFull);
         console.log(postResult.data);
         const responseObject = postResult.data
         resust = responseObject;

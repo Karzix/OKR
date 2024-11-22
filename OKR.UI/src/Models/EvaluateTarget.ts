@@ -6,4 +6,6 @@ export class EvaluateTarget {
     id : string|undefined
     modifiedOn: Date|undefined
     modifiedby: string|undefined
+    isEdit?: boolean|undefined
+    preCMT?: string|undefined
 }

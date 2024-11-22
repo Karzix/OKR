@@ -1,4 +1,5 @@
 <template>
+  
   <div class="Content">
     <el-form
       ref="ruleFormRef"
@@ -9,7 +10,7 @@
       @keyup.enter="login"
     >
       <el-form-item label="Username" prop="username" class="login-formitem">
-        <el-input v-model="state.email" placeholder="User name" autofocus class="login-input"/>
+        <el-input v-model="state.email" placeholder="User name" autofocus class="login-input" @input="trimInput('email')"/>
       </el-form-item>
 
       <el-form-item label="Password" prop="pass" class="login-formitem">
@@ -20,6 +21,7 @@
           autocomplete="off"
           show-password
           class="login-input"
+          @input="trimInput('password')"
         />
       </el-form-item>
 
@@ -27,12 +29,11 @@
         <el-button type="primary" @click="login()" class="login-btn">Sign In</el-button>
       </el-form-item>
     </el-form>
-
-    <el-dialog v-model="dialogVisible" title="Error">
+  </div>
+  <!-- <el-dialog v-model="dialogVisible" title="Error">
       <p>Invalid login information</p>
       <el-button type="primary" @click="dialogVisible = false">OK</el-button>
-    </el-dialog>
-  </div>
+  </el-dialog> -->
 </template>
 <script setup lang="ts">
 import { Calendar, Search, User, Key } from "@element-plus/icons-vue";
@@ -43,17 +44,17 @@ import { handleLogin } from "../../Service/Auth/handleLogin";
 import { LoginModel } from "../../Models/LoginModel";
 
 //const _toast = useToast();
+
+import { ElMessageBox, ElNotification } from "element-plus";
+import router from "@/router";
+
+const dialogVisible = ref(false);
 const state = reactive<LoginModel>({
   email: "",
   password: "",
   twoFactorCode: "",
   twoFactorRecoveryCode: "",
 });
-import { ElMessageBox } from "element-plus";
-import router from "@/router";
-
-const dialogVisible = ref(false);
-
 const login = async () => {
   const loginResult = await handleLogin(state);
   if (!loginResult) {
@@ -66,9 +67,21 @@ const login = async () => {
       document.cookie =
         name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
     }
-    dialogVisible.value = true;
+    // dialogVisible.value = true;
+    ElNotification({
+      title: 'Error',
+      message: 'Login failed',
+      type: 'error',
+    })
   } else {
     router.push("/");
+  }
+};
+const trimInput = (field: string) => {
+  if (field === 'email') {
+    state.email = state.email?.trim();
+  } else if (field === 'password') {
+    state.password = state.password?.trim();
   }
 };
 </script>

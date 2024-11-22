@@ -20,6 +20,6 @@ namespace OKR.DTO
         public bool IsPublic { get; set; } = true;
         public string? Period { get; set; }
         public int? Year { get; set; }
-        public List<KeyResultRequest> KeyResults { get; set; }
+        public ICollection<KeyResultRequest> KeyResults { get; set; }
     }
 }

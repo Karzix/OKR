@@ -18,5 +18,6 @@ namespace OKR.Service.Contract
         AppResponse<List<UserRespone>> GetAll();
         Task<AppResponse<UserRespone>> Get(string iduserName);
         AppResponse<List<UserRespone>> GetListByKeyworld(string userName);
+        Task<AppResponse<string>> ChangePassword(UserRequest request);
     }
 }

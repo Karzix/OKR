@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 using OKR.Models.Entity;
 using OKR.Repository.Contract;
 using OKR.Service.Contract;
@@ -62,7 +63,11 @@ namespace OKR.Service.Implementation
                 }
                 var objectives = objectivesAsQueryable.First();
                 var currentUser = await _userManager.FindByNameAsync(userName);
-                if (GetCurrentUserRole() == "Teamleader" || currentUser.Id == objectives.ApplicationUserId)
+                var role = GetCurrentUserRole();
+                if ((role == "Teamleader" && objectives.DepartmentId == currentUser.DepartmentId && objectives.TargetType ==TargetType.department)
+                    || (objectives.ApplicationUserId == currentUser.Id && objectives.TargetType == TargetType.individual)
+                    || (role == "Admin" && objectives.TargetType == TargetType.company)
+                    )
                 {
                     var progress = new ProgressUpdates();
                     progress.Id = Guid.NewGuid();
@@ -71,9 +76,15 @@ namespace OKR.Service.Implementation
                     progress.Note = GetUpdateString(request, keyresult);
                     progress.KeyResultId = keyresult.Id;
                     progress.OldPoint = keyresult.CurrentPoint;
-                    progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints;
+                    progress.NewPoint = keyresult.CurrentPoint + request.AddedPoints ?? 0;
 
-                    keyresult.CurrentPoint += (int)request.AddedPoints!;
+                    keyresult.CurrentPoint += request.AddedPoints ?? 0;
+                    keyresult.IsCompleted = (bool)request.IsCompleted;
+                    if(keyresult.Unit == TypeUnitKeyResult.CompletedOrNotCompleted)
+                    {
+                        progress.OldPoint = keyresult.IsCompleted ? 0 : 1;
+                        progress.NewPoint = keyresult.IsCompleted ? 1 : 0;
+                    }
                     _keyResultRepository.Edit(keyresult);
                     progress.ObjectivesCompletionRate = _objectivesRepository.caculatePercentObjectivesById(keyresult.ObjectivesId);
                     _progressUpdatesRepository.Add(progress);
@@ -85,9 +96,11 @@ namespace OKR.Service.Implementation
                     departmentProgressApproval.CreatedOn = now;
                     departmentProgressApproval.CreatedBy = userName;
                     departmentProgressApproval.Note = GetUpdateString(request, keyresult);
-                    departmentProgressApproval.AddedPoints = (int)request.AddedPoints;
+                    departmentProgressApproval.AddedPoints = request.AddedPoints ?? 0;
                     departmentProgressApproval.KeyResultsId = keyresult.Id;
                     departmentProgressApproval.Note = GetUpdateString(request, keyresult);
+                    departmentProgressApproval.Unit = (TypeUnitKeyResult)request.Unit;
+                    departmentProgressApproval.IsCompleted = (bool)request.IsCompleted;
                     _progressApprovalRepository.Add(departmentProgressApproval);
                 }
 
@@ -107,6 +120,11 @@ namespace OKR.Service.Implementation
                 return NewKeyResult.Note;
             }
             string content = _contextAccessor.HttpContext.User.Identity.Name + " ";
+            if(CurKeyResults.Unit == Infrastructure.Enum.TypeUnitKeyResult.CompletedOrNotCompleted)
+            {
+                content += "change status of " + CurKeyResults.Description + " to " + ((bool)NewKeyResult.IsCompleted ? "COMPLETED" : "NOT COMPLETED");
+                return content; 
+            }
             if ((CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints) != CurKeyResults.CurrentPoint)
             {
                 content += "update weights " + NewKeyResult.Description +" from " + CurKeyResults.CurrentPoint + " to " + (CurKeyResults.CurrentPoint + NewKeyResult.AddedPoints)+ "; ";
@@ -161,7 +179,7 @@ namespace OKR.Service.Implementation
                     CreatedBy = x.CreatedBy,
                     CreatedOn = x.CreatedOn,
                     CurrentPoint = x.CurrentPoint,
-                    EndDay = x.Deadline,
+                    EndDay = x.Objectives.EndDay,
                     MaximunPoint = x.MaximunPoint,
                     Description = x.Description,
                     Id = x.Id,
@@ -172,6 +190,7 @@ namespace OKR.Service.Implementation
                     //Percentage = x.Percentage,
                     ObjectivesId = x.ObjectivesId,
                     Percentage = x.Percentage,
+                    Unit = x.Unit,
                     
                     
                 }).First();

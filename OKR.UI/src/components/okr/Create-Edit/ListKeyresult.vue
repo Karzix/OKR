@@ -7,6 +7,7 @@
   >
     <div class="keyresult">
       <el-input-number
+        @click.stop
         v-model="item.percentage"
         :controls="false"
         style="width: 55px; min-width: 55px !important"
@@ -15,7 +16,7 @@
       <p class="keyresult-title">{{ item.description }}</p>
     </div>
 
-    <el-progress
+    <el-progress v-if="item.unit != 2"
       :percentage="
         (((item.currentPoint ?? 0) / (item.maximunPoint ?? 1)) * 100).toFixed(2)
       "
@@ -23,6 +24,10 @@
       style="width: 150px; min-width: 150px"
       class="keyresult-progress"
     />
+    <el-button v-else @click.stop="() =>{item.isCompleted = !item.isCompleted}"
+      :disabled="true" > 
+      {{ item.isCompleted ? 'Completed' : 'Not Completed' }}
+    </el-button>
   </div>
 </template>
 <script setup lang="ts">

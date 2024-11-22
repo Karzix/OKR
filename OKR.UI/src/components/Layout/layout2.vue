@@ -1,10 +1,18 @@
 <template>
   <div class="common-layout">
-    <div class="userName" @click="handleAsideClick('logout')">
-      {{ Cookies.get("userName")?.toString() }}
-    </div>
+    <el-dropdown trigger="click">
+      <span class="userName" style="cursor: pointer;">
+        {{ Cookies.get("userName")?.toString() }}
+      </span>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item @click="showChangePassword = true">Change Password</el-dropdown-item>
+          <el-dropdown-item divided @click="handleAsideClick('logout')">Logout</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
     <el-container>
-      <el-header class="layout2_header" v-if="!isMobile">
+      <el-header class="layout2_header" >
         <div class="layout2-logo" @click="handleAsideClick('')">
           <img src="@/assets/logo2.png" alt="" >
         </div>
@@ -21,39 +29,9 @@
             </el-icon>
             <span>Department</span>
           </el-col>
-          <!-- <el-col
-            v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])"
-            :span="6"
-            class="item-menu"
-            @click="handleAsideClick('Branch')"
-          >
-            <el-icon>
-              <OfficeBuilding />
-            </el-icon>
-            <span>Branch</span>
-          </el-col> -->
-          <!-- <el-col :span="6" class="layout2-search">
-            <el-select
-              v-model="searchUsername"
-              clearable
-              placeholder="User Name"
-              style="width: 190px"
-              filterable
-              remote
-              :remote-method="seachUser"
-            >
-              <el-option
-                v-for="item in listUser"
-                :key="item.userName"
-                :label="item.userName"
-                :value="item.userName"
-              />
-            </el-select>
-            <el-icon><Search /></el-icon>
-          </el-col> -->
         </el-row>
       </el-header>
-      <el-header class="mobile-header" v-if="isMobile">
+      <el-header class="mobile-header" v-if="false">
         <div class="mobile-header-content">
           <el-button
             class="toggle-button"
@@ -113,6 +91,20 @@
 
     </el-row>
   </el-drawer>
+  <el-dialog v-model="showChangePassword" title="Change Password" @close="showChangePassword = false" width="350px">
+    <div class="input-changepassword">
+      <p>Current password</p>
+      <el-input v-model="user.password" placeholder="current password"></el-input>
+    </div>
+    <div class="input-changepassword">
+      <p>New password</p>
+      <el-input v-model="user.newPassword" placeholder="new password"></el-input>
+    </div>
+    <div style="text-align: center;">
+      <el-button type="primary" @click="handleChangePassword">Save</el-button>
+    </div>
+    
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -125,11 +117,12 @@ import {
   Search,
   Flag,
 } from "@element-plus/icons-vue";
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, reactive } from "vue";
 import Cookies from "js-cookie";
 import type { UserModel } from "@/Models/UserModel";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { hasPermission } from "@/components/maynghien/Common/handleRole";
+import { ElMessage } from "element-plus";
 
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
@@ -150,6 +143,20 @@ const handleAsideClick = (action: string) => {
 };
 const searchUsername = ref("");
 const listUser = ref<UserModel[]>([]);
+const user = reactive<UserModel>({
+  userName: "",
+  password: "",
+  email: "",
+  role: undefined,
+  token: undefined,
+  refreshToken: "",
+  id: undefined,
+  departmentName: "",
+  departmentId: undefined,
+  managerName: "",
+  newPassword: "",
+})
+const showChangePassword = ref(false);
 const getRole = () => {
   var jsonString = Cookies.get('Roles')?.toString() ?? '';
   var jsonObject = JSON.parse(jsonString);
@@ -193,12 +200,19 @@ function logout() {
   window.location.reload();
 }
 
-const seachUser = async (query: string) => {
-  const url = "User/list-by-keyworld/" + query;
-  await axiosInstance.get(url).then((res) => {
-    listUser.value = res.data.data
+const handleChangePassword = () => {
+  user.userName = Cookies.get("userName")?.toString() ?? '';
+  user.email = Cookies.get("userName")?.toString() ?? '';
+  axiosInstance.put("User/change-password", user).then((res) => {
+    if(res.data.isSuccess){
+      showChangePassword.value = false;
+      ElMessage({ message: "Change password success", type: "success" })
+    }
+    else{
+      ElMessage({ message: res.data.message, type: "error" })
+    }
   })
-}
+};
 const loadpage = () => {
   const url = "/UserName=" + searchUsername.value;
   window.open(url, "_blank"); // Mở cửa sổ mới với URL
@@ -218,12 +232,12 @@ watch(() => searchUsername.value, () => {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 5px;
 }
+
 .common-layout {
-  background-image: url("../../assets/web.png");
-  background-repeat: no-repeat;
-  background-size: cover; /* Đảm bảo hình nền phủ toàn bộ khung */
+  background: linear-gradient(199deg, #e6673966, #9585f43b, #c4c1c1a3);
+  background-size: cover; /* Đảm bảo nền phủ toàn bộ khung */
   background-position: center center;
   background-attachment: fixed; /* Cố định hình nền */
   min-height: 100vh; /* Chiều cao tối thiểu luôn bằng chiều cao của màn hình */
@@ -299,5 +313,9 @@ watch(() => searchUsername.value, () => {
 }
 .layout2-logo > img{
   height: 60px;
+}
+.input-changepassword {
+    width: 300px;
+    margin: 15px;
 }
 </style>

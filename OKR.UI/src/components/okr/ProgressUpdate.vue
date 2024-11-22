@@ -3,13 +3,15 @@
     <ul class="list">
       <li v-for="item in listProgressUpdate" :key="item.id" class="list-item">
         <el-card>
-          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint)">
+          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint) && item.unit != 2">
             <strong>{{ item.oldPoint }}</strong>
             <el-icon><Right /></el-icon>
             <strong>{{ item.newPoint }}</strong>
-            <el-tag>
-              {{ item.unit == 0 ? "Percent" : item.unit == 1 ? "Value" : "Checked" }}
-            </el-tag>
+          </div>
+          <div class="point" v-if="isNumberOrNumericString(item.oldPoint) && isNumberOrNumericString(item.newPoint) && item.unit == 2">
+            <strong>{{ item.oldPoint == 1 ? 'Completed' : 'not completed' }}</strong>
+            <el-icon><Right /></el-icon>
+            <strong>{{ item.newPoint == 1 ? 'Completed' : 'not completed' }}</strong>
           </div>
           <div class="content">
             <p>Date: <strong>{{ formatDate(item.createOn) }}</strong></p>
@@ -37,6 +39,7 @@ import { SearchRequest } from "../../components/maynghien/BaseModels/SearchReque
 import { ProgressUpdates } from "../../Models/ProgressUpdates";
 import { SearchResponse } from "../maynghien/BaseModels/SearchResponse";
 import { Loading } from "@element-plus/icons-vue";
+import { toQueryParams } from "../maynghien/Common/toQueryParams";
 
 const route = useRoute();
 const loading = ref(false);
@@ -67,7 +70,8 @@ const searchProgressUpdate = async () => {
   loading.value = true;
   
   try {
-    const response = await axiosInstance.post("ProgressUpdates/search", searchRequest.value);
+    var url = "ProgressUpdates/search" + "?" + toQueryParams(searchRequest.value);
+    const response = await axiosInstance.get(url);
     if (!response.data.isSuccess) {
       ElMessage.error(response.data.message);
       noMore.value = true;
@@ -81,6 +85,9 @@ const searchProgressUpdate = async () => {
         searchRequest.value.PageIndex = (searchRequest.value.PageIndex || 1) + 1;
         listProgressUpdate.value.push(...searchResponse.value.data);
       } else {
+        noMore.value = true;
+      }
+      if(searchResponse.value.currentPage == searchResponse.value.totalPages){
         noMore.value = true;
       }
     }

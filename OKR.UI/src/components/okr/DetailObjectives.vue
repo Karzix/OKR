@@ -2,7 +2,6 @@
     <div class="detail-objectives">
         <div class="left">
             <div class="left-header">
-                <p class="user-name">{{ objectives.createdBy }}</p>
                 <el-button-group class="ml-4">
                     <el-button type="primary" :icon="Edit" v-if="isOwner" @click="onEdit"/>
                     <el-button type="primary" :icon="Share" @click="copyLinkShare" />
@@ -45,6 +44,10 @@
                 <p class="label">Visibility: </p>
                 <p class="value">{{  objectives.isPublic ? 'Public' : 'Private' }}</p>
             </div>
+            <div class="right-item">
+                <p class="label">Created by: </p>
+                <p class="value">{{ objectives.createdBy }}</p>
+            </div>
         </div>
     </div>
     <div class="comment-progress">
@@ -57,7 +60,7 @@
         <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives" 
         :allow-update-weight="allowUpdateWeight" :objectives="objectives"></DetailKeyresult>
     </el-dialog>
-    <el-dialog v-model="showDialogEdit">
+    <el-dialog v-model="showDialogEdit" class="dialog-Create-Objective">
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
     </el-dialog>   
 </template>
@@ -204,6 +207,25 @@ const onDelete = () => {
     axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
         emit('delete:objectives', objectives.value)
     })
+    ElMessageBox.confirm(
+        'Are you sure to delete this objective?',
+        'Warning',
+        {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    ).then(() => {
+        axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
+            emit('delete:objectives', objectives.value)
+        })
+    })
+   .catch(() => {
+        ElMessage({
+            type: 'info',
+            message: 'Delete canceled',
+        })
+    })
 }
 const onEdit = () => {
     showDialogEdit.value = true
@@ -212,7 +234,8 @@ const onEdit = () => {
 const CheckPermissions = () =>{
     var departmentId = Cookies.get("DepartmentId")?.toString() ?? "";
     var userid = Cookies.get("UserId")?.toString() ?? "";
-    if(objectives.value.departmentId == departmentId || objectives.value.applicationUserId == userid){
+    if(objectives.value.departmentId == departmentId || objectives.value.applicationUserId == userid
+     || objectives.value.targetType == TargetType.Company){
         allowUpdateWeight.value = true
     }
     else{
@@ -252,7 +275,7 @@ onBeforeMount(() => {
 .left-header{
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content:end;
 }
 .title{
     font-size: 24px;

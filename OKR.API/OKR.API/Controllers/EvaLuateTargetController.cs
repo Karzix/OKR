@@ -35,9 +35,9 @@ namespace OKR.API.Controllers
             var reuslt = _evaluateTargetService.Edit(request);
             return Ok(reuslt);
         }
-        [HttpPost]
+        [HttpGet]
         [Route("search")]
-        public IActionResult Search(SearchRequest request)
+        public IActionResult Search([FromQuery]SearchRequest request)
         {
             var result = _evaluateTargetService.Search(request);
             return Ok(result);

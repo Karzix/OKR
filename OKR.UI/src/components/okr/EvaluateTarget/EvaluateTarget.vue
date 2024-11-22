@@ -3,25 +3,28 @@
     <ul
       class="list"
     >
-      <div class="comment" v-for="(item, index)  in listEvaluateTarget" :key="item.id">
-        <p class="comment-header">
-          <strong>{{ item.createBy }}</strong> -
-          <span class="timestamp">{{ item.createOn ? formatDate_dd_mm_yyyy_hh_mm(item.createOn) : '' }}</span>
-        </p>
-        <p class="comment-body" v-if="!isEdit">{{ item.content }}</p>
-        <div class="comment-body-edit" v-else>
-          <el-input v-model="item.content" type="textarea"></el-input>
-          <el-button type="primary" @click="Edit(item)"><el-icon><Promotion /></el-icon></el-button>
-        </div>
-        
-        <div class="comment-btn" v-if="Cookies.get('userName') == item.createBy">
-          <el-button-group class="ml-4">
-            <el-button @click="Delete(item.id ?? '')" :icon="CloseBold" type="danger" plain/>
-            <el-button @click="isEdit = !isEdit" :icon="EditPen" type="primary" plain></el-button>
-          </el-button-group>
-          
-        </div>
+    <div class="comment" v-for="(item, index) in listEvaluateTarget" :key="item.id">
+      <p class="comment-header">
+        <strong>{{ item.createBy }}</strong> -
+        <span class="timestamp">{{ item.createOn ? formatDate_dd_mm_yyyy_hh_mm(item.createOn) : '' }}</span>
+      </p>
+      <!-- Chỉ hiển thị ô input nếu isEdit của item là true -->
+      <p class="comment-body" v-if="!item.isEdit">{{ item.content }}</p>
+      <div class="comment-body-edit" v-else>
+        <el-input v-model="item.content" type="textarea"></el-input>
+        <el-button type="primary" @click="Edit(item)">
+          <el-icon><Promotion /></el-icon>
+        </el-button>
       </div>
+
+      <div class="comment-btn" v-if="Cookies.get('userName') == item.createBy">
+        <el-button-group class="ml-4">
+          <el-button @click="Delete(item.id ?? '')" :icon="CloseBold" type="danger" plain />
+          <el-button @click="toggleEdit(item)" :icon="EditPen" type="primary" plain></el-button>
+        </el-button-group>
+      </div>
+    </div>
+
       <p v-if="loading" class="loading-av"><el-icon class="spinning-icon"><Loading /></el-icon></p>
       <p v-if="noMore" class="no-more-text">No more items</p>
     </ul>
@@ -47,6 +50,7 @@ import { formatDate, RecalculateTheDate, formatDate_dd_mm_yyyy_hh_mm } from "@/S
 import { Loading } from "@element-plus/icons-vue";
 import { CloseBold, EditPen, Promotion } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
+import { toQueryParams } from "@/components/maynghien/Common/toQueryParams";
 
 const route = useRoute();
 const loading = ref(false);
@@ -76,13 +80,16 @@ const search = async () => {
   if (loading.value && noMore.value) return;
   loading.value = true;
   try {
+    var url = "EvaLuateTarget/search" + "?" + toQueryParams(searchRequest.value);
     await axiosInstance
-      .post("EvaLuateTarget/search", searchRequest.value)
+      .get(url)
       .then((res) => {
         if (res.data.isSuccess) {
           searchResponse.value = res.data.data;
           searchResponse.value.data?.forEach((item) => {
             item.createOn = RecalculateTheDate(item.createOn);
+            item.isEdit = false;
+            item.preCMT = item.content;
           });
           if (
             searchResponse.value.data &&
@@ -96,6 +103,9 @@ const search = async () => {
           } else {
             noMore.value = true;
             disabled.value = true;
+          }
+          if(searchResponse.value.currentPage == searchResponse.value.totalPages){
+            noMore.value = true;
           }
         } else {
           ElMessage({
@@ -115,13 +125,6 @@ const search = async () => {
     disabled.value = noMore.value;
   }
 };
-
-// onMounted(() => {
-//   // var filter = new Filter();
-//   // filter.FieldName = "objectivesId";
-//   // filter.Value = prop;
-//   search();
-// });
 watch(
   () => props.searchRequest.filters,
   () => {
@@ -132,14 +135,8 @@ watch(
   },
   { deep: true }
 );
-// onMounted(() => {
-//   searchRequest.value = props.searchRequest;
-//   console.log(props.targetType);
-//   search();
-// });
 
 const AddEvaluateTarget = async () => {
-  // const evaluateTarget = new EvaluateTarget();
   const evaluateTarget = new EvaluateTarget();
   evaluateTarget.content = content.value;
   evaluateTarget.objectivesId = props.searchRequest.filters?.filter(x=>x.FieldName == "objectivesId")[0].Value;
@@ -209,6 +206,7 @@ const Delete = (id: string) => {
   
 }
 const Edit = (item: EvaluateTarget) => {
+  
   console.log(item);
   axiosInstance
     .put("EvaLuateTarget", item)
@@ -219,7 +217,8 @@ const Edit = (item: EvaluateTarget) => {
           type: "success",
           plain: true,
         });
-        isEdit.value = false  ;
+        item.isEdit = false;
+        item.preCMT = item.content;
       }
       else {
         ElMessage({
@@ -232,6 +231,43 @@ const Edit = (item: EvaluateTarget) => {
       
     )
 }
+const toggleEdit = async (item: EvaluateTarget) => {
+  if (item.isEdit) {
+    console.log("edit cmt");
+    await confirmEdit(item);
+  }
+  listEvaluateTarget.value.forEach((comment) => {
+    if (comment.id !== item.id) {
+      comment.isEdit = false;
+    }
+  });
+  item.isEdit = !item.isEdit;
+};
+
+const confirmEdit = async (item: EvaluateTarget): Promise<void> => {
+  if(item.content == item.preCMT){
+    return
+  }
+  try {
+    await ElMessageBox.confirm(
+      "Do you want to save your changes?",
+      "Warning",
+      {
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
+        type: "warning",
+      }
+    );
+    await Edit(item); 
+  } catch {
+    item.content = item.preCMT ?? "";
+    ElMessage({
+      type: "info",
+      message: "Edit canceled",
+    });
+  }
+};
+
 onMounted(() => {
   search();
 });

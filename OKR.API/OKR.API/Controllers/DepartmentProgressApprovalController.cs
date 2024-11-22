@@ -9,7 +9,7 @@ namespace OKR.API.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    [Authorize(Roles = "Teamleader, BranchManagement")]
+    [Authorize(Roles = "Teamleader, Admin")]
     public class DepartmentProgressApprovalController : Controller
     {
         private IDepartmentProgressApprovalService _service;
@@ -18,9 +18,9 @@ namespace OKR.API.Controllers
             _service = service;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("search")]
-        public IActionResult search(SearchRequest request)
+        public IActionResult search([FromQuery]SearchRequest request)
         {
             var result = _service.Search(request);
             return Ok(result);
