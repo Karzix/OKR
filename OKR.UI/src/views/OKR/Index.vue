@@ -50,7 +50,7 @@
     <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true" @update:objectives="updateData" @delete:objectives="updateData"></ListView>
   </div>
   <el-dialog v-model="dialogCreate" class="dialog-Create-Objective">
-    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @close="dialogCreate = false"></CreateEdit>
+    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @close="dialogCreate = false" v-if="dialogCreate"></CreateEdit>
   </el-dialog>
 
 

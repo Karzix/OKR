@@ -107,7 +107,6 @@
   <el-dialog
     v-model="dialogAddKeyResult"
     @close="dialogAddKeyResult = false"
-    :title="isEdit ? 'Edit key result' : 'new key result'"
     class="createDialog"
   >
     <AddKeyresult
@@ -116,6 +115,8 @@
       :isEdit="isEdit"
       @onAddItem="onAddKeyresult"
       @onEditItem="onEditKeyresult"
+      @on-delete-item="onDeleteKeyResult"
+      :index="indexSelected"
     />
   </el-dialog>
 </template>
@@ -221,6 +222,7 @@ const period = [
     label: "FY (January - December)",
   },
 ];
+const indexSelected = ref(0);
 const currentFill = ref("rgb(235, 180.6, 99)");
 watch(
   () => objectives.value.targetType,
@@ -253,11 +255,16 @@ const onAddKeyresult = (keyresult : KeyResult) => {
     caculateWeightKeyresult();
     dialogAddKeyResult.value = false;
 }
-const onEditKeyresult = (keyresult : KeyResult) => {
-
-    const index = objectives.value.keyResults.findIndex(kr => kr.id == keyresult.id);
+const onEditKeyresult = (keyresult : KeyResult , index : number = 0) => {
+  if(keyresult.id != undefined && keyresult.id != null){
+    const index2 = objectives.value.keyResults.findIndex(kr => kr.id == keyresult.id);
+    objectives.value.keyResults[index2] = keyresult;
+    caculateWeightKeyresult();
+  }
+  else{
     objectives.value.keyResults[index] = keyresult;
     caculateWeightKeyresult();
+  }
     dialogAddKeyResult.value = false;
 }
 const caculateWeightKeyresult = () => {
@@ -411,15 +418,24 @@ onMounted(() => {
     }
   }
 })
-const onSelectKeyResult = (item: KeyResult) => {
+const onSelectKeyResult = (item: KeyResult, index: number) => {
   keyresults.value = deepCopy(item);
   isEdit.value = true;
   dialogAddKeyResult.value = true;
+  indexSelected.value = index;
 }
 function getRadioStyle(status: StatusObjectives) {
   return {
     borderColor: objectives.value.status === status ? getStatusColor(status) : undefined
   };
+}
+const onDeleteKeyResult = (index : number) =>{
+  objectives.value.keyResults.splice(index, 1);
+  dialogAddKeyResult.value = false
+  ElMessage({
+    message: "Delete success",
+    type: "success",
+  })
 }
 </script>
 <style scoped>
