@@ -188,6 +188,7 @@ const userSelect = ref<UserModel>({
   departmentName: "",
   departmentId: "",
   managerName: "",
+  newPassword: "",
 });
 const basicAdminFormRef = ref<InstanceType<typeof BasicAdminFormVue> | null>(null);
 const onCustomAction = (item: CustomActionResponse) => {

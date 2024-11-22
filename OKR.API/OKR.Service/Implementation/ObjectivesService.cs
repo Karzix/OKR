@@ -587,8 +587,7 @@ namespace OKR.Service.Implementation
             }
             else if(User.UserName != currentUserName)
             {
-                predicate = predicate.And(x => x.ApplicationUserId == User.Id
-            /*  || (x.DepartmentId == User.DepartmentId && User.DepartmentId != null)*/);
+                predicate = predicate.And(x => x.CreatedBy == User.UserName);
                 predicate = predicate.And(x => x.IsPublic == true);
             }
             //predicate = predicate.And(x => x.ApplicationUserId == User.Id
@@ -604,14 +603,14 @@ namespace OKR.Service.Implementation
             {
                 var currentQuarterRange = GetCurrentQuarterDateRange();
                 predicate = predicate.And(m => m.StartDay <= currentQuarterRange.Item2 && m.EndDay >= currentQuarterRange.Item1);
-                var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
+                //var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
             }
             if (filters == null || !filters.Any(f => f.FieldName == "userName"))
             {
                 var currentUser = await _userManager.FindByNameAsync(_contextAccessor.HttpContext.User.Identity.Name);
                 predicate = predicate.And(x => x.ApplicationUserId == currentUser.Id
               || (x.DepartmentId == currentUser.DepartmentId && currentUser.DepartmentId != null) || x.TargetType == TargetType.company);
-                var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
+                //var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
             }
             return predicate;
         }
