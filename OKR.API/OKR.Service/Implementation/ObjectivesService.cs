@@ -359,6 +359,7 @@ namespace OKR.Service.Implementation
                             x.ModifiedOn = DateTime.UtcNow;
                             x.Status = dto.Status;
                             x.Description = dto.Description;
+                            x.Unit = dto.Unit;
                         }
                     }
                     
