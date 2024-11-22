@@ -104,7 +104,7 @@ const props = defineProps<{
     isEdit?: boolean,
     index : number
 }>();
-
+const currentUnit = ref(0);
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
   (e: "onEditItem", item: KeyResult, index: number): void;
@@ -193,6 +193,20 @@ const onDeleteKeyResult = () => {
   });
   
 }
+onMounted(() => {
+  if(props.isEdit){
+    currentUnit.value = keyresults.value.unit ?? 0
+  }
+})
+watch(() => keyresults.value.unit, () => {
+  if(props.isEdit && keyresults.value.unit != currentUnit.value){
+    keyresults.value.unit = currentUnit.value
+    ElMessage({
+      type: 'warning',
+      message: 'If you want to change the unit, delete and create a new keyresults',
+    })
+  }
+})
 </script>
 <style scope>
 .form-item{

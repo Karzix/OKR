@@ -319,6 +319,7 @@ const onSave = async () => {
                 message: "Update success",
                 type: "success",
             });
+            emit("updateData");
             dialogAddKeyResult.value = false;
         } else {
             ElMessage({
