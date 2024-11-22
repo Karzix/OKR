@@ -60,7 +60,7 @@
         <DetailKeyresult :keyresult-id="keyresultIdSelect" :key="keyresultIdSelect" @update-data="refreshObjectives" 
         :allow-update-weight="allowUpdateWeight" :objectives="objectives"></DetailKeyresult>
     </el-dialog>
-    <el-dialog v-model="showDialogEdit">
+    <el-dialog v-model="showDialogEdit" class="dialog-Create-Objective">
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
     </el-dialog>   
 </template>
@@ -180,7 +180,8 @@ const onEdit = () => {
 const CheckPermissions = () =>{
     var departmentId = Cookies.get("DepartmentId")?.toString() ?? "";
     var userid = Cookies.get("UserId")?.toString() ?? "";
-    if(objectives.value.departmentId == departmentId || objectives.value.applicationUserId == userid){
+    if(objectives.value.departmentId == departmentId || objectives.value.applicationUserId == userid
+     || objectives.value.targetType == TargetType.Company){
         allowUpdateWeight.value = true
     }
     else{

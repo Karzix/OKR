@@ -208,6 +208,9 @@ const isTeamleadOrOwner = () : boolean => {
   if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
     return true;
   }
+  else if(props.objectives.targetType == TargetType.Company && hasPermission(userRoles as string[], ['Admin'])){
+    return true;
+  }
   else if(props.objectives.applicationUserId == userIdOfCurrentUser){
     return true;
   }

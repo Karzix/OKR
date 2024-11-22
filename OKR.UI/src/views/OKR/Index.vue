@@ -50,7 +50,7 @@
     <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true"></ListView>
   </div>
   <el-dialog v-model="dialogCreate" class="dialog-Create-Objective">
-    <CreateEdit :objectives="objectives" @updateData="onUpdateData"></CreateEdit>
+    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @close="dialogCreate = false"></CreateEdit>
   </el-dialog>
 
 
@@ -146,6 +146,10 @@ const getOverallProgress = async () => {
   OverallProgress.value = responeOverallProgress.data.data;
 }
 onBeforeMount(async () => {
+  var filTargetType = new Filter();
+  filTargetType.FieldName = "targetType";
+  filTargetType.Value = TargetType.Individual.toString();
+  handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filTargetType));
   await axiosInstance.get("Objectives/periods").then((res) => {
     var result = res.data as AppResponse<string[]>;
     periods.value.push({value: "default", label: "Default"})
@@ -170,6 +174,7 @@ const onChangePeriod = (filters: string) => {
   var filPeriod = new Filter();
   filPeriod.FieldName = "period";
   filPeriod.Value = filters;
+
   handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filPeriod));
   searchRequest.value.PageIndex = 1;
   AddFilterAndSearch(searchRequest.value.filters as [])

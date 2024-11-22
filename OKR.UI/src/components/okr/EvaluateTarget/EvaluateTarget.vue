@@ -245,9 +245,12 @@ const toggleEdit = async (item: EvaluateTarget) => {
 };
 
 const confirmEdit = async (item: EvaluateTarget): Promise<void> => {
+  if(item.content == item.preCMT){
+    return
+  }
   try {
     await ElMessageBox.confirm(
-      "Are you sure you want to edit?",
+      "Do you want to save your changes?",
       "Warning",
       {
         confirmButtonText: "OK",

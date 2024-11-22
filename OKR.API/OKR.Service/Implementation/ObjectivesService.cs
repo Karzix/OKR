@@ -457,7 +457,7 @@ namespace OKR.Service.Implementation
                 {
                     throw new Exception("User does not have a department.");
                 }
-                predicate = predicate.And(x=>x.DepartmentId == user.DepartmentId);
+                predicate = predicate.And(x=>x.DepartmentId == user.DepartmentId && x.TargetType == TargetType.department);
 
             }
 

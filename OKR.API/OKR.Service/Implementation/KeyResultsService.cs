@@ -63,8 +63,10 @@ namespace OKR.Service.Implementation
                 }
                 var objectives = objectivesAsQueryable.First();
                 var currentUser = await _userManager.FindByNameAsync(userName);
-                if (GetCurrentUserRole() == "Teamleader" || currentUser.Id == objectives.ApplicationUserId
-                        || (GetCurrentUserRole() == "Admin" && objectives.TargetType == Infrastructure.Enum.TargetType.company)
+                var role = GetCurrentUserRole();
+                if ((role == "Teamleader" && objectives.DepartmentId == currentUser.DepartmentId && objectives.TargetType ==TargetType.department)
+                    || (objectives.ApplicationUserId == currentUser.Id && objectives.TargetType == TargetType.individual)
+                    || (role == "Admin" && objectives.TargetType == TargetType.company)
                     )
                 {
                     var progress = new ProgressUpdates();

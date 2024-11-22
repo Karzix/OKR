@@ -45,6 +45,7 @@ import { ref, watch } from "vue";
 import Cookies from "js-cookie";
 import type { Objectives } from "@/Models/Objective";
 import { hasPermission } from "@/components/maynghien/Common/handleRole";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 const props = defineProps<{
   keyresults: KeyResult;
@@ -114,7 +115,12 @@ const isTeamleadOrOwner = () : boolean => {
   var jsonObject = JSON.parse(jsonString);
   var arrayFromString = Object.values(jsonObject);
   var userRoles = arrayFromString as string[];
-  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+  if(props.objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])
+    && props.objectives.targetType == TargetType.Department
+  ){
+    return true;
+  }
+  else if(props.objectives.targetType == TargetType.Company && hasPermission(userRoles as string[], ['Admin'])){
     return true;
   }
   else if(props.objectives.applicationUserId == userIdOfCurrentUser){

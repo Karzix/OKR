@@ -149,6 +149,7 @@ import { hasPermission } from "../maynghien/Common/handleRole";
 import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressApprovalDto";
 import { ElMessage } from "element-plus";
 import { toQueryParams } from "../maynghien/Common/toQueryParams";
+import { TargetType } from "@/Models/Enum/TargetType";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -275,7 +276,12 @@ const isTeamleadOrOwner = (objectives : Objectives) : boolean => {
   var jsonObject = JSON.parse(jsonString);
   var arrayFromString = Object.values(jsonObject);
   var userRoles = arrayFromString as string[];
-  if(objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])){
+  if(objectives.departmentId == departmentIdOfCurrentUser && hasPermission(userRoles as string[], ['Teamleader'])
+    && objectives.targetType == TargetType.Department
+  ){
+    return true;
+  }
+  else if(objectives.targetType == TargetType.Company && hasPermission(userRoles as string[], ['Admin'])){
     return true;
   }
   else if(objectives.applicationUserId == userIdOfCurrentUser){
@@ -324,7 +330,7 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
   color: #ef4444;
 }
 .expand-table{
- margin-left: 40px;
+ margin-left: 48px;
 }
 .okr-table {
 

@@ -25,7 +25,7 @@
       class="keyresult-progress"
     />
     <el-button v-else @click.stop="() =>{item.isCompleted = !item.isCompleted}"
-      :disabled="!props.isCreateOrEdit" > 
+      :disabled="true" > 
       {{ item.isCompleted ? 'Completed' : 'Not Completed' }}
     </el-button>
   </div>

@@ -166,6 +166,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
     (e: "updateData"): void;
+    (e: "close"): void;
 }>();
 const statusOptions = Object.values(StatusObjectives)
   .filter(value => typeof value === 'number')

@@ -1,6 +1,10 @@
 <template>
   <el-table :data="data.data" style="width: 100%; height: 200px;" >
-    <el-table-column prop="createdOn" label="Date" min-width="100"></el-table-column>
+    <el-table-column prop="createdOn" label="Date" min-width="100">
+      <template #default="scope">
+        {{ formatDate_dd_mm_yyyy_hh_mm(scope.row.createdOn) }}
+      </template>
+    </el-table-column>
     <el-table-column prop="createdBy" label="Created By" min-width="100"></el-table-column>
     <el-table-column prop="note" label="Note" min-width="140"></el-table-column>
     <el-table-column fixed="right" label="Operations" min-width="120">
@@ -35,6 +39,7 @@ import { deepCopy } from '@/Service/deepCopy';
 import { axiosInstance } from '@/Service/axiosConfig';
 import { ElMessage } from 'element-plus';
 import { toQueryParams } from '../maynghien/Common/toQueryParams';
+import { formatDate_dd_mm_yyyy_hh_mm } from '@/Service/formatDate';
 
 
 
