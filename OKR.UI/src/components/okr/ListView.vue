@@ -24,7 +24,10 @@
               <!-- Progress Column -->
               <el-table-column :width="customCSS.withProgress">
                 <template #default="{ row }">
-                  <el-progress :percentage="Math.round(row.currentPoint / row.maximunPoint * 100)" :color="getStatusColor(row.status)" />
+                  <el-progress  v-if="row.unit != 2"
+                  :percentage="Math.round(row.currentPoint / row.maximunPoint * 100)" :color="getStatusColor(row.status)" />
+                  <el-progress  v-else
+                  :percentage="row.isCompleted ? 100 : 0" :color="getStatusColor(row.status)" />
                   <!-- <span class="progress-percentage">{{ (row.currentPoint/row.maximunPoint * 100).toFixed(2)}}%</span> -->
                 </template>
               </el-table-column>
