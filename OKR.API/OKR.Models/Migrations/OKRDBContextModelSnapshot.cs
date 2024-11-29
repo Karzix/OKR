@@ -261,7 +261,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("ParentDepartmentId");
 
-                    b.ToTable("Department", (string)null);
+                    b.ToTable("Department");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.DepartmentProgressApproval", b =>
@@ -305,7 +305,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("KeyResultsId");
 
-                    b.ToTable("DepartmentProgressApproval", (string)null);
+                    b.ToTable("DepartmentProgressApproval");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.EvaluateTarget", b =>
@@ -340,7 +340,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("ObjectivesId");
 
-                    b.ToTable("EvaluateTarget", (string)null);
+                    b.ToTable("EvaluateTarget");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.KeyResults", b =>
@@ -396,7 +396,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("ObjectivesId");
 
-                    b.ToTable("KeyResults", (string)null);
+                    b.ToTable("KeyResults");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.Objectives", b =>
@@ -461,7 +461,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Objectives", (string)null);
+                    b.ToTable("Objectives");
                 });
 
             modelBuilder.Entity("OKR.Models.Entity.ProgressUpdates", b =>
@@ -507,7 +507,7 @@ namespace OKR.Models.Migrations
 
                     b.HasIndex("KeyResultId");
 
-                    b.ToTable("ProgressUpdates", (string)null);
+                    b.ToTable("ProgressUpdates");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
