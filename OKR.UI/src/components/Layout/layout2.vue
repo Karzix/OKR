@@ -155,6 +155,7 @@ const user = reactive<UserModel>({
   departmentId: undefined,
   managerName: "",
   newPassword: "",
+  isLocked: false
 })
 const showChangePassword = ref(false);
 const getRole = () => {
