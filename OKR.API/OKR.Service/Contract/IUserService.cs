@@ -13,7 +13,7 @@ namespace OKR.Service.Contract
     {
         Task<AppResponse<UserRespone>> Create(UserRequest request);
         Task<AppResponse<UserRespone>> Update(UserRequest request);
-        Task<AppResponse<string>> LockAsync(UserRequest request, int day = 30);
+        Task<AppResponse<string>> LockAsync(string userId, bool isLock);
         Task<AppResponse<SearchResponse<UserRespone>>> Search(SearchRequest request);
         AppResponse<List<UserRespone>> GetAll();
         Task<AppResponse<UserRespone>> Get(string iduserName);

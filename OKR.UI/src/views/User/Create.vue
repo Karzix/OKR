@@ -72,6 +72,7 @@ const User = ref<UserModel>({
     departmentId: undefined,
     managerName: "",
     newPassword: "",
+    isLocked: false
 })
 const props = defineProps<{
     openDialog: Boolean,

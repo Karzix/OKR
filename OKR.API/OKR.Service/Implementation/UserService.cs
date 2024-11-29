@@ -74,29 +74,22 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-        public async Task<AppResponse<string>> LockAsync(UserRequest request, int day = 30)
+        public async Task<AppResponse<string>> LockAsync(string userId, bool isLock)
         {
             var result = new AppResponse<string>();
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(request.Id.ToString());
+                ApplicationUser user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
                     return result.BuildError("can't find user");
                 }
-                if (user.LockoutEnabled == false)
+                if(user.UserName == "karzix1809@gmail.com")
                 {
-                    await _userManager.SetLockoutEnabledAsync(user, true);
-                    user.LockoutEnd = null;
-                    await _userManager.UpdateAsync(user);
-                   
+                    return result.BuildError("You don't can lock this account");
                 }
-                else
-                {
-                    DateTimeOffset LockoutEndnable = DateTimeOffset.UtcNow.AddDays(day);
-                    await _userManager.SetLockoutEnabledAsync(user, false);
-                    await _userManager.UpdateAsync(user);
-                }
+                user.IsLocked = isLock;
+                await _userManager.UpdateAsync(user);
                 return result.BuildResult("OK");
             }
             catch (Exception ex)
@@ -134,7 +127,8 @@ namespace OKR.Service.Implementation
                         Id = (x.Id),
                         DepartmentName = x.DepartmentId != null ? x.Department.Name : "",
                         DepartmentId = x.DepartmentId,
-                        ManagerName = x.ManagerName
+                        ManagerName = x.ManagerName,
+                        IsLocked = x.IsLocked
                     }).ToList();
                 if (dtoList != null && dtoList.Count > 0)
                 {

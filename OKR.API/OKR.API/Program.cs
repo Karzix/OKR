@@ -29,7 +29,7 @@ builder.Services.AddDbContext<OKRDBContext>(options =>
 
 new ServiceRepoMapping().Mapping(builder);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
 builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 builder.Services.AddScoped<RoleManager<IdentityRole>>();
 

@@ -10,6 +10,7 @@
       :CustomActions="CustomActions"
       :changePageSize="false"
        @onCustomAction="onCustomAction"
+        ref="basicAdminFormRef"
     ></BasicAdminFormVue>
   </Suspense>
   <Create v-if="showDialogCustomCreate" :openDialog="showDialogCustomCreate" @onClose="onClose()" :isEdit="isEdit" :User="userSelect"></Create>
@@ -28,7 +29,9 @@ import { TableColumn } from "@/components/maynghien/adminTable/Models/TableColum
 import Cookies from "js-cookie";
 import { ref } from "vue";
 import Create from "./Create.vue";
-
+import { ElMessage, ElMessageBox } from "element-plus";
+import { axiosInstance } from "@/Service/axiosConfig";
+import { deepCopy } from "@/Service/deepCopy";
 
 const CustomActions: CustomAction[] = [
   {
@@ -41,6 +44,13 @@ const CustomActions: CustomAction[] = [
   {
     ActionName: "Edit",
     ActionLabel: "Edit",
+    ApiActiontype: ApiActionType.PUT,
+    IsRowAction: true,
+    DataType: CustomActionDataType.Filters,
+  },
+  {
+    ActionName: "Lock/Unlock",
+    ActionLabel: "Lock/Unlock",
     ApiActiontype: ApiActionType.PUT,
     IsRowAction: true,
     DataType: CustomActionDataType.Filters,
@@ -78,19 +88,30 @@ const tableColumns: TableColumn[] = [
     hiddenElement: true
   },
   {
-    key: "lockoutEnabled",
-    label: "Khóa/Mở",
-    width: 500,
-    sortable: false,
+    key: "isLocked",
+    label: "Locked",
     enableEdit: false,
-
     enableCreate: false,
-    required: false,
     hidden: false,
+    width: 300,
+    required: false,
+    sortable: false,
     showSearch: false,
     inputType: "text",
-    dropdownData: null,
-    hiddenElement: true
+    // dropdownData: {
+    //   displayMember: "label",
+    //   keyMember: "value",
+    //   data: [
+    //     {
+    //       label: "Unlock",
+    //       value: false,
+    //     },
+    //     {
+    //       label: "Lock",
+    //       value: true,
+    //     },
+    //   ],
+    // },
   },
   {
     key: "role",
@@ -189,6 +210,7 @@ const userSelect = ref<UserModel>({
   departmentId: "",
   managerName: "",
   newPassword: "",
+  isLocked: false
 });
 const basicAdminFormRef = ref<InstanceType<typeof BasicAdminFormVue> | null>(null);
 const onCustomAction = (item: CustomActionResponse) => {
@@ -199,7 +221,36 @@ const onCustomAction = (item: CustomActionResponse) => {
   if(item.Action.ActionName == "Edit"){
     isEdit.value = true;
     showDialogCustomCreate.value = true;
-    userSelect.value = item.Data;
+    userSelect.value = deepCopy(item.Data);
+  }
+  if(item.Action.ActionName == "Lock/Unlock"){
+    ElMessageBox.confirm(
+      "Are you sure you want to ' " + (item.Data.isLocked ? "Unlock" : "Lock") + " ' this user?",
+      "Warning",
+      {
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
+        type: "warning",
+      }
+    )
+      .then(() => {
+        axiosInstance.put(`User/lock?userId=${item.Data.id}&isLock=${!item.Data.isLocked}`).then((rs) => {
+          if(rs.data.isSuccess){
+            ElMessage({
+              type: "success",
+              message: "Success",
+            })
+            // basicAdminFormRef.value?.Search;
+            item.Data.isLocked = !item.Data.isLocked;
+          }
+        })
+      })
+      .catch(() => {
+        ElMessage({
+          type: "info",
+          message: "Delete canceled",
+        });
+      });
   }
 };
 const onClose = () => {
