@@ -22,5 +22,7 @@ namespace OKR.Models.Entity
         public string? ManagerName { get; set; }
 
         ICollection<ApplicationUser>? Employees { get; set; }
+
+        //public bool IsLocked { get; set; } = false;
     }
 }

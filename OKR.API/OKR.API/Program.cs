@@ -13,6 +13,10 @@ using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 using static Quartz.Logging.OperationName;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text.Json.Serialization;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -31,6 +35,8 @@ new ServiceRepoMapping().Mapping(builder);
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+
+
 builder.Services.AddScoped<RoleManager<IdentityRole>>();
 
 Log.Logger = new LoggerConfiguration()
@@ -51,29 +57,41 @@ builder.Services.AddCors(options =>
                .AllowCredentials();
     });
 });
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
-
-builder.Services.AddIdentityCore<ApplicationUser>()
-    .AddRoles<IdentityRole>() 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+})
     .AddEntityFrameworkStores<OKRDBContext>()
-    .AddApiEndpoints();
-
-// SignalR
-//builder.Services.AddSignalR();
-
-// RabbitMQ
-//var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQ");
-//builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
-//{
-//    HostName = rabbitMQConfig["HostName"],
-//    UserName = rabbitMQConfig["UserName"],
-//    Password = rabbitMQConfig["Password"],
-//    VirtualHost = rabbitMQConfig["VirtualHost"],
-//    Port = int.Parse(rabbitMQConfig["Port"])
-//});
-//builder.Services.AddSingleton<RabbitMQ.Client.IConnection>(sp => sp.GetRequiredService<IConnectionFactory>().CreateConnection());
-//builder.Services.AddSingleton<RabbitMQ.Client.IModel>(sp => sp.GetRequiredService<RabbitMQ.Client.IConnection>().CreateModel());
+    .AddDefaultTokenProviders();
+builder.Services.AddAuthentication(opt =>
+{
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtConfig:validIssuer"],
+        ValidAudience = builder.Configuration["JwtConfig:validAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+builder.Services.AddAuthorization();
+//builder.Services.AddAuthentication("Bearer").AddJwtBearer();
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 //  Cache
 builder.Services.AddMemoryCache();
@@ -105,6 +123,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapIdentityApi<ApplicationUser>();
+//app.MapIdentityApi<ApplicationUser>();
 //app.MapHub<WeightUpdateNotification>("/weightUpdateNotification");
 app.Run();

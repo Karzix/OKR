@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
+using OKR.DTO.Auth;
 using OKR.Infrastructure;
 using OKR.Service.Contract;
 using RabbitMQ.Client;
@@ -11,7 +12,7 @@ using System.Text.Json;
 
 namespace OKR.API.Controllers
 {
-    [Route("account")]
+    [Route("")]
     [ApiController]
     [Authorize]
     public class AccountController : ControllerBase
@@ -25,15 +26,15 @@ namespace OKR.API.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("login")]
-        public async Task<IActionResult> Login(UserRequest login)
+        public async Task<IActionResult> Login(LoginRequest login)
         {
             var result = await _authencationService.AuthencationUser(login);
             return Ok(result);
         }
         [HttpPost]
-        [Route("Refresh")]
+        [Route("refresh")]
         [AllowAnonymous]
-        public IActionResult Refresh(UserRespone request)
+        public IActionResult Refresh(string request)
         {
             var result =  _authencationService.Refresh(request);
             return Ok(result);

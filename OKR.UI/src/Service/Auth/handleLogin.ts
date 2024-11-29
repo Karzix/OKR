@@ -12,7 +12,7 @@ const loginUrl = "login";
 export const handleLogin = async (model: LoginModel): Promise<boolean> => {
   try{
     const LoginResult = await axiosInstance.post(loginUrl, model);
-    const responseObject = LoginResult.data;
+    const responseObject = LoginResult.data.data;
     if (LoginResult.status == 200) {
       Cookies.set("accessToken", responseObject.accessToken ?? "", { expires: undefined,});
       Cookies.set("refreshToken", responseObject.refreshToken ?? "", { expires: undefined,});
@@ -20,7 +20,7 @@ export const handleLogin = async (model: LoginModel): Promise<boolean> => {
         "Authorization"
       ] = `Bearer ${responseObject.accessToken}`;
   
-      var infor = await axiosInstance.get("account/account-infor");
+      var infor = await axiosInstance.get("account-infor");
       var inforData = infor.data;
       if (inforData.isSuccess) {
         Cookies.set("userName", inforData.data.userName ?? "", { expires: undefined });
