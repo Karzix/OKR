@@ -36,9 +36,9 @@ namespace OKR.API.Controllers
         [HttpPut]
         [Route("lock")]
         [Authorize(Roles = "superadmin, Admin")]
-        public async Task<IActionResult> Lock(UserRequest request)
+        public async Task<IActionResult> Lock(string userId, bool isLock)
         {
-            var result = await _userService.LockAsync(request);
+            var result = await _userService.LockAsync(userId, isLock);
             return Ok(result);
         }
         [HttpGet]

@@ -11,4 +11,5 @@ export class UserModel {
     departmentId: string | undefined;
     managerName: string = "";
     newPassword: string = "";
+    isLocked: boolean = false;
 }
