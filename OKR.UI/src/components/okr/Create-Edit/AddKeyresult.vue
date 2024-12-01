@@ -1,7 +1,11 @@
 <template>
   <div class="keyresult-form">
     <!-- <div class="header">New Key Result</div> -->
-    <!-- <div class="left"> -->
+     <div class="header">
+      <h1>{{ props.isEdit ? 'Edit key result' : 'new key result' }}</h1>
+      <el-button type="danger" :icon="Delete" circle v-if="props.isEdit" @click="onDeleteKeyResult" />
+     </div>
+     
       <div class="form-item">
         <p class="form-label">Title: </p>
         <el-input
@@ -72,10 +76,13 @@ import {
   User,
   View,
   Hide,
+  Delete
 } from "@element-plus/icons-vue";
 import type { KeyResult } from "@/Models/KeyResult";
 import { getStatusText, StatusObjectives,getTagType, getStatusColor } from "@/Models/EntityObjectives";
 import { deepCopy } from "@/Service/deepCopy";
+import { ElMessage, ElMessageBox } from "element-plus";
+
 
 const keyresults = ref<KeyResult>({
   id: undefined,
@@ -94,12 +101,14 @@ const keyresults = ref<KeyResult>({
 });
 const props = defineProps<{ 
     keyresults: KeyResult,
-    isEdit?: boolean
+    isEdit?: boolean,
+    index : number
 }>();
-
+const currentUnit = ref(0);
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
-  (e: "onEditItem", item: KeyResult): void;
+  (e: "onEditItem", item: KeyResult, index: number): void;
+  (e: "onDeleteItem", index: number): void;
 }>();
 const statusOptions = Object.values(StatusObjectives)
   .filter(value => typeof value === 'number')
@@ -132,7 +141,7 @@ onBeforeMount(() => {
 });
 const AddSave = () => {
   if(props.isEdit){
-    emit("onEditItem", deepCopy(keyresults.value));
+    emit("onEditItem", deepCopy(keyresults.value), props.index ?? 0);
   }
   else{
     emit("onAddItem", deepCopy(keyresults.value));
@@ -163,6 +172,41 @@ function getRadioStyle(status: StatusObjectives) {
     borderColor: keyresults.value.status === status ? getStatusColor(status) : undefined
   };
 }
+const onDeleteKeyResult = () => {
+  ElMessageBox.confirm(
+    'Are you sure delete this keyresult?',
+    'Warning',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+  .then(() => {
+    emit("onDeleteItem", props.index ?? 0);
+  })
+  .catch(() => {
+    ElMessage({
+      type: 'info',
+      message: 'Delete canceled',
+    })
+  });
+  
+}
+onMounted(() => {
+  if(props.isEdit){
+    currentUnit.value = keyresults.value.unit ?? 0
+  }
+})
+watch(() => keyresults.value.unit, () => {
+  if(props.isEdit && keyresults.value.unit != currentUnit.value){
+    keyresults.value.unit = currentUnit.value
+    ElMessage({
+      type: 'warning',
+      message: 'If you want to change the unit, delete and create a new keyresults',
+    })
+  }
+})
 </script>
 <style scope>
 .form-item{
@@ -185,6 +229,12 @@ function getRadioStyle(status: StatusObjectives) {
 .radio-status-addkeyresult{
   width: 100%;
   justify-content: space-between;
+}
+.header{
+  display: flex;
+    gap: 20px;
+    align-content: center;
+    align-items: center;
 }
 </style>
 <style>

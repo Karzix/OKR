@@ -243,6 +243,12 @@ const onCustomAction = (item: CustomActionResponse) => {
             // basicAdminFormRef.value?.Search;
             item.Data.isLocked = !item.Data.isLocked;
           }
+          else{
+            ElMessage({
+              type: "error",
+              message: rs.data.message,
+            })
+          }
         })
       })
       .catch(() => {

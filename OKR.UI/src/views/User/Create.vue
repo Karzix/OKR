@@ -69,7 +69,7 @@ const User = ref<UserModel>({
     refreshToken: "",
     id: undefined,
     departmentName: "",
-    departmentId: "",
+    departmentId: undefined,
     managerName: "",
     newPassword: "",
     isLocked: false

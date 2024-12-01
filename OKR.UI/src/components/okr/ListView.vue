@@ -254,6 +254,7 @@ const refreshObjectives = (objective: Objectives) => {
   if (index !== -1) {
     listObjectivesDisplay.value.splice(index, 1, objective); 
   }
+  emit('update:objectives', objective);
 };
 const onDelete = (Objectives : Objectives) => {
   const index = listObjectivesDisplay.value.findIndex((item) => item.id === Objectives.id);

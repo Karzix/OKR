@@ -1,9 +1,9 @@
 <template>
   <div
-    v-for="item in props.keyresults"
+    v-for="(item, index ) in props.keyresults"
     :key="item.description"
     class="keyresult-item"
-    @click="emit('onSelectKeyResult', item)"
+    @click="emit('onSelectKeyResult', item, index)"
   >
     <div class="keyresult">
       <el-input-number
@@ -38,7 +38,7 @@ import { getTagType, StatusObjectives, getStatusColor } from "@/Models/EntityObj
 const emit = defineEmits<{
   (e: "onAddItem", item: KeyResult): void;
   (e: "onTurnOffDialog"): void;
-  (e: "onSelectKeyResult", item: KeyResult): void;
+  (e: "onSelectKeyResult", item: KeyResult, index: number): void;
 }>();
 const props = defineProps<{
   keyresults: KeyResult[];

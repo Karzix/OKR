@@ -65,7 +65,7 @@
     <div class="comment-progress">
         <el-tabs v-model="tabs" class="demo-tabs">
             <!-- <el-tab-pane label="Comment" name="comment"><EvaluateTarget :searchRequest="searchRequest" :targetType="'0'"></EvaluateTarget></el-tab-pane> -->
-            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest" ></ProgressUpdate></el-tab-pane>
+            <el-tab-pane label="Progress" name="progress"><ProgressUpdate :searchRequest="searchRequest" :key="keyProgressUpdate"></ProgressUpdate></el-tab-pane>
        </el-tabs>
     </div>  
 
@@ -128,7 +128,7 @@ const searchRequest = ref<SearchRequest>({
     filters: [],
     SortBy: undefined,
 })
-const keyProgressUpdate= ref(1);
+const keyProgressUpdate = ref(1);
 const getKeyresult = async () => {
     await axiosInstance.get(`KeyResults/${props.keyresultId}`).then((res) => {
         keyresult.value = res.data.data
@@ -154,6 +154,7 @@ const onUpdatedSuccessfully = async (point : number) => {
     await getKeyresult();
     // var temp = keyresult.value.id;
     // keyresult.value.id = "";
+    keyProgressUpdate.value++;
     emit("updateData");
 }
 const CompletedKeyResult = async () => {
