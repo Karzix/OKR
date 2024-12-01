@@ -1,32 +1,29 @@
-# Use a Debian-based Node.js image for the build stage to avoid Musl issues
+# Bước 1: Sử dụng hình ảnh Node.js để xây dựng ứng dụng
 FROM node:20 AS build
 
-# Set working directory
+# Tạo thư mục làm việc
 WORKDIR /app
 
-# Copy package.json and package-lock.json for dependency installation
+# Sao chép package.json và package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Cài đặt các phụ thuộc
 RUN npm install --legacy-peer-deps
 
-# Copy the rest of the application files
+# Sao chép mã nguồn vào thư mục làm việc
 COPY . .
 
-# Build the application
+# Xây dựng ứng dụng
 RUN npm run build
 
-# Use the lightweight Nginx image for serving the app
+# Bước 2: Sử dụng hình ảnh Nginx để phục vụ ứng dụng đã xây dựng
 FROM nginx:alpine
-
-# Copy Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built files from the build stage to Nginx's web directory
+# Sao chép các tệp đã xây dựng từ bước 1 vào thư mục phục vụ của Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80
+# Expose cổng 80
 EXPOSE 80
 
-# Start Nginx
+# Khởi động Nginx
 CMD ["nginx", "-g", "daemon off;"]

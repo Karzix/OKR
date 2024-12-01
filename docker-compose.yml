@@ -16,8 +16,8 @@ services:
 
   okrui:
     build: 
-      context: ./OKR.UI
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./OKR.UI/Dockerfile
     image: karzix/okrui:latest
     ports:
       - "80:80"
