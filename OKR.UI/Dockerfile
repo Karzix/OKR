@@ -19,17 +19,9 @@ RUN node --version && npm --version
 # Xây dựng ứng dụng
 RUN npm run build || cat /app/node_modules/rollup/dist/native.js
 
-# Bước 2: Sử dụng hình ảnh Nginx để phục vụ ứng dụng đã xây dựng
 FROM nginx:alpine
-
-# Sao chép cấu hình Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Sao chép các tệp đã xây dựng từ bước 1 vào thư mục phục vụ của Nginx
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Đặt quyền truy cập cho thư mục Nginx
-RUN chmod -R 755 /usr/share/nginx/html
 
 # Expose cổng 80
 EXPOSE 80
