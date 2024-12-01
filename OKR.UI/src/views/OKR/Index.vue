@@ -50,7 +50,7 @@
     <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true"></ListView>
   </div>
   <el-dialog v-model="dialogCreate" class="dialog-Create-Objective">
-    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @close="dialogCreate = false"></CreateEdit>
+    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @on-close="onCloseCreate" v-if="dialogCreate"></CreateEdit>
   </el-dialog>
 
 
@@ -164,6 +164,9 @@ onBeforeMount(async () => {
 
 const onUpdateData = async () => {
   listViewRef.value?.ReLoad();
+  dialogCreate.value = false
+  getStatusStatistics()
+  getOverallProgress()
 }
 
 // const onClickButtonSearch = (filters: Filter[]) => {
@@ -178,6 +181,9 @@ const onChangePeriod = (filters: string) => {
   handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filPeriod));
   searchRequest.value.PageIndex = 1;
   AddFilterAndSearch(searchRequest.value.filters as [])
+}
+const onCloseCreate = () => {
+  dialogCreate.value = false
 }
 watch(() => targetType.value, () => {
   var filTargetType = new Filter();

@@ -166,7 +166,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
     (e: "updateData"): void;
-    (e: "close"): void;
+    (e: "onClose"): void;
 }>();
 const statusOptions = Object.values(StatusObjectives)
   .filter(value => typeof value === 'number')
@@ -312,6 +312,8 @@ const onSave = async () => {
                 message: "Update success",
                 type: "success",
             });
+            emit("updateData");
+            emit("onClose");
             dialogAddKeyResult.value = false;
         } else {
             ElMessage({
