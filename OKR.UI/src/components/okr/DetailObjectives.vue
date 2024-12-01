@@ -203,10 +203,6 @@ function copyTextToClipboard(text : string) {
     document.body.removeChild(textArea);
 }
 const onDelete = () => {
-    
-    axiosInstance.delete(`Objectives/${props.objectives.id}`).then(() => {
-        emit('delete:objectives', objectives.value)
-    })
     ElMessageBox.confirm(
         'Are you sure to delete this objective?',
         'Warning',
