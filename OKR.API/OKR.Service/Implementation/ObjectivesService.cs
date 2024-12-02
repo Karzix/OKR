@@ -142,18 +142,18 @@ namespace OKR.Service.Implementation
             {
                 var query = await  BuildFilterExpression(request.Filters);
                     var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
-                var model = _objectiveRepository.FindByPredicate(query);
-                if (request.SortBy != null)
-                {
-                    model = _objectiveRepository.addSort(model, request.SortBy);
-                }
+                var model = _objectiveRepository.FindByPredicate(query).OrderByDescending(x=>x.CreatedOn);
+                //if (request.SortBy != null)
+                //{
+                //    model = _objectiveRepository.addSort(model, request.SortBy);
+                //}
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
                 
-                model = model.Skip(startIndex).Take(pageSize);
+                //model = model;
                 //var objectId_point = _objectiveRepository.caculatePercentObjectives(model);
-                var List = model.Include(x=>x.TargetType)
+                var List = model.Include(x=>x.TargetType).Skip(startIndex).Take(pageSize)
                     .Select(x => new ObjectivesRespone
                     {
                         Id = x.Id,
