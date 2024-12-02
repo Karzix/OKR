@@ -60,7 +60,9 @@ namespace OKR.Service.Implementation
                     CreatedBy = x.CreatedBy,
                     CreatedOn = x.CreatedOn,
                     KeyresultID = x.KeyResultsId,
-                    Note = x.Note,
+                    Note = x.Unit == TypeUnitKeyResult.CompletedOrNotCompleted 
+                        ? "change status of " + x.KeyResults.Description + " to " + ((bool)x.IsCompleted ? "COMPLETED" : "NOT COMPLETED")
+                        : "add " + x.AddedPoints + " for " + x.KeyResults.Description + " ",
                     IsCompleted = x.IsCompleted
                 }).ToList();
                 var searchResult = new SearchResponse<DepartmentProgressApprovalRespone>
@@ -158,6 +160,7 @@ namespace OKR.Service.Implementation
             try
             {
                 var departmentProgressApproval = _departmentProgressApprovalRepository.Get(dept.Id.Value);
+                departmentProgressApproval.KeyResults = _keyResultRepository.Get(departmentProgressApproval.KeyResultsId);
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 if (dept.IsApproved)
                 {
@@ -168,7 +171,7 @@ namespace OKR.Service.Implementation
                         progress.Id = Guid.NewGuid();
                         progress.CreatedOn = DateTime.UtcNow;
                         progress.CreatedBy = userName;
-                        progress.Note = departmentProgressApproval.Note;
+                        progress.Note = GetUpdateString(departmentProgressApproval);
                         progress.OldPoint = keyresult.CurrentPoint;
                         progress.NewPoint = keyresult.CurrentPoint + departmentProgressApproval.AddedPoints;
                         progress.KeyResultId = departmentProgressApproval.KeyResultsId;
@@ -184,7 +187,7 @@ namespace OKR.Service.Implementation
                         progress.Id = Guid.NewGuid();
                         progress.CreatedOn = DateTime.UtcNow;
                         progress.CreatedBy = userName;
-                        progress.Note = departmentProgressApproval.Note;
+                        progress.Note = GetUpdateString(departmentProgressApproval);
                         progress.KeyResultId = departmentProgressApproval.KeyResultsId;
                         progress.OldPoint = departmentProgressApproval.IsCompleted ?  0 : 1;
                         progress.NewPoint = departmentProgressApproval.IsCompleted ? 1 : 0;
@@ -206,7 +209,24 @@ namespace OKR.Service.Implementation
             return result;
         }
 
-
+        private string GetUpdateString(DepartmentProgressApproval dpa)
+        {
+            if (!string.IsNullOrEmpty(dpa.Note))
+            {
+                return dpa.Note;
+            }
+            string content = dpa.CreatedBy + " ";
+            if (dpa.Unit == Infrastructure.Enum.TypeUnitKeyResult.CompletedOrNotCompleted)
+            {
+                content += "change status of " + dpa.KeyResults.Description + " to " + ((bool)dpa.IsCompleted ? "COMPLETED" : "NOT COMPLETED");
+                return content;
+            }
+            else if ((dpa.KeyResults.CurrentPoint + dpa.AddedPoints) != dpa.KeyResults.CurrentPoint)
+            {
+                content += "update weights " + dpa.KeyResults.Description + " from " + dpa.KeyResults.CurrentPoint + " to " + (dpa.KeyResults.CurrentPoint + dpa.AddedPoints) + "; ";
+            }
+            return content;
+        }
 
     }
 }
