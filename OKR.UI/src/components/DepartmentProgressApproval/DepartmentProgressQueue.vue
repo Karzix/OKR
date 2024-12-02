@@ -108,7 +108,8 @@ const saveState = (request : DepartmentProgressApprovalDto) => {
     
       }
       remove(request);
-      emit("onSuccess", request); 
+      if (request.isApproved)
+        emit("onSuccess", request); 
     })
 };
 const remove = (request : DepartmentProgressApprovalDto) => {
