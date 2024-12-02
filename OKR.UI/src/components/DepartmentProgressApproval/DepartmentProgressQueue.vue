@@ -39,7 +39,7 @@ import { deepCopy } from '@/Service/deepCopy';
 import { axiosInstance } from '@/Service/axiosConfig';
 import { ElMessage } from 'element-plus';
 import { toQueryParams } from '../maynghien/Common/toQueryParams';
-import { formatDate_dd_mm_yyyy_hh_mm } from '@/Service/formatDate';
+import { formatDate_dd_mm_yyyy_hh_mm, RecalculateTheDate } from '@/Service/formatDate';
 
 
 
@@ -71,6 +71,9 @@ const Search = async () => {
     }
     else{
       data.value.data = res.data.data.data;
+      data.value.data?.forEach((item) => {
+        item.createdOn = RecalculateTheDate(item.createdOn);
+      })
       searchRequest.value.PageIndex = (searchRequest.value.PageIndex ?? 0)+ 1
     }
     
