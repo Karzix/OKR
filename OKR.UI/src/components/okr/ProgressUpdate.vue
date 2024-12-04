@@ -14,7 +14,7 @@
             <strong>{{ item.newPoint == 1 ? 'Completed' : 'not completed' }}</strong>
           </div>
           <div class="content">
-            <p>Date: <strong>{{ formatDate(item.createOn) }}</strong></p>
+            <p>Date: <strong>{{ formatDate_dd_mm_yyyy_hh_mm(item.createOn) }}</strong></p>
             <p>{{ item.note }}</p>
           </div>
         </el-card>
@@ -32,7 +32,7 @@ import { ref, watch, onMounted } from "vue";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { ElMessage } from "element-plus";
 import { useRoute } from "vue-router";
-import { formatDate, RecalculateTheDate } from "../../Service/formatDate";
+import { formatDate, RecalculateTheDate, formatDate_dd_mm_yyyy_hh_mm } from "../../Service/formatDate";
 import { isNumberOrNumericString } from '@/Service/Number';
 import { Right } from "@element-plus/icons-vue";
 import { SearchRequest } from "../../components/maynghien/BaseModels/SearchRequest";

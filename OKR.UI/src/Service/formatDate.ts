@@ -9,7 +9,7 @@ export function formatDate(date: any): string {
 
     return dS;
 }
-export function formatDate_dd_mm_yyyy_hh_mm(date : Date) {
+export function formatDate_dd_mm_yyyy_hh_mm(date : any) {
 
     var typeDate = new Date();
     if (typeof date === "string") {
