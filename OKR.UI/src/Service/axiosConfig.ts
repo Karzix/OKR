@@ -39,7 +39,7 @@ axiosInstance.interceptors.response.use(response => response, async error => {
         var user = new UserModel();
         user.token = Cookies.get('accessToken')?.toString();
         user.refreshToken = Cookies.get('refreshToken')?.toString();
-        const response = await axios.post(baseAPIUrl + "refresh",user.refreshToken);
+        const response = await axios.post("http://103.209.34.217:8080/refresh",{"refreshToken" :user.refreshToken });
   
         if (response.status === 200) {
             Cookies.set('accessToken',  response.data.data.token ?? "", { expires: undefined });
@@ -62,15 +62,19 @@ axiosInstance.interceptors.response.use(response => response, async error => {
     return Promise.reject(error);
   }
   catch(error){
-    // alert("Login session has expired! Please log in again")
-    // var cookies = document.cookie.split(";");
-    // for (var i = 0; i < cookies.length; i++) {
-    //   var cookie = cookies[i];
-    //   var eqPos = cookie.indexOf("=");
-    //   var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-    //   document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
-    // }
-    // window.location.reload();
+
   }
   
 });
+
+const logout = () => {
+   alert("Login session has expired! Please log in again")
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i];
+      var eqPos = cookie.indexOf("=");
+      var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+      document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+    }
+    window.location.reload();
+}
