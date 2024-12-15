@@ -15,7 +15,7 @@ export function toQueryParams(searchRequest: SearchRequest): string {
   const sortByParams: Record<string, string> = SortBy
     ? {
         "SortBy.FieldName": SortBy.FieldName ?? "",
-        "SortBy.IsAscending": SortBy.Ascending.toString(),
+        "SortBy.Ascending": SortBy.Ascending.toString(),
       }
     : {};
   const queryParams: Record<string, string> = {

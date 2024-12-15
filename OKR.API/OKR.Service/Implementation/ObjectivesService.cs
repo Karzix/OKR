@@ -55,7 +55,7 @@ namespace OKR.Service.Implementation
                 objectives.Id = Guid.NewGuid();
                 objectives.KeyResults.Clear();
                 objectives.CreatedBy = userName;
-                var Day = GetDateRange(request.Period + ":" +request.Year);
+                var Day = GetDateRange(request);
                 if(Day.EndDate < now)
                 {
                     return result.BuildError("You need to select the cycle in the current or future time");
@@ -142,11 +142,15 @@ namespace OKR.Service.Implementation
             {
                 var query = await  BuildFilterExpression(request.Filters);
                     var numOfRecords = _objectiveRepository.CountRecordsByPredicate(query);
-                var model = _objectiveRepository.FindByPredicate(query).OrderByDescending(x=>x.CreatedOn);
-                //if (request.SortBy != null)
-                //{
-                //    model = _objectiveRepository.addSort(model, request.SortBy);
-                //}
+                var model = _objectiveRepository.FindByPredicate(query);
+                if (request.SortBy != null)
+                {
+                    model = AddSort(model, request.SortBy);
+                }
+                else
+                {
+                    model = model.OrderByDescending(x => x.CreatedOn);
+                }
                 int pageIndex = request.PageIndex ?? 1;
                 int pageSize = request.PageSize ?? 10;
                 int startIndex = (pageIndex - 1) * (int)pageSize;
@@ -207,6 +211,46 @@ namespace OKR.Service.Implementation
             }
             return result;
         }
+
+        private IQueryable<Objectives> AddSort(IQueryable<Objectives> input, SortByInfo sortByInfo)
+        {
+            var result = input.AsQueryable();
+            switch (sortByInfo.FieldName)
+            {
+
+                case "Status":
+                    {
+                        if (sortByInfo.Ascending != null && sortByInfo.Ascending.Value)
+                        {
+                            result = result.OrderBy(m => m.status);
+
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(m => m.status);
+                        }
+                    }
+                    break;
+                case "End Date":
+                    {
+                        if (sortByInfo.Ascending != null && sortByInfo.Ascending.Value)
+                        {
+                            result = result.OrderBy(m => m.EndDay).ThenBy(x=>x.Period);
+
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(m => m.EndDay).ThenBy(x => x.Period);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return result;
+        }
+
+
         private async Task<ExpressionStarter<Objectives>> BuildFilterExpression(List<Filter> Filters)
         {
             try
@@ -377,7 +421,7 @@ namespace OKR.Service.Implementation
                 objectives.Name = request.Name;
                 objectives.TargetType = request.TargetType;
                 objectives.Period = request.Period;
-                var Day = GetDateRange(request.Period + ":" + request.Year);
+                var Day = GetDateRange(request);
                 objectives.StartDay = Day.StartDate;
                 objectives.EndDay = Day.EndDate;
                 objectives.status = request.status;
@@ -478,9 +522,13 @@ namespace OKR.Service.Implementation
         }
 
 
-        private (DateTime StartDate, DateTime EndDate) GetDateRange(string timePeriod)
+        private (DateTime StartDate, DateTime EndDate) GetDateRange(ObjectivesRequest objectivesRequest)
         {
-            var parts = timePeriod.Split(':');
+            if (objectivesRequest.Period == "custom")
+            {
+                return ((DateTime)objectivesRequest.StartDay!, (DateTime)objectivesRequest.EndDay!);
+            }
+            var parts = objectivesRequest.Period.Split(':');
             if (parts.Length != 2)
             {
                 throw new ArgumentException("Invalid time period format. Expected format is {period}:{year}.");

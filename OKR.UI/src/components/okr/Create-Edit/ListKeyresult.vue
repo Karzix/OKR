@@ -59,5 +59,6 @@ const props = defineProps<{
 .keyresult-item {
   display: flex;
   justify-content: space-between;
+  margin-top: 10px;
 }
 </style>

@@ -210,7 +210,11 @@ watch(() => keyresults.value.unit, () => {
 </script>
 <style scope>
 .form-item{
-    font-weight: bold; 
+  font-weight: bold;
+  display: flex;
+  /* gap: 5px; */
+  flex-direction: column;
+  gap: 4px;
 }
 .form-item-2{
     display: flex;

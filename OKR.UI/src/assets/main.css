@@ -23,3 +23,7 @@ html, body {
   margin: 0;
   padding: 0;
 }
+.el-table--fit .el-table__inner-wrapper:before {
+    width: 100%;
+    display: none;
+}

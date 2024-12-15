@@ -25,28 +25,28 @@
         </div>
         <div class="right">
             <div class="right-item">
-                <p class="label">Created: </p>
-                <p class="value">{{ formatDate(objectives.createdOn) }}</p>
+                <p class="label">Created: {{ formatDate(objectives.createdOn) }}</p>
+                <!-- <p class="value">{{ formatDate(objectives.createdOn) }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Start date: </p>
-                <p class="value">{{ formatDate(objectives.startDay) }}</p>
+                <p class="label">Start date: {{ formatDate(objectives.startDay) }}</p>
+                <!-- <p class="value">{{ formatDate(objectives.startDay) }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">End date: </p>
-                <p class="value">{{ formatDate(objectives.endDay) }}</p>
+                <p class="label">End date: {{ formatDate(objectives.endDay) }}</p>
+                <!-- <p class="value">{{ formatDate(objectives.endDay) }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Last progress update: </p>
-                <p class="value">{{ objectives.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(objectives.lastProgressUpdate) : '' }}</p>
+                <p class="label">Last progress update: {{ objectives.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(objectives.lastProgressUpdate) : '' }}</p>
+                <!-- <p class="value">{{ objectives.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(objectives.lastProgressUpdate) : '' }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Visibility: </p>
-                <p class="value">{{  objectives.isPublic ? 'Public' : 'Private' }}</p>
+                <p class="label">Visibility: {{  objectives.isPublic ? 'Public' : 'Private' }}</p>
+                <!-- <p class="value">{{  objectives.isPublic ? 'Public' : 'Private' }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Created by: </p>
-                <p class="value">{{ objectives.createdBy }}</p>
+                <p class="label">Created by: {{ objectives.createdBy }}</p>
+                <!-- <p class="value">{{ objectives.createdBy }}</p> -->
             </div>
         </div>
     </div>
@@ -286,8 +286,8 @@ onBeforeMount(() => {
     gap: 10px;
 }
 .value{
-    font-weight: bold;
-    font-size: 18px;
+    /* font-weight: bold; */
+    /* font-size: 18px; */
     padding-left: 10px;
 }
 .right {

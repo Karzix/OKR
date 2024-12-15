@@ -75,11 +75,24 @@
             />
           </el-select>
           <el-input-number
+            v-if="objectives.period != 'custom'"
             v-model="objectives.year"
             :controls="false"
             placeholder="Enter year"
             :min="new Date().getFullYear()"
             controls-position="right"
+          />
+        </div>
+        <div v-if="objectives.period == 'custom'" class="input-group">
+          <el-date-picker 
+            v-model="objectives.startDay"
+            type="date"
+            placeholder="Start date"
+          />
+          <el-date-picker
+            v-model="objectives.endDay"
+            type="date"
+            placeholder="End date"
           />
         </div>
       </div>
@@ -100,7 +113,7 @@
         </el-radio-group>
       </div>
       <div class="btn-Save">
-        <el-button type="primary" size="large"  @click="onSave">Save</el-button>
+        <el-button type="primary" size="large"  @click="onSave" style="width: 120px;">Save</el-button>
       </div>
     </div>
   </div>
@@ -220,6 +233,10 @@ const period = [
   {
     value: "FY",
     label: "FY (January - December)",
+  },
+  {
+    value: "custom",
+    label: "Custom datetime",
   },
 ];
 const indexSelected = ref(0);
@@ -452,7 +469,11 @@ const onDeleteKeyResult = (index : number) =>{
     gap: 20px;
 }
 .form-item{
-    font-weight: bold; 
+  font-weight: bold;
+  display: flex;
+  /* gap: 5px; */
+  flex-direction: column;
+  gap: 4px;
 }
 .left {
     display: flex;
@@ -465,6 +486,8 @@ const onDeleteKeyResult = (index : number) =>{
     flex-direction: column;
     gap: 10px;
     width: 40%;
+    max-width: 327px;
+    position: relative;
 }
 .input-group{
     display: flex;
@@ -478,7 +501,11 @@ const onDeleteKeyResult = (index : number) =>{
 .el-radio{
   margin-right: 0 !important;
 }
-
+.btn-Save{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
 </style>
 <style>
 .Visibility-button > span {

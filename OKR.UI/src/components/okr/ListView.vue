@@ -1,6 +1,6 @@
 <template>
   <div class="okr-table">
-    <el-table :data="listObjectivesDisplay" v-loading="loadingTable">
+    <el-table :data="listObjectivesDisplay" v-loading="loadingTable" @sort-change="handleSortChange">
       <!-- Expandable Row -->
       <el-table-column type="expand">
         <template #default="props">
@@ -91,16 +91,16 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Status" :width="customCSS.withStatus">
+      <el-table-column label="Status" :width="customCSS.withStatus" sortable>
         <template #default="{ row }">
           <el-tag :type="getTagType(row.status)">{{ getStatusText(row.status) }}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column label="End Date" :width="customCSS.withEndDate">
+      <el-table-column label="End Date" :width="customCSS.withEndDate" sortable>
         <template #default="{ row }">
           <span :class="{ 'date-warning': row.status === 'At risk' }">{{
-            getDisplayString(row.period + ":" + row.year) 
+            getDisplayString(row) 
           }}</span>
         </template>
       </el-table-column>
@@ -111,11 +111,11 @@
       </el-table-column>
       <template #append>
         <div style="text-align: center; padding: 10px;" @click="handleAddRow" class="btn-add-item" v-if="!noMore">
-          <el-text class="mx-1" type="primary">see more...</el-text>
+          <el-text class="mx-1" type="primary">load more...</el-text>
         </div>
-        <div style="text-align: center; padding: 10px;" class="btn-add-item" v-else>
+        <!-- <div style="text-align: center; padding: 10px;" class="btn-add-item" v-else>
           <el-text class="mx-1" type="primary">no more...</el-text>
-        </div>
+        </div> -->
       </template>
     </el-table>
   </div>
@@ -153,6 +153,7 @@ import type { DepartmentProgressApprovalDto } from "@/Models/DepartmentProgressA
 import { ElMessage } from "element-plus";
 import { toQueryParams } from "../maynghien/Common/toQueryParams";
 import { TargetType } from "@/Models/Enum/TargetType";
+import type { SortByInfo } from "../maynghien/BaseModels/SortByInfo";
 
 
 const searchResponseObjectives = ref<SearchResponse<Objectives[]>>({
@@ -305,6 +306,21 @@ const DepartmentProgressQueue_onSuccess = (objectives: Objectives, DepartmentPro
   o.point = recaculateObjectivesAfterProgressApproval(objectives, DepartmentProgressApproval);
   o.numberOfPendingUpdates -=1;
 }
+const handleSortChange = async (event: any) => {
+  console.log(event.order);
+  const ascending = event.order !== "descending";
+  const sortByInfo: SortByInfo = {
+    FieldName: event.column.label,
+    Ascending: ascending
+
+  }
+  console.log(sortByInfo);
+  searchRequest.value.SortBy = sortByInfo;
+  searchRequest.value.PageIndex = 1;
+  noMore.value = false;
+  await ReLoad();
+  
+};
 defineExpose({ onAddFilterAndSearch, ReLoad });
 </script>
 
@@ -340,6 +356,7 @@ defineExpose({ onAddFilterAndSearch, ReLoad });
 }
 .expand-table{
  margin-left: 48px;
+ margin-bottom: -9px;
 }
 .okr-table {
 

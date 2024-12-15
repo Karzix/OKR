@@ -45,20 +45,20 @@
                 <p class="value">{{ formatDate(keyresult.createdOn) }}</p>
             </div>
             <div class="right-item">
-                <p class="label">Start date: </p>
-                <p class="value">{{ formatDate(keyresult.startDay) }}</p>
+                <p class="label">Start date: {{ formatDate(keyresult.startDay) }}</p>
+                <!-- <p class="value">{{ formatDate(keyresult.startDay) }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">End date: </p>
-                <p class="value">{{ formatDate(keyresult.endDay) }}</p>
+                <p class="label">End date: {{ formatDate(keyresult.endDay) }}</p>
+                <!-- <p class="value">{{ formatDate(keyresult.endDay) }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Last progress update: </p>
-                <p class="value">{{ keyresult.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(keyresult.lastProgressUpdate) : '' }}</p>
+                <p class="label">Last progress update: {{ keyresult.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(keyresult.lastProgressUpdate) : '' }}</p>
+                <!-- <p class="value">{{ keyresult.lastProgressUpdate ? formatDate_dd_mm_yyyy_hh_mm(keyresult.lastProgressUpdate) : '' }}</p> -->
             </div>
             <div class="right-item">
-                <p class="label">Created by: </p>
-                <p class="value">{{ keyresult.createdBy }}</p>
+                <p class="label">Created by: {{ keyresult.createdBy }}</p>
+                <!-- <p class="value">{{ keyresult.createdBy }}</p> -->
             </div>
         </div>
     </div>
@@ -252,8 +252,8 @@ const isTeamleadOrOwner = () : boolean => {
     gap: 10px;
 }
 .value{
-    font-weight: bold;
-    font-size: 18px;
+    /* font-weight: bold; */
+    /* font-size: 18px; */
     padding-left: 10px;
 }
 .right {

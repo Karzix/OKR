@@ -69,7 +69,7 @@ import { ApiActionType, CustomAction } from "@/components/maynghien/adminTable/M
 import type { TableColumn } from "@/components/maynghien/adminTable/Models/TableColumn";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { axiosInstance } from "@/Service/axiosConfig";
-import { getDisplayString } from "@/Service/OKR/DisplayPeriod";
+import { getDisplayString, getDisplayStringFormtimePeriod } from "@/Service/OKR/DisplayPeriod";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
@@ -154,7 +154,8 @@ onBeforeMount(async () => {
     var result = res.data as AppResponse<string[]>;
     periods.value.push({value: "default", label: "Default"})
     result.data?.forEach((element) => {
-      periods.value.push({value: element, label: getDisplayString(element)})
+      if (!element.includes("custom"))
+        periods.value.push({value: element, label: getDisplayStringFormtimePeriod(element) as string})
     })
     
   })
