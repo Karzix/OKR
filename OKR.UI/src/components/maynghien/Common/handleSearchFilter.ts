@@ -12,11 +12,12 @@ export function addFilter(listFilter : Filter[], add : Filter){
     }
 }
 
-export function removeFilter(listFilter : Filter[], remove : Filter){
-    var findFilName = listFilter.find(x => x.FieldName == remove.FieldName);
+export function removeFilter(listFilter : Filter[], remove : string){
+    var findFilName = listFilter.find(x => x.FieldName == remove);
     if(findFilName != null){
-        listFilter = listFilter.filter(x => x.FieldName != remove.FieldName);
+        listFilter = listFilter.filter(x => x.FieldName != remove);
     }
+    return listFilter;
 }
 
 export function handleFilterBeforSearch(listFilter? : Filter[]) : Filter[]{

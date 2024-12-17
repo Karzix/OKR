@@ -2,15 +2,19 @@
     <div class="detail-objectives">
         <div class="left">
             <div class="left-header">
-                <el-button-group class="ml-4">
-                    <el-button type="primary" :icon="Edit" v-if="isOwner" @click="onEdit"/>
-                    <el-button type="primary" :icon="Share" @click="copyLinkShare" />
-                    <el-button type="primary" :icon="Delete" v-if="isOwner" @click="onDelete"/>
-                </el-button-group>
+                <div>
+                    <p class="title">{{ objectives.name }}</p>
+                </div>
+                <el-tooltip placement="right">
+                    <template #content>
+                    <p class="tooltip-item"  v-if="isOwner" @click="onEdit"><el-icon><Edit /></el-icon> Edit</p>
+                    <p class="tooltip-item" v-if="isOwner" @click="onDelete"><el-icon><Delete /></el-icon> Delete</p>
+                    <p class="tooltip-item" @click="copyLinkShare"><el-icon><Share /></el-icon> Share</p>
+                    </template>
+                    <el-icon><More /></el-icon>
+                </el-tooltip>
             </div>
-            <div>
-            <p class="title">{{ objectives.name }}</p>
-            </div>
+         
             <div class="objective-progress">
                 <el-progress :percentage="objectives.point" color="#6366F1" />
                 <p class="progress-caption">The objectives progress is calculated from the key results</p>
@@ -65,7 +69,7 @@
     </el-dialog>   
 </template>
 <script setup lang="ts">
-import { Edit, Share, Delete } from "@element-plus/icons-vue";
+import { Edit, Share, Delete, More } from "@element-plus/icons-vue";
 import { onBeforeMount, onMounted, ref } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
 import ListKeyresult from "./Create-Edit/ListKeyresult.vue";
@@ -271,7 +275,7 @@ onBeforeMount(() => {
 .left-header{
     display: flex;
     align-items: center;
-    justify-content:end;
+    justify-content:space-between;
 }
 .title{
     font-size: 24px;
@@ -296,5 +300,14 @@ onBeforeMount(() => {
     gap: 10px;
     border-left: 2px solid #ccc;
     padding-left: 15px;
+}
+.tooltip-item:hover{
+  cursor: pointer;
+  background-color: #5a9cf8;
+  color: #fff;
+}
+.tooltip-item{
+  padding: 5px;
+  border-radius: 5px;
 }
 </style>

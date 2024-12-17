@@ -306,18 +306,8 @@ namespace OKR.Service.Implementation
                                         var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
                                         break;
                                     }
-                                    var parts = filter.Value.Split(':');
-                                    if (parts.Length != 2)
-                                    {
-                                        throw new ArgumentException("Invalid time period format. Expected format is {period}:{year}.");
-                                    }
-                                    string period = parts[0];
-                                    if (!int.TryParse(parts[1], out int year))
-                                    {
-                                        throw new ArgumentException("Invalid year format.");
-                                    }
-                                    predicate = predicate.And(m =>
-                                        (m.Period == period && m.Year == year));
+                                    var Day = GetDateRange(filter.Value);
+                                    predicate = predicate.And(x=>x.StartDay.Date < Day.EndDate && x.EndDay.Date > x.StartDay);
                                     break;
                                 }
                             case "name":
@@ -578,8 +568,59 @@ namespace OKR.Service.Implementation
 
             return (startDate, endDate);
         }
+        private (DateTime StartDate, DateTime EndDate) GetDateRange(string Period)
+        {
+            var parts = Period.Split(':');
+            if (parts.Length != 2)
+            {
+                throw new ArgumentException("Invalid time period format. Expected format is {period}:{year}.");
+            }
 
-     
+            string period = parts[0];
+            if (!int.TryParse(parts[1], out int year))
+            {
+                throw new ArgumentException("Invalid year format.");
+            }
+
+            DateTime startDate, endDate;
+
+            switch (period)
+            {
+                case "Q1":
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 3, 31);
+                    break;
+                case "Q2":
+                    startDate = new DateTime(year, 4, 1);
+                    endDate = new DateTime(year, 6, 30);
+                    break;
+                case "Q3":
+                    startDate = new DateTime(year, 7, 1);
+                    endDate = new DateTime(year, 9, 30);
+                    break;
+                case "Q4":
+                    startDate = new DateTime(year, 10, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                case "H1":
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 6, 30);
+                    break;
+                case "H2":
+                    startDate = new DateTime(year, 7, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                case "FY": // Full year
+                    startDate = new DateTime(year, 1, 1);
+                    endDate = new DateTime(year, 12, 31);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid period format. Expected Q1, Q2, Q3, Q4, H1, H2, or FY.");
+            }
+
+            return (startDate, endDate);
+        }
+
         public AppResponse<List<string>> GetPeriods()
         {
             var result = new AppResponse<List<string>>();

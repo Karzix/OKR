@@ -112,10 +112,11 @@
           </el-radio-button>
         </el-radio-group>
       </div>
-      <div class="btn-Save">
-        <el-button type="primary" size="large"  @click="onSave" style="width: 120px;">Save</el-button>
-      </div>
+      
     </div>
+  </div>
+  <div class="footer">
+    <el-button type="primary" size="large"  @click="onSave" style="width: 120px;">Save</el-button>
   </div>
   <el-dialog
     v-model="dialogAddKeyResult"
@@ -501,10 +502,11 @@ const onDeleteKeyResult = (index : number) =>{
 .el-radio{
   margin-right: 0 !important;
 }
-.btn-Save{
-  position: absolute;
-  bottom: 0;
-  right: 0;
+.footer{
+  display: flex;
+  flex-direction: row-reverse;
+  border-top: 1px solid #cccc;
+  padding: 10px;
 }
 </style>
 <style>

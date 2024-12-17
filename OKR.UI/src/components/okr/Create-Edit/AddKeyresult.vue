@@ -61,8 +61,8 @@
     <!-- </div> -->
 
   </div>
-  <div class="btn-Save">
-    <el-button type="primary" @click="AddSave">Save</el-button>
+  <div class="footer">
+    <el-button type="primary" size="large"  @click="AddSave" style="width: 120px;">Save</el-button>
   </div>
 </template>
 <script setup lang="ts">
@@ -239,6 +239,13 @@ watch(() => keyresults.value.unit, () => {
     gap: 20px;
     align-content: center;
     align-items: center;
+}
+.footer{
+  display: flex;
+  flex-direction: row-reverse;
+  border-top: 1px solid #cccc;
+  padding: 10px;
+  margin-top: 10px;
 }
 </style>
 <style>

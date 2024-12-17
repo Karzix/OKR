@@ -2,59 +2,97 @@
   <div class="action">
     <div class="left">
       <el-radio-group v-model="targetType">
-        <el-radio value="MyObjectives" size="large" class="custom-radio" >My objectives</el-radio>
-        <el-radio value="Team" size="large" class="custom-radio" >Team</el-radio>
-        <el-radio value="Comany" size="large" class="custom-radio" >Comany</el-radio>
+        <el-radio value="MyObjectives" size="large" class="custom-radio"
+          >My objectives</el-radio
+        >
+        <el-radio value="Team" size="large" class="custom-radio">Team</el-radio>
+        <el-radio value="Comany" size="large" class="custom-radio"
+          >Comany</el-radio
+        >
       </el-radio-group>
       <div class="period">
-        <el-select v-model="period" placeholder="Filter by period" @change="onChangePeriod" filterable>
-          <el-option v-for="period in periods" :key="period.value" :label="period.label" :value="period.value" />
+        <el-select
+          v-model="period"
+          placeholder="Filter by period"
+          @change="onChangePeriod"
+          filterable
+        >
+          <el-option
+            v-for="period in periods"
+            :key="period.value"
+            :label="period.label"
+            :value="period.value"
+          />
         </el-select>
       </div>
-     
     </div>
     <div class="right">
       <div class="btn-objectives">
-        <el-button type="primary" @click="dialogCreate = true" :icon="Plus">New objective</el-button>
+        <el-button type="primary" @click="dialogCreate = true" :icon="Plus"
+          >New objective</el-button
+        >
       </div>
       <div class="search">
         <ActionSearch @onSearch="AddFilterAndSearch" />
       </div>
     </div>
-    
-    
   </div>
   <div class="progress-overview">
-    
     <div class="overall-progress">
       <div class="progress-circle">
-        <el-progress :percentage="OverallProgress" type="circle" color="#6366F1" />
+        <el-progress
+          :percentage="OverallProgress"
+          type="circle"
+          color="#6366F1"
+        />
         <p class="title">Overall progress</p>
       </div>
       <div class="status-info">
-        
         <div class="status-tags">
-          <el-tag>{{ statusStatistics.noStatus }} No status</el-tag>
-          <el-tag type="success">{{ statusStatistics.onTrack }} On track</el-tag>
-          <el-tag type="warning">{{ statusStatistics.atRisk }} At risk</el-tag>
-          <el-tag type="danger">{{ statusStatistics.offTrack }} Off track</el-tag>
-          <el-tag type="info">{{ statusStatistics.closed }} Closed</el-tag>
+          <el-tag @click="addFilterStatusAndSearch(StatusObjectives.noStatus)" class="status-tag"
+            >{{ statusStatistics.noStatus }} No status</el-tag
+          >
+          <el-tag
+            type="success"
+            @click="addFilterStatusAndSearch(StatusObjectives.onTrack)" class="status-tag"
+            >{{ statusStatistics.onTrack }} On track</el-tag
+          >
+          <el-tag
+            type="warning"
+            @click="addFilterStatusAndSearch(StatusObjectives.atRisk)" class="status-tag"
+            >{{ statusStatistics.atRisk }} At risk</el-tag
+          >
+          <el-tag
+            type="danger"
+            @click="addFilterStatusAndSearch(StatusObjectives.offTrack)" class="status-tag"
+            >{{ statusStatistics.offTrack }} Off track</el-tag
+          >
+          <el-tag
+            type="info"
+            @click="addFilterStatusAndSearch(StatusObjectives.closed)" class="status-tag"
+            >{{ statusStatistics.closed }} Closed</el-tag
+          >
         </div>
-        
       </div>
     </div>
-    
-    
   </div>
   <div class="ListView">
-    <ListView ref="listViewRef" :searchRequest="searchRequest" :allow-update-weight="true" @update:objectives="updateData" @delete:objectives="updateData"></ListView>
+    <ListView
+      ref="listViewRef"
+      :searchRequest="searchRequest"
+      :allow-update-weight="true"
+      @update:objectives="updateData"
+      @delete:objectives="updateData"
+    ></ListView>
   </div>
   <el-dialog v-model="dialogCreate" class="dialog-Create-Objective">
-    <CreateEdit :objectives="objectives" @updateData="onUpdateData" @on-close="onCloseCreate" v-if="dialogCreate"></CreateEdit>
+    <CreateEdit
+      :objectives="objectives"
+      @updateData="onUpdateData"
+      @on-close="onCloseCreate"
+      v-if="dialogCreate"
+    ></CreateEdit>
   </el-dialog>
-
-
-  
 </template>
 
 <script setup lang="ts">
@@ -65,11 +103,17 @@ import type { Objectives } from "@/Models/Objective";
 import { TargetType } from "@/Models/Enum/TargetType";
 import { Plus } from "@element-plus/icons-vue";
 import MnActionPane from "@/components/maynghien/adminTable/MnActionPane.vue";
-import { ApiActionType, CustomAction } from "@/components/maynghien/adminTable/Models/CustomAction";
+import {
+  ApiActionType,
+  CustomAction,
+} from "@/components/maynghien/adminTable/Models/CustomAction";
 import type { TableColumn } from "@/components/maynghien/adminTable/Models/TableColumn";
 import { Filter } from "@/components/maynghien/BaseModels/Filter";
 import { axiosInstance } from "@/Service/axiosConfig";
-import { getDisplayString, getDisplayStringFormtimePeriod } from "@/Service/OKR/DisplayPeriod";
+import {
+  getDisplayString,
+  getDisplayStringFormtimePeriod,
+} from "@/Service/OKR/DisplayPeriod";
 import type { AppResponse } from "@/components/maynghien/BaseModels/AppResponse";
 import * as handleSearch from "@/components/maynghien/Common/handleSearchFilter";
 import type { SearchRequest } from "@/components/maynghien/BaseModels/SearchRequest";
@@ -77,6 +121,7 @@ import type { StatusStatistics } from "@/Models/StatusStatistics";
 import ActionSearch from "@/components/okr/ActionSearch.vue";
 import { deepCopy } from "@/Service/deepCopy";
 import { toQueryParams } from "@/components/maynghien/Common/toQueryParams";
+import { StatusObjectives } from "@/Models/EntityObjectives";
 
 const progressPercentage = ref(63);
 const dialogCreate = ref(false);
@@ -100,10 +145,10 @@ const objectives = ref<Objectives>({
   period: "Q1",
   lastProgressUpdate: new Date(),
   createdOn: new Date(),
-  numberOfPendingUpdates: 0
+  numberOfPendingUpdates: 0,
 });
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
-const periods = ref<{value: string; label: string}[]>([]);
+const periods = ref<{ value: string; label: string }[]>([]);
 const period = ref("");
 const statusStatistics = ref<StatusStatistics>({
   onTrack: 0,
@@ -111,68 +156,75 @@ const statusStatistics = ref<StatusStatistics>({
   offTrack: 0,
   closed: 0,
   total: 0,
-  noStatus: 0
+  noStatus: 0,
 });
 const OverallProgress = ref(0);
 const targetType = ref<string>("MyObjectives");
 const AddFilterAndSearch = (filters: Filter[]) => {
+  filters = handleSearch.removeFilter(filters as [], "status");
+  searchRequest.value.filters = filters;
   listViewRef.value?.onAddFilterAndSearch(filters);
   searchRequest.value.filters = filters;
-  getStatusStatistics()
-  getOverallProgress()
-}
+  getStatusStatistics();
+  getOverallProgress();
+};
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,
   filters: [],
   SortBy: undefined,
-})
+});
 const getStatusStatistics = async () => {
   var url = "Objectives/statusStatistics";
-    var parramsQuery = toQueryParams(searchRequest.value);
-    var urlFull = url + "?" + parramsQuery;
+  var parramsQuery = toQueryParams(searchRequest.value);
+  var urlFull = url + "?" + parramsQuery;
   await axiosInstance.get(urlFull).then((res) => {
     var result = res.data as AppResponse<StatusStatistics>;
-      if (result.data) {
-        statusStatistics.value = result.data;
-      }
-  })
-}
+    if (result.data) {
+      statusStatistics.value = result.data;
+    }
+  });
+};
 const getOverallProgress = async () => {
   var url = "Objectives/overal-progress";
   var parramsQuery = toQueryParams(searchRequest.value);
   var urlFull = url + "?" + parramsQuery;
   var responeOverallProgress = await axiosInstance.get(urlFull);
   OverallProgress.value = responeOverallProgress.data.data;
-}
+};
 onBeforeMount(async () => {
   var filTargetType = new Filter();
   filTargetType.FieldName = "targetType";
   filTargetType.Value = TargetType.Individual.toString();
-  handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filTargetType));
+  handleSearch.addFilter(
+    searchRequest.value.filters as [],
+    deepCopy(filTargetType)
+  );
   await axiosInstance.get("Objectives/periods").then((res) => {
     var result = res.data as AppResponse<string[]>;
-    periods.value.push({value: "default", label: "Default"})
+    periods.value.push({ value: "default", label: "Default" });
     result.data?.forEach((element) => {
       if (!element.includes("custom"))
-        periods.value.push({value: element, label: getDisplayStringFormtimePeriod(element) as string})
-    })
-    
-  })
-  getStatusStatistics()
-  getOverallProgress()
-})
+        periods.value.push({
+          value: element,
+          label: getDisplayStringFormtimePeriod(element) as string,
+        });
+    });
+  });
+  getStatusStatistics();
+  getOverallProgress();
+});
 
 const onUpdateData = async () => {
   listViewRef.value?.ReLoad();
-  dialogCreate.value = false
-  getStatusStatistics()
-  getOverallProgress()
-}
-const updateData = async (objectives : Objectives) => {
-  getStatusStatistics()
-  getOverallProgress()
-}
+  dialogCreate.value = false;
+  getStatusStatistics();
+  getOverallProgress();
+};
+const updateData = async (objectives: Objectives) => {
+  getStatusStatistics();
+  getOverallProgress();
+};
 // const onClickButtonSearch = (filters: Filter[]) => {
 //   searchRequest.value.filters = filters;
 //   onUpdateData();
@@ -182,33 +234,57 @@ const onChangePeriod = (filters: string) => {
   filPeriod.FieldName = "period";
   filPeriod.Value = filters;
 
-  handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filPeriod));
+  handleSearch.addFilter(
+    searchRequest.value.filters as [],
+    deepCopy(filPeriod)
+  );
   searchRequest.value.PageIndex = 1;
-  AddFilterAndSearch(searchRequest.value.filters as [])
-}
+  AddFilterAndSearch(searchRequest.value.filters as []);
+};
 const onCloseCreate = () => {
-  dialogCreate.value = false
-}
-watch(() => targetType.value, () => {
-  var filTargetType = new Filter();
-  filTargetType.FieldName = "targetType";
-  switch (targetType.value) {
-    case "MyObjectives":
-      filTargetType.Value = TargetType.Individual.toString();
-      break;
-    case "Team":
-      filTargetType.Value = TargetType.Department.toString();
-      break;
-    case "Comany":
-      filTargetType.Value = TargetType.Company.toString();
-      break;
-    default:
-      break;
+  dialogCreate.value = false;
+};
+watch(
+  () => targetType.value,
+  () => {
+    var filTargetType = new Filter();
+    filTargetType.FieldName = "targetType";
+    switch (targetType.value) {
+      case "MyObjectives":
+        filTargetType.Value = TargetType.Individual.toString();
+        break;
+      case "Team":
+        filTargetType.Value = TargetType.Department.toString();
+        break;
+      case "Comany":
+        filTargetType.Value = TargetType.Company.toString();
+        break;
+      default:
+        break;
+    }
+    handleSearch.addFilter(
+      searchRequest.value.filters as [],
+      deepCopy(filTargetType)
+    );
+    searchRequest.value.PageIndex = 1;
+    AddFilterAndSearch(searchRequest.value.filters as []);
   }
-  handleSearch.addFilter(searchRequest.value.filters as [], deepCopy(filTargetType));
+);
+
+const addFilterStatusAndSearch = (status: StatusObjectives) => {
+  var filStatus = new Filter();
+  filStatus.FieldName = "status";
+  filStatus.Value = status.toString();
+  handleSearch.addFilter(
+    searchRequest.value.filters as [],
+    deepCopy(filStatus)
+  );
   searchRequest.value.PageIndex = 1;
-  AddFilterAndSearch(searchRequest.value.filters as [])
-})
+  listViewRef.value?.onAddFilterAndSearch(searchRequest.value.filters as []);
+  searchRequest.value.filters = searchRequest.value.filters as [];
+  // getStatusStatistics()
+  getOverallProgress();
+};
 </script>
 
 <style scoped>
@@ -281,20 +357,20 @@ watch(() => targetType.value, () => {
 .view-options .el-button[disabled] {
   background-color: #e0e0e0;
 }
-.ListView > div{
+.ListView > div {
   max-width: 100px;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
   border-radius: 6px;
 }
-.ListView{
+.ListView {
   box-shadow: -1px -1px 10px -1px #00000030;
   width: 1300px;
   margin-left: auto;
   margin-right: auto;
 }
-.action{
+.action {
   display: flex;
   gap: 10px;
   justify-content: space-between;
@@ -302,24 +378,23 @@ watch(() => targetType.value, () => {
   margin-left: auto;
   margin-right: auto;
 }
-.action > .right{
+.action > .right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
-
 }
-.action > .left{
+.action > .left {
   display: flex;
   flex-direction: column;
 }
 .action > .left .el-radio-group {
   gap: 20px;
 }
-.action > .left .el-radio-group .el-radio .el-radio__label{
+.action > .left .el-radio-group .el-radio .el-radio__label {
   padding: 0px !important;
 }
-.search{
+.search {
   margin-bottom: 20px;
 }
 .custom-radio {
@@ -328,13 +403,16 @@ watch(() => targetType.value, () => {
 }
 
 .custom-radio.is-checked::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: #409eff; /* Màu border */
+}
+.status-tag :hover {
+  cursor: pointer;
 }
 </style>
 <style>
@@ -349,9 +427,9 @@ watch(() => targetType.value, () => {
   }
 } */
 .el-dialog.dialog-Create-Objective {
-    width: 871px !important;
+  width: 871px !important;
 }
-.status-tags .el-tag{
+.status-tags .el-tag {
   width: 110px;
   height: 44px;
 }

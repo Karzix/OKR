@@ -18,10 +18,17 @@
       </div>
 
       <div class="comment-btn" v-if="Cookies.get('userName') == item.createBy">
-        <el-button-group class="ml-4">
+        <!-- <el-button-group class="ml-4">
           <el-button @click="Delete(item.id ?? '')" :icon="CloseBold" type="danger" plain />
           <el-button @click="toggleEdit(item)" :icon="EditPen" type="primary" plain></el-button>
-        </el-button-group>
+        </el-button-group> -->
+        <el-tooltip placement="right">
+            <template #content>
+            <p class="tooltip-item"  @click="toggleEdit(item)"><el-icon><EditIcon /></el-icon> Edit</p>
+            <p class="tooltip-item" @click="Delete(item.id ?? '')"><el-icon><Deleteicon /></el-icon> Delete</p>
+            </template>
+            <el-icon><More /></el-icon>
+        </el-tooltip>
       </div>
     </div>
 
@@ -48,7 +55,7 @@ import { EvaluateTarget } from "@/Models/EvaluateTarget";
 import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import { formatDate, RecalculateTheDate, formatDate_dd_mm_yyyy_hh_mm } from "@/Service/formatDate";
 import { Loading } from "@element-plus/icons-vue";
-import { CloseBold, EditPen, Promotion } from "@element-plus/icons-vue";
+import { CloseBold, EditPen, Promotion, Delete as Deleteicon, More, Edit as EditIcon } from "@element-plus/icons-vue";
 import Cookies from "js-cookie";
 import { toQueryParams } from "@/components/maynghien/Common/toQueryParams";
 
@@ -198,10 +205,7 @@ const Delete = (id: string) => {
       });
     })
     .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: 'Delete canceled',
-      })
+
     })
   
 }
@@ -261,10 +265,7 @@ const confirmEdit = async (item: EvaluateTarget): Promise<void> => {
     await Edit(item); 
   } catch {
     item.content = item.preCMT ?? "";
-    ElMessage({
-      type: "info",
-      message: "Edit canceled",
-    });
+
   }
 };
 
@@ -330,8 +331,8 @@ p.loading-av {
 .comment-btn {
   display: block;
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 10px;
+  top: 10px;
 }
 .comment-body-edit{
   display: flex;
@@ -343,5 +344,14 @@ p.loading-av {
 }
 .form-comment{
   display: flex;
+}
+.tooltip-item:hover{
+  cursor: pointer;
+  background-color: #5a9cf8;
+  color: #fff;
+}
+.tooltip-item{
+  padding: 5px;
+  border-radius: 5px;
 }
 </style>
