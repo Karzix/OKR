@@ -1,96 +1,66 @@
 <template>
   <div class="common-layout">
-    <el-dropdown trigger="click">
-      <span class="userName" style="cursor: pointer;">
-        {{ Cookies.get("userName")?.toString() }}
-      </span>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item @click="showChangePassword = true">Change Password</el-dropdown-item>
-          <el-dropdown-item divided @click="handleAsideClick('logout')">Logout</el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
     <el-container>
-      <el-header class="layout2_header" >
+      <el-aside width="175px" style="background-color: #a7dcff;">
         <div class="layout2-logo" @click="handleAsideClick('')">
           <img src="@/assets/logo2.png" alt="" >
         </div>
-        <el-row :gutter="20" class="w-100 layout2-row-header">
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
-            <el-icon>
-              <User />
-            </el-icon>
-            <span>User</span>
-          </el-col>
-          <el-col :span="6" class="item-menu" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
-            <el-icon>
-              <Flag />
-            </el-icon>
-            <span>Department</span>
-          </el-col>
-        </el-row>
-      </el-header>
-      <el-header class="mobile-header" v-if="false">
-        <div class="mobile-header-content">
-          <el-button
-            class="toggle-button"
-            type="primary"
-            :icon="Expand"
-            circle
-            @click="toggleAside"
-          />
-          <span class="mobile-header-title">Menu</span>
+        <div class="menu">
+          <div class="menu-top">
+            <el-menu 
+              :default-active="activeIndex" 
+              class="el-menu-vertical-demo" 
+            >
+              <el-menu-item index="/"  @click="handleAsideClick('')">
+                <el-icon><Aim /></el-icon>
+                Goal
+              </el-menu-item>
+            </el-menu>
+          </div>
+          <div class="menu-bottom">
+            <el-menu 
+              :default-active="activeIndex" 
+              class="el-menu-vertical-demo" 
+            >
+              <el-menu-item index="/Department"   @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['superadmin','Admin'])">
+                <el-icon>
+                  <Flag />
+                </el-icon>
+                <span>Department</span>
+              </el-menu-item>
+              <el-menu-item index="/user"  @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
+                <el-icon>
+                  <User />
+                </el-icon>
+                <span>User</span>
+              </el-menu-item>
+            </el-menu>
+          </div>
         </div>
-      </el-header>
-      <el-main class="layout2-main"><router-view /></el-main>
+        
+        
+      </el-aside>
+      <el-container>
+        <el-header class="layout2_header"  style="text-align: right;">
+         <div class="toolbar">
+            <el-dropdown>
+              <el-icon style="margin-right: 8px; margin-top: 1px">
+                <Setting />
+              </el-icon>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="showChangePassword = true">Change Password</el-dropdown-item>
+                  <el-dropdown-item divided @click="handleAsideClick('logout')">Logout</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <span> {{ Cookies.get("userName")?.toString() }}</span>
+          </div>
+        </el-header>
+        <el-main class="layout2-main"><el-scrollbar><router-view /></el-scrollbar></el-main>
+      </el-container>
     </el-container>
   </div>
-
-  <el-drawer v-model="drawerMenuMobile" width="100%" direction="ltr">
-    <el-row class="tac">
-      <el-col>
-        <el-menu default-active="1" class="el-menu-vertical-demo">
-          <el-menu-item index="2" @click="handleAsideClick('User')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
-            <el-icon>
-              <User />
-            </el-icon>
-            <span>User</span>
-          </el-menu-item>
-          <el-menu-item index="3" @click="handleAsideClick('Department')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
-            <el-icon>
-              <Flag />
-            </el-icon>
-            <span>Team</span>
-          </el-menu-item>
-          <!-- <el-menu-item index="4" @click="handleAsideClick('Branch')" v-if="hasPermission(userRoles as string[], ['Admin','superadmin'])">
-            <el-icon><OfficeBuilding /></el-icon>
-            <span>Branch</span>
-          </el-menu-item> -->
-          <!-- <el-menu-item index="5" >
-            <el-select
-              v-model="searchUsername"
-              clearable
-              placeholder="User Name"
-              style="width: 190px"
-              filterable
-              remote
-              :remote-method="seachUser"
-            >
-              <el-option
-                v-for="item in listUser"
-                :key="item.userName"
-                :label="item.userName"
-                :value="item.userName"
-              />
-            </el-select>
-            <el-icon><Search /></el-icon>
-          </el-menu-item> -->
-        </el-menu>
-      </el-col>
-
-    </el-row>
-  </el-drawer>
   <el-dialog v-model="showChangePassword" title="Change Password" @close="showChangePassword = false" width="350px">
     <div class="input-changepassword">
       <p>Current password</p>
@@ -108,7 +78,6 @@
 </template>
 
 <script setup lang="ts">
-import router from "@/router";
 import {
   Expand,
   User,
@@ -116,6 +85,7 @@ import {
   UserFilled,
   Search,
   Flag,
+  Setting
 } from "@element-plus/icons-vue";
 import { ref, onMounted, onUnmounted, watch, reactive } from "vue";
 import Cookies from "js-cookie";
@@ -123,11 +93,16 @@ import type { UserModel } from "@/Models/UserModel";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { hasPermission } from "@/components/maynghien/Common/handleRole";
 import { ElMessage } from "element-plus";
+import { Aim } from "@element-plus/icons-vue";
+import { useRoute, useRouter } from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
 const isAsideVisible = ref(true);
 const isMobile = ref(false);
 const drawerMenuMobile = ref(false);
 const userRoles = ref<string[]>();
+const activeIndex = ref(route.path);
 const handleAsideClick = (action: string) => {
   switch (action) {
     case "logout":
@@ -221,6 +196,9 @@ const loadpage = () => {
 watch(() => searchUsername.value, () => {
   loadpage();
 })
+watch(() => route.path, (newPath) => {
+  activeIndex.value = newPath;
+});
 </script>
 
 <style>
@@ -254,69 +232,46 @@ watch(() => searchUsername.value, () => {
 .w-100 {
   width: 100% !important;
 }
-.layout2_header {
-  background-color: #00ffff99;
-  display: flex !important;
+.layout2_header .toolbar {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
-  width: 80%;
-  border-radius: 15px;
-  min-height: 60px !important;
-}
-.mobile-header {
-  background-color: #00ffff99;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  border-radius: 0;
-}
-.mobile-header-content {
-  display: flex;
-  align-items: center;
-}
-.mobile-header-title {
-  font-weight: bold;
-  font-size: 18px;
-  margin-left: 10px;
+  height: 100%;
+  right: 20px;
 }
 .el-col:hover {
   cursor: pointer;
 }
-.userName {
-  position: fixed;
-  background-color: #0000ffad;
-  right: 0;
-  color: white;
-  padding: 12px;
-  border-radius: 0 0 0 10px;
-  z-index: 999;
+.menu{
+  height: calc(100vh - 114px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .layout2-main {
-  background-color: #ffffff00 !important;
-
+  height: calc(100vh - 60px); 
+  overflow: hidden;
 }
 .layout2-search > i {
   padding: 5px;
   font-size: 24px;
 }
-.layout2-search{
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-}
-.layout2-search-mobile{
-
+.layout2-logo{
+  text-align: center;
+  padding: 10px;
 }
 .layout2-logo :hover {
   cursor: pointer;
 }
 .layout2-logo > img{
-  height: 60px;
+  height: 90px;
 }
 .input-changepassword {
     width: 300px;
     margin: 15px;
+}
+.el-menu-item.is-active {
+  background-color: #f0f8ff !important; /* Màu nền khi active */
+  color: #409EFF !important; /* Màu chữ khi active */
 }
 </style>

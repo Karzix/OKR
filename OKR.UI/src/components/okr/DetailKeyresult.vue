@@ -189,10 +189,7 @@ const CompletedKeyResult = async () => {
         }
     })
     .catch(() => {
-        ElMessage({
-            type: 'info',
-            message: 'Cancel',
-        })
+  
         keyresult.value.isCompleted = !keyresult.value.isCompleted;
     })
     

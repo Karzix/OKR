@@ -15,18 +15,14 @@
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="keyresults.status" size="medium"  :fill="customFillStatus" class="radio-status-addkeyresult">
-            <el-radio 
-            v-for="status in statusOptions"
-            :key="status.value"
-            :label="status.value"
-            :border="true"
-            >
-            <el-tag :type="getTagType(status.value)" effect="dark">
-                {{ status.text }}
-            </el-tag>
-            </el-radio>
-        </el-radio-group>
+        <div class="radio-status">
+          <el-check-tag v-for="status in statusOptions" :key="status.value" 
+            :checked="keyresults.status === status.value" 
+            :type="getTagType(status.value)" 
+            @click="selectStatus(status.value)">
+            {{ status.text }}
+          </el-check-tag>
+        </div>
       </div>
       <div class="form-item-2">
         <div class="form-item min-w-200px" >
@@ -186,10 +182,7 @@ const onDeleteKeyResult = () => {
     emit("onDeleteItem", props.index ?? 0);
   })
   .catch(() => {
-    ElMessage({
-      type: 'info',
-      message: 'Delete canceled',
-    })
+
   });
   
 }
@@ -207,6 +200,9 @@ watch(() => keyresults.value.unit, () => {
     })
   }
 })
+const selectStatus = (index: StatusObjectives) => {
+  keyresults.value.status = index
+}
 </script>
 <style scope>
 .form-item{
@@ -219,6 +215,7 @@ watch(() => keyresults.value.unit, () => {
 .form-item-2{
     display: flex;
     gap: 10px;
+    justify-content: space-between;
 }
 .keyresult-form{
     padding: 0 40px;
@@ -246,6 +243,10 @@ watch(() => keyresults.value.unit, () => {
   border-top: 1px solid #cccc;
   padding: 10px;
   margin-top: 10px;
+}
+.radio-status{
+  display: flex;
+  justify-content: space-between;
 }
 </style>
 <style>

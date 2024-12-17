@@ -37,7 +37,7 @@
       </div>
       <div class="form-item">
         <p>Status:</p>
-        <el-radio-group v-model="objectives.status" size="medium" :fill="customFillStatus">
+        <!-- <el-radio-group v-model="objectives.status" size="medium" :fill="customFillStatus">
             <el-radio
             v-for="status in statusOptions"
             :key="status.value"
@@ -49,7 +49,15 @@
                 {{ status.text }}
             </el-tag>
             </el-radio>
-        </el-radio-group>
+        </el-radio-group> -->
+        <div class="radio-status">
+          <el-check-tag v-for="status in statusOptions" :key="status.value" 
+            :checked="objectives.status === status.value" 
+            :type="getTagType(status.value)" 
+            @click="selectStatus(status.value)">
+            {{ status.text }}
+          </el-check-tag>
+        </div>
       </div>
       <!-- <Radio.Group block options={options} defaultValue="Pear" optionType="button" /> -->
       <div class="btn-add-keyresult form-item">
@@ -166,7 +174,7 @@ const objectives = ref<Objectives>({
   targetType: TargetType.Individual,
   targetTypeName: "",
   point: 0,
-  status: 0,
+  status: StatusObjectives.noStatus,
   isPublic: true,
   isUserObjectives: true,
   year: new Date().getFullYear(),
@@ -457,6 +465,9 @@ const onDeleteKeyResult = (index : number) =>{
     type: "success",
   })
 }
+const selectStatus = (index: StatusObjectives) => {
+  objectives.value.status = index
+}
 </script>
 <style scoped>
 .header {
@@ -507,6 +518,10 @@ const onDeleteKeyResult = (index : number) =>{
   flex-direction: row-reverse;
   border-top: 1px solid #cccc;
   padding: 10px;
+}
+.radio-status{
+  display: flex;
+  justify-content: space-between;
 }
 </style>
 <style>
