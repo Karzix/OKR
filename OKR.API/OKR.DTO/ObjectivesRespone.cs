@@ -19,6 +19,7 @@ namespace OKR.DTO
         public Status status { get; set; }
         public Guid? DepartmentId { get; set; }
         public string? ApplicationUserId { get; set; }
+        public ObjectivesStatusClose? StatusClose { get; set; }
 
         public bool IsPublic { get; set; } = true;
         public bool IsUserObjectives { get; set; } = true;

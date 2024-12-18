@@ -1,5 +1,6 @@
 import type { DepartmentProgressApprovalDto } from "./DepartmentProgressApprovalDto";
 import  { StatusObjectives } from "./EntityObjectives";
+import type { ObjectivesStatusClose } from "./Enum/ObjectivesStatusClose";
 import type { TargetType } from "./Enum/TargetType";
 import type { KeyResult } from "./KeyResult";
 
@@ -22,7 +23,8 @@ export class Objectives {
     lastProgressUpdate: Date | undefined;
     createdBy?: string | undefined;
     createdOn: Date | undefined;
-    numberOfPendingUpdates: number = 0
+    numberOfPendingUpdates: number = 0;
+    statusClose: ObjectivesStatusClose | undefined;
 }
 export const recaculateObjectivesAfterProgressApproval = (objectives: Objectives, DepartmentProgressApproval : DepartmentProgressApprovalDto) => {
     const keyResult = objectives.keyResults.find(x => x.id == DepartmentProgressApproval.keyresultID);

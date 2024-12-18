@@ -61,7 +61,12 @@ namespace OKR.Service.Implementation
                 {
                     return result.BuildError("Cannot find objectives");
                 }
+
                 var objectives = objectivesAsQueryable.First();
+                if(objectives.StatusClose != null)
+                {
+                    return result.BuildError("This objectives is close");
+                }
                 var currentUser = await _userManager.FindByNameAsync(userName);
                 var role = GetCurrentUserRole();
                 if ((role == "Teamleader" && objectives.DepartmentId == currentUser.DepartmentId && objectives.TargetType ==TargetType.department)

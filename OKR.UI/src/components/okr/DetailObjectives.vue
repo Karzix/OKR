@@ -3,13 +3,14 @@
         <div class="left">
             <div class="left-header">
                 <div>
-                    <p class="title">{{ objectives.name }}</p>
+                    <p class="title">{{ objectives.name }} <IconStatusClose :status="objectives.statusClose" :key="objectives.statusClose"></IconStatusClose></p> 
                 </div>
                 <el-tooltip placement="right">
                     <template #content>
                     <p class="tooltip-item"  v-if="isOwner" @click="onEdit"><el-icon><Edit /></el-icon> Edit</p>
                     <p class="tooltip-item" v-if="isOwner" @click="onDelete"><el-icon><Delete /></el-icon> Delete</p>
                     <p class="tooltip-item" @click="copyLinkShare"><el-icon><Share /></el-icon> Share</p>
+                    <p class="tooltip-item" @click="() => {showDialogCloseGoal = true}"><el-icon><Lock /></el-icon> Close goal</p>
                     </template>
                     <el-icon><More /></el-icon>
                 </el-tooltip>
@@ -67,9 +68,12 @@
     <el-dialog v-model="showDialogEdit" class="dialog-Create-Objective">
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
     </el-dialog>   
+    <el-dialog v-model="showDialogCloseGoal" title="Close goal">
+        <CloseGoal :objectivesId="objectives.id" @close="showDialogCloseGoal = false"/>
+    </el-dialog>
 </template>
 <script setup lang="ts">
-import { Edit, Share, Delete, More } from "@element-plus/icons-vue";
+import { Edit, Share, Delete, More,Lock } from "@element-plus/icons-vue";
 import { onBeforeMount, onMounted, ref } from "vue";
 import { KeyResult } from "@/Models/KeyResult";
 import ListKeyresult from "./Create-Edit/ListKeyresult.vue";
@@ -88,7 +92,9 @@ import DetailKeyresult from "./DetailKeyresult.vue";
 import CreateEditObjectives from "./Create-Edit/Create.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import Cookies from "js-cookie";
-
+//@ts-ignore
+import CloseGoal from "./CloseGoal.vue";
+import IconStatusClose from "../icons/IconStatusClose.vue";
 
 const props = defineProps<{
     isOwner?: boolean;
@@ -111,7 +117,8 @@ const objectives = ref<Objectives>({
   period: "Q1",
   createdOn: new Date(),
   lastProgressUpdate: new Date(),
-  numberOfPendingUpdates: 0
+  numberOfPendingUpdates: 0,
+  statusClose: 0
 });
 const keyresults = ref<KeyResult[]>([]);
 const tabs = ref("comment");
@@ -119,6 +126,7 @@ const showDialogDetailKeyresult = ref(false);
 const keyresultIdSelect = ref("");
 const showDialogEdit = ref(false);
 const allowUpdateWeight = ref(false);
+const showDialogCloseGoal = ref(false);
 const searchRequest = ref<SearchRequest>({
   PageIndex: 1,
   PageSize: 10,

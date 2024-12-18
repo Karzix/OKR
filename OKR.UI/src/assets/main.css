@@ -5,10 +5,10 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
-.el-radio__inner {
-  display: none !important;
+.custom-radio .el-radio__inner {
+  display: none;
 }
-.el-radio{
+.custom-radio .el-radio{
   margin-right: 0 !important;
 }
 body {
@@ -26,4 +26,56 @@ html, body {
 .el-table--fit .el-table__inner-wrapper:before {
     width: 100%;
     display: none;
+}
+.Achieved .el-radio__input{
+  background-color: #67c23a;
+  border-color: #67c23a;
+  border: 3px solid #67c23a;
+  border-radius: 10px;
+}
+.Achieved .el-radio__input.is-checked+.el-radio__label{
+  color: #67c23a;
+}
+.Achieved .el-radio__input.is-checked .el-radio__inner {
+  border-color: #67c23a;
+  background: #67c23a;
+}
+.Partial .el-radio__input{
+  background-color: #e6a23c;
+  border-color: #e6a23c;
+  border: 3px solid #e6a23c;
+  border-radius: 10px;
+}
+.Partial .el-radio__input.is-checked+.el-radio__label{
+  color: #e6a23c;
+}
+.Partial .el-radio__input.is-checked .el-radio__inner {
+  border-color: #e6a23c;
+  background: #e6a23c;
+}
+.Missed .el-radio__input{
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+  border: 3px solid #f56c6c;
+  border-radius: 10px;
+}
+.Missed .el-radio__input.is-checked+.el-radio__label{
+  color: #f56c6c;
+}
+.Missed .el-radio__input.is-checked .el-radio__inner {
+  border-color: #f56c6c;
+  background: #f56c6c;
+}
+.Dropped .el-radio__input{
+  background-color: #909399;
+  border-color: #909399;
+  border: 3px solid #909399;
+  border-radius: 10px;
+}
+.Dropped .el-radio__input.is-checked+.el-radio__label{
+  color: #909399;
+}
+.Dropped .el-radio__input.is-checked .el-radio__inner {
+  border-color: #909399;
+  background: #909399;
 }

@@ -414,6 +414,7 @@ const addFilterStatusAndSearch = (status: StatusObjectives) => {
 .status-tag :hover {
   cursor: pointer;
 }
+
 </style>
 <style>
 @media screen and (max-width: 1200px) {
@@ -433,4 +434,6 @@ const addFilterStatusAndSearch = (status: StatusObjectives) => {
   width: 110px;
   height: 44px;
 }
+
+
 </style>

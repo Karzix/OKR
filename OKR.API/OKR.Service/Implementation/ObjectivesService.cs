@@ -189,7 +189,8 @@ namespace OKR.Service.Implementation
                         CreatedBy = x.CreatedBy,
                         CreatedOn = x.CreatedOn,
                         NumberOfPendingUpdates = _progressApprovalRepository.AsQueryable().Where(da=>da.KeyResults.ObjectivesId == x.Id 
-                            && da.IsDeleted != true).Count()
+                            && da.IsDeleted != true).Count(),
+                        StatusClose = x.StatusClose,
                     })
                     .ToList();
                 foreach (var item in List)
@@ -370,6 +371,10 @@ namespace OKR.Service.Implementation
             {
                 var userName = _contextAccessor.HttpContext.User.Identity.Name;
                 var objectives = _objectiveRepository.FindBy(x=>x.Id == request.Id).First();
+                if (objectives.StatusClose != null)
+                {
+                    return result.BuildError("This objectives is close");
+                }
                 var keyresults = _keyResultRepository.FindBy(x=>x.ObjectivesId == objectives.Id).ToList();
                 //edit
                 keyresults.ForEach(x =>
@@ -702,6 +707,25 @@ namespace OKR.Service.Implementation
                 //var test = _objectiveRepository.AsQueryable().Where(predicate).ToList();
             }
             return predicate;
+        }
+
+        public AppResponse<string> Close(Guid ObjecivesId, ObjectivesStatusClose status)
+        {
+            var result  = new AppResponse<string>();
+            try
+            {
+                var objectives  = _objectiveRepository.Get(ObjecivesId);
+                objectives.StatusClose = status;
+                objectives.Modifiedby = _contextAccessor.HttpContext.User.Identity.Name;
+                objectives.ModifiedOn = DateTime.UtcNow;
+                _objectiveRepository.Edit(objectives);
+                result.BuildResult("OK");
+            }
+            catch (Exception ex)
+            {
+                result.BuildError(ex.Message);
+            }
+            return result;
         }
 
     }

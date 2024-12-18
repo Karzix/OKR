@@ -1,6 +1,7 @@
 ﻿using MayNghien.Infrastructure.Request.Base;
 using MayNghien.Models.Response.Base;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 
 namespace OKR.Service.Contract
 {
@@ -14,5 +15,6 @@ namespace OKR.Service.Contract
         public AppResponse<ObjectivesRespone> Edit(ObjectivesRequest request);
         public AppResponse<List<string>> GetPeriods();
         public Task<AppResponse<StatusStatistics>> StatusStatistics(SearchRequest request);
+        public AppResponse<string> Close(Guid ObjecivesId, ObjectivesStatusClose status);
     }
 }

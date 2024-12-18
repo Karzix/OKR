@@ -155,7 +155,6 @@ import {
   Hide,
   Plus,
 } from "@element-plus/icons-vue";
-//@ts-ignore
 import AddKeyresult from "./AddKeyresult.vue";
 import type { KeyResult } from "@/Models/KeyResult";
 import { getStatusText, StatusObjectives,getTagType, getStatusColor } from "@/Models/EntityObjectives";

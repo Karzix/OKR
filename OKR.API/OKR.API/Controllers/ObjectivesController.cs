@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OKR.DTO;
+using OKR.Infrastructure.Enum;
 using OKR.Service.Contract;
 using OKR.Service.Implementation;
 
@@ -76,6 +77,13 @@ namespace OKR.API.Controllers
         public async Task<IActionResult> GetStatusStatistics([FromQuery] SearchRequest request)
         {
             var result = await _objectiveService.StatusStatistics(request);
+            return Ok(result);
+        }
+        [HttpPut]
+        [Route("CloseGoal/{id}/{status}")]
+        public IActionResult CloseGoal(Guid id, ObjectivesStatusClose status)
+        {
+            var result = _objectiveService.Close(id, status);
             return Ok(result);
         }
     }
