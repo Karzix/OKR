@@ -180,7 +180,8 @@ const objectives = ref<Objectives>({
   period: "Q1",
   lastProgressUpdate: new Date(),
   createdOn: new Date(),
-  numberOfPendingUpdates: 0
+  numberOfPendingUpdates: 0,
+  statusClose: 0
 });
 const props = defineProps<{
   objectives: Objectives;
@@ -377,7 +378,8 @@ const onSave = async () => {
                 period: "Q1",
                 lastProgressUpdate: new Date(),
                 createdOn: new Date(),
-                numberOfPendingUpdates: 0
+                numberOfPendingUpdates: 0,
+                statusClose: 0
             };
             dialogAddKeyResult.value = false;
         } else {
@@ -441,7 +443,8 @@ onMounted(() => {
         period: "Q1",
         lastProgressUpdate: new Date(),
         createdOn: new Date(),
-        numberOfPendingUpdates: 0
+        numberOfPendingUpdates: 0,
+        statusClose: 0
     }
   }
 })
