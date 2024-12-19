@@ -10,7 +10,7 @@
                     <p class="tooltip-item"  v-if="isOwner" @click="onEdit"><el-icon><Edit /></el-icon> Edit</p>
                     <p class="tooltip-item" v-if="isOwner" @click="onDelete"><el-icon><Delete /></el-icon> Delete</p>
                     <p class="tooltip-item" @click="copyLinkShare"><el-icon><Share /></el-icon> Share</p>
-                    <p class="tooltip-item" @click="() => {showDialogCloseGoal = true}"><el-icon><Lock /></el-icon> Close goal</p>
+                    <p class="tooltip-item" v-if="isOwner" @click="() => {showDialogCloseGoal = true}"><el-icon><Lock /></el-icon> Close goal</p>
                     </template>
                     <el-icon><More /></el-icon>
                 </el-tooltip>

@@ -475,7 +475,7 @@ const selectStatus = (index: StatusObjectives) => {
 .header {
     text-align: center;
     font-weight: bold; 
-    font-size: 1.5em;
+    font-size: 22px;  
 }
 .objective-form{
     display: flex;

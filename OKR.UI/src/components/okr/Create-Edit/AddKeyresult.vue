@@ -2,7 +2,7 @@
   <div class="keyresult-form">
     <!-- <div class="header">New Key Result</div> -->
      <div class="header">
-      <h1>{{ props.isEdit ? 'Edit key result' : 'new key result' }}</h1>
+      <div class="header">{{ props.isEdit ? 'Edit key result' : 'New key result' }}</div>
       <el-button type="danger" :icon="Delete" circle v-if="props.isEdit" @click="onDeleteKeyResult" />
      </div>
      
@@ -205,6 +205,11 @@ const selectStatus = (index: StatusObjectives) => {
 }
 </script>
 <style scope>
+.header {
+    text-align: center;
+    font-weight: bold; 
+    font-size: 22px;
+}
 .form-item{
   font-weight: bold;
   display: flex;
