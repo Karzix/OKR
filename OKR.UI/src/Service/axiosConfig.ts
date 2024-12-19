@@ -1,4 +1,5 @@
 import { UserModel } from "@/Models/UserModel";
+import router from "@/router";
 import axios from "axios";
 import Cookies from 'js-cookie';
 export const baseAPIUrl =  "http://103.209.34.217:8080/";
@@ -39,11 +40,11 @@ axiosInstance.interceptors.response.use(response => response, async error => {
         var user = new UserModel();
         user.token = Cookies.get('accessToken')?.toString();
         user.refreshToken = Cookies.get('refreshToken')?.toString();
-        const response = await axios.post("http://103.209.34.217:8080/refresh",{"refreshToken" :user.refreshToken });
+        const response = await axios.post(baseAPIUrl +"refresh",{"refreshToken" :user.refreshToken });
   
         if (response.status === 200) {
-            Cookies.set('accessToken',  response.data.data.token ?? "", { expires: undefined });
-            Cookies.set('refreshToken', response.data.data.refreshToken ?? "", { expires: undefined });
+            Cookies.set('accessToken',  response.data.accessToken ?? "", { expires: undefined });
+            Cookies.set('refreshToken', response.data.refreshToken ?? "", { expires: undefined });
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
             return axiosInstance(originalRequest);
         }
@@ -56,7 +57,7 @@ axiosInstance.interceptors.response.use(response => response, async error => {
             var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
             document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
           }
-          window.location.reload();
+          router.push("/login");
         }
     }
     return Promise.reject(error);

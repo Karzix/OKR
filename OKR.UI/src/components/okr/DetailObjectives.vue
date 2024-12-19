@@ -69,7 +69,7 @@
         <CreateEditObjectives :objectives="objectives" :is-edit="true" @update-data="refreshObjectives"></CreateEditObjectives>
     </el-dialog>   
     <el-dialog v-model="showDialogCloseGoal" title="Close goal">
-        <CloseGoal :objectivesId="objectives.id" @close="showDialogCloseGoal = false"/>
+        <CloseGoal :objectivesId="objectives.id ?? ''" :current-status="objectives.statusClose ?? 0" @close="(status) => {showDialogCloseGoal = false; objectives.statusClose = status}"/>
     </el-dialog>
 </template>
 <script setup lang="ts">
@@ -290,7 +290,12 @@ onBeforeMount(() => {
     font-weight: bold;
 }
 .objective-status >.label{
-    font-weight: bold;
+    /* font-weight: bold; */
+    color: black;
+}
+.label{
+    /* font-weight: bold; */
+    color: black;
 }
 .objective-status{
     display: flex; 

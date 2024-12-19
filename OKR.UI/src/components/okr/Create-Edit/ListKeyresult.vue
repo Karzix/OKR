@@ -61,4 +61,7 @@ const props = defineProps<{
   justify-content: space-between;
   margin-top: 10px;
 }
+.keyresult-title{
+  color: black;
+}
 </style>

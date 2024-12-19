@@ -41,8 +41,8 @@
         </div>
         <div class="right">
             <div class="right-item">
-                <p class="label">Created: </p>
-                <p class="value">{{ formatDate(keyresult.createdOn) }}</p>
+                <p class="label">Created: {{ formatDate(keyresult.createdOn) }}</p>
+                <!-- <p class="value">{{ formatDate(keyresult.createdOn) }}</p> -->
             </div>
             <div class="right-item">
                 <p class="label">Start date: {{ formatDate(keyresult.startDay) }}</p>
@@ -241,7 +241,11 @@ const isTeamleadOrOwner = () : boolean => {
     font-weight: bold;
 }
 .keyresult-status >.label{
-    font-weight: bold;
+    /* font-weight: bold; */
+}
+.label{
+    /* font-weight: bold; */
+    color: black;
 }
 .keyresult-status{
     display: flex; 

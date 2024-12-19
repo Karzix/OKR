@@ -5,7 +5,7 @@
     >
     <div class="comment" v-for="(item, index) in listEvaluateTarget" :key="item.id">
       <p class="comment-header">
-        <strong>{{ item.createBy }}</strong> -
+        {{ item.createBy }} -
         <span class="timestamp">{{ item.createOn ? formatDate_dd_mm_yyyy_hh_mm(item.createOn) : '' }}</span>
       </p>
       <!-- Chỉ hiển thị ô input nếu isEdit của item là true -->

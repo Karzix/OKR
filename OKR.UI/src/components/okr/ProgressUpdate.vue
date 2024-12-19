@@ -14,7 +14,7 @@
             <strong>{{ item.newPoint == 1 ? 'Completed' : 'not completed' }}</strong>
           </div>
           <div class="content">
-            <p>Date: <strong>{{ formatDate_dd_mm_yyyy_hh_mm(item.createOn) }}</strong></p>
+            <p>Date: {{ formatDate_dd_mm_yyyy_hh_mm(item.createOn) }}</p>
             <p>{{ item.note }}</p>
           </div>
         </el-card>

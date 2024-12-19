@@ -29,16 +29,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { ObjectivesStatusClose } from "@/Models/Enum/ObjectivesStatusClose";
 import { axiosInstance } from "@/Service/axiosConfig";
 import { ElMessage } from "element-plus";
 
 const props = defineProps<{
-    objectivesId: string
+    objectivesId: string,
+    currentStatus: ObjectivesStatusClose
 }>();
 const emit = defineEmits<{
-    (e: "close"): void;
+    (e: "close", status: ObjectivesStatusClose): void;
 }>();
 const selectedOutcome = ref<ObjectivesStatusClose | null>(null); // Giá trị kiểu Enum
 
@@ -51,7 +52,7 @@ const handleSave = () => {
         type: "success",
         message: "Success",
       })
-      emit("close");
+      emit("close", selectedOutcome.value as ObjectivesStatusClose);
     }
     else{
       ElMessage({
@@ -61,6 +62,9 @@ const handleSave = () => {
     }
   })
 };
+onMounted(() => {
+  selectedOutcome.value = props.currentStatus
+})
 </script>
 <style scoped>
 .el-radio {
